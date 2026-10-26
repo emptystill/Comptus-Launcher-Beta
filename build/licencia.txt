@@ -1,0 +1,12 @@
+﻿Comptus (versión beta) - Aviso de uso
+
+Comptus es un lanzador de juegos de uso personal. Reúne en una sola ventana tus juegos de Steam, Epic Games y los que tengas en tu equipo.
+
+1. Tus datos se guardan solo en tu equipo, en %APPDATA%\mi-lanzador-de-juegos. Comptus no los envía a ningún servidor propio.
+2. Para mostrar tu biblioteca, logros y portadas, Comptus se conecta con servicios de terceros (Steam, Epic Games, SteamGridDB, RAWG y similares) usando las cuentas o claves que tú configures. Esas conexiones se rigen por las condiciones de cada servicio.
+3. La sesión de Epic Games se guarda cifrada con la protección de tu propio usuario de Windows. Puedes cerrarla cuando quieras desde Configuración.
+4. Comptus es un proyecto independiente y no está afiliado a Valve, Epic Games ni a ninguna otra tienda. Los nombres e imágenes de los juegos pertenecen a sus dueños.
+5. Al ser una versión beta, el programa se ofrece tal cual, sin garantía de ningún tipo. Haz copia de tus datos si son importantes.
+6. Desinstalar Comptus no borra tus datos. Si quieres eliminarlos, borra la carpeta indicada en el punto 1.
+
+Tipografía Audiowide, licencia SIL Open Font License.

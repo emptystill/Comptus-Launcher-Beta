@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Comptus</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
+<style>
+@font-face { font-family: 'Audiowide'; src: url('fonts/audiowide.woff2') format('woff2'); }
+:root { --a: #7c83ff; --b: color-mix(in srgb, var(--a), white 28%); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; user-select: none; -webkit-app-region: drag; }
+.card { position: absolute; inset: 0; border-radius: 22px; background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--a) 22%, #0f1115) 0%, #0f1115 70%); border: 1px solid color-mix(in srgb, var(--a) 35%, #20232d); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.logo { width: 64px; height: 64px; color: var(--a); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; animation: pulse 1.6s ease-in-out infinite; filter: drop-shadow(0 0 14px color-mix(in srgb, var(--a) 60%, transparent)); }
+.name { font-family: 'Audiowide', 'Segoe UI', sans-serif; font-size: 40px; letter-spacing: .08em; line-height: 1; background: linear-gradient(90deg, var(--a), var(--b)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bar { width: 180px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 8px; }
+.bar i { display: block; width: 40%; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--a), var(--b)); animation: slide 1.2s ease-in-out infinite; }
+.ver { position: absolute; bottom: 12px; font: 11px 'Segoe UI', sans-serif; color: rgba(255,255,255,.35); }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes slide { 0% { transform: translateX(-110%); } 100% { transform: translateX(280%); } }
+@media (prefers-reduced-motion: reduce) { .logo, .bar i { animation: none; } }
+</style></head>
+<body><div class="card">
+<svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><path d="M17.3 5H6.7a4 4 0 0 0-3.9 3.2l-1.7 8A3 3 0 0 0 4 20c1 0 1.6-.6 2.2-1.4L8 16h8l1.8 2.6c.6.8 1.2 1.4 2.2 1.4a3 3 0 0 0 2.9-3.8l-1.7-8A4 4 0 0 0 17.3 5z"/></svg>
+<div class="name">Comptus</div>
+<div class="bar"><i></i></div>
+<div class="ver" id="v"></div>
+</div>
+<script src="splash.js"></script></body></html>

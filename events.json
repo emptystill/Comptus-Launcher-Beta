@@ -1,0 +1,9 @@
+{
+  "updated": "2026-10-22",
+  "note": "Fechas aproximadas tomadas de calendarios públicos de terceros; confirma siempre en la tienda.",
+  "events": [
+    { "id": "steam-nextfest-2026-10", "name": "Steam Next Fest (octubre)", "store": "steam", "kind": "fest", "start": "2026-10-19T17:00:00Z", "end": "2026-10-26T17:00:00Z", "url": "https://store.steampowered.com/sale/nextfest", "desc": "Demos gratis de juegos que están por salir." },
+    { "id": "steam-screamfest-2026", "name": "Steam Scream Fest", "store": "steam", "kind": "fest", "start": "2026-10-26T17:00:00Z", "end": "2026-11-02T18:00:00Z", "url": "https://store.steampowered.com/specials", "desc": "Terror y Halloween: ofertas y demos." },
+    { "id": "steam-winter-2026", "name": "Rebajas de invierno de Steam", "store": "steam", "kind": "sale", "start": "2026-12-17T18:00:00Z", "end": "2027-01-04T18:00:00Z", "url": "https://store.steampowered.com/specials", "desc": "La mayor rebaja del año en Steam." }
+  ]
+}

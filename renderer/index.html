@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' https: file: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; media-src 'self' blob: file: https://*.steamstatic.com; connect-src 'self' https://*.steamstatic.com; worker-src 'self' blob:" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comptus</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <h1 class="brand"><i data-ic="gamepad"></i> <span class="brand-name">Comptus</span></h1>
+    <nav id="filters">
+      <button class="filter active" data-filter="all"><i data-ic="gamepad"></i> Página principal <span class="count" data-count="all"></span></button>
+      <button class="filter" data-filter="favorites"><i data-ic="star"></i> Favoritos <span class="count" data-count="favorites"></span></button>
+      <button class="filter" data-filter="recent"><i data-ic="clock"></i> Recientes <span class="count" data-count="recent"></span></button>
+      <button class="filter" data-filter="wish"><i data-ic="heart"></i> Deseados <span class="count" data-count="wish"></span></button>
+      <button class="filter" data-filter="free"><i data-ic="gift"></i> Gratis <span class="count" data-count="free"></span></button>
+      <button class="filter" data-filter="events"><i data-ic="calendar"></i> Eventos <span class="count" data-count="events"></span></button>
+      <button class="filter" data-filter="hidden"><i data-ic="eyeOff"></i> Ocultos <span class="count" data-count="hidden"></span></button>
+      <div class="nav-title collapsible" data-sec="sources" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span>Bibliotecas</div>
+      <div id="sourceFilters"></div>
+      <div class="nav-title collapsible" data-sec="colls" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span><span class="nav-link" id="collsLink" title="Ver todas las colecciones">Colecciones</span> <button id="newColl" class="mini" title="Nueva colección"><i data-ic="plus"></i></button></div>
+      <div id="collList"></div>
+    </nav>
+    <div class="nav-title list-title collapsible" data-sec="games" title="Mostrar u ocultar esta sección"><span><span class="sec-chev"><i data-ic="chevD"></i></span>Juegos</span> <span class="count" id="listCount"></span></div>
+    <div id="gameList" class="game-list"></div>
+    <button id="openTheme"><i data-ic="settings"></i> Configuración</button>
+    <button id="addLocal" class="primary">＋ Agregar juego local</button>
+  </aside>
+
+  <main>
+    <div id="bgLayer" class="bg-layer"></div>
+    <header class="toolbar">
+      <div id="searchBox" class="search-box">
+        <button id="searchBtn" class="icon-btn" title="Buscar juego (Ctrl + F)"><i data-ic="search"></i></button>
+        <input id="search" type="search" placeholder="Buscar juego…" autocomplete="off" />
+      </div>
+      <select id="sort" class="hidden" title="Ordenar por">
+        <option value="name">Nombre (A–Z)</option>
+        <option value="nameDesc">Nombre (Z–A)</option>
+        <option value="lastPlayed">Jugados recientemente</option>
+        <option value="playTime">Más tiempo jugado</option>
+        <option value="diskSize">Más espacio en disco</option>
+        <option value="releaseDate">Fecha de lanzamiento (más nuevos)</option>
+        <option value="releaseOld">Fecha de lanzamiento (más antiguos)</option>
+        <option value="metacritic">Mejor puntuación (Metacritic)</option>
+        <option value="achievements">Más logros conseguidos</option>
+      </select>
+<button id="filterBtn" class="icon-btn" title="Filtrar y ordenar"><i data-ic="filter"></i><span id="filterCount" class="fbadge hidden"></span></button>
+      <button id="couchBtn" class="icon-btn" title="Modo consola (pantalla completa para televisor y mando)"><i data-ic="monitor"></i></button>
+      <button id="diceBtn" class="icon-btn" title="¿Qué juego hoy?"><i data-ic="dice"></i></button>
+      <button id="statsBtn" class="icon-btn" title="Estadísticas"><i data-ic="chart"></i></button>
+      <input id="sizeQuick" type="range" min="90" max="480" step="10" title="Tamaño de las portadas (también Ctrl + rueda del ratón)" />
+      <button id="onlyInstalled" class="icon-btn on" title="Solo juegos instalados (los locales siempre se ven): activado"><i data-ic="hdd"></i></button>
+      <button id="selectBtn" class="icon-btn" title="Seleccionar varios juegos para añadirlos a una colección (también Ctrl + clic)"><i data-ic="checkSquare"></i></button>
+      <button id="refresh" class="icon-btn" title="Volver a escanear las bibliotecas"><i data-ic="refresh"></i></button>
+    </header>
+    <div id="pageTitle" class="page-title hidden"></div>
+    <section id="grid" class="grid"></section>
+    <div id="empty" class="empty hidden"></div>
+    <section id="detail" class="detail hidden"></section>
+    <section id="statsPage" class="stats-page hidden"></section>
+    <section id="freePage" class="stats-page hidden"></section>
+    <section id="wishPage" class="stats-page hidden"></section>
+    <section id="eventsPage" class="stats-page hidden"></section>
+  </main>
+
+  <aside id="filterSide" class="filter-side" aria-hidden="true"><div class="filter-inner"><div class="fhead"></div><div class="fbody"></div></div></aside>
+
+  <div id="mediaModal" class="modal hidden">
+    <div class="modal-box" style="max-width:520px">
+      <h3>Carpeta para tus imágenes</h3>
+      <p class="hint">Comptus puede crear una carpeta <b>«Comptus Media»</b> con subcarpetas para Portadas, Banners, Logos, Iconos, Collections Banners, Themes Wallpaper, Video - Trailers y Comptus Copias de seguridad. Todo lo que elijas se guarda ahí y puedes soltar tus propios archivos con el nombre del juego.</p>
+      <p class="hint">Se creará en: <b id="mediaSuggest"></b></p>
+      <div class="modal-actions">
+        <button type="button" id="mediaNo" class="ghost">Ahora no</button>
+        <button type="button" id="mediaPick">Elegir otra ubicación…</button>
+        <button type="button" id="mediaYes" class="primary">Crear aquí</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="themeModal" class="modal hidden">
+    <div class="modal-box settings">
+      <h2><i data-ic="settings"></i> Configuración</h2>
+      <div class="settings-body">
+        <nav class="settings-nav"><button type="button" data-tab="libs"><i data-ic="gamepad"></i> Bibliotecas</button><button type="button" data-tab="look"><i data-ic="palette"></i> Apariencia</button><button type="button" data-tab="bg"><i data-ic="image"></i> Fondo</button><button type="button" data-tab="info"><i data-ic="globe"></i> Información</button><button type="button" data-tab="sgdb"><i data-ic="image"></i> SteamGridDB</button><button type="button" data-tab="steam"><i data-ic="trophy"></i> Steam</button><button type="button" data-tab="epic"><i data-ic="gamepad"></i> Epic Games</button><button type="button" data-tab="itch"><i data-ic="gamepad"></i> itch.io</button><button type="button" data-tab="xbox"><i data-ic="gamepad"></i> Xbox</button><button type="button" data-tab="overlay"><i data-ic="camera"></i> Overlay y capturas</button><button type="button" data-tab="backup"><i data-ic="download"></i> Sistema</button><button type="button" data-tab="about"><i data-ic="info"></i> Acerca de</button></nav>
+        <div class="settings-pages">
+      <section class="settings-page" data-page="libs">
+      <h3 class="page-h">Bibliotecas</h3>
+      <div id="libraries" class="libs"></div>
+      <label class="lib"><input type="checkbox" id="ubiVia" /><span>Incluir los juegos de Ubisoft Connect comprados en otras tiendas (Steam…)</span></label>
+      <label class="lib"><input type="checkbox" id="mergeDupes" /><span>Unir los juegos repetidos de varias bibliotecas en una sola ficha</span></label>
+      <p class="hint">Si un juego está en Steam y en Epic (o es un juego local que también tienes en una tienda), se muestra una sola vez en la página principal, favoritos, recientes y colecciones. En su página eliges con cuál jugar. En cada biblioteca se sigue viendo lo suyo.</p>
+      <p class="hint">Solo se escanean las bibliotecas activas. Xbox usa PowerShell y puede tardar unos segundos, por eso viene desactivada.</p>
+      <div class="row-btns"><button type="button" id="diagUbi" class="ghost"><i data-ic="info"></i> Diagnóstico de Ubisoft</button><button type="button" id="diagDupes" class="ghost"><i data-ic="link"></i> Ver juegos repetidos</button></div>
+      <p class="hint" id="diagMsg">Los dos botones copian un informe al portapapeles: el de Ubisoft muestra qué fuentes se revisaron y qué se encontró; el de repetidos, qué juegos se unieron y cuáles se parecen sin estar unidos.</p>
+      </section>
+      <section class="settings-page hidden" data-page="look">
+      <h3 class="page-h">Temas</h3>
+      <div id="presets" class="presets"></div>
+      <div class="section-label">Temas con ilustración</div>
+      <div id="imgPresets" class="presets"></div>
+      
+      <div class="section-label">Mis temas</div>
+      <div id="myThemes" class="presets"></div>
+      <p id="myThemesEmpty" class="hint">Ajusta los colores de abajo (y elige un fondo en la pestaña «Fondo») y guárdalo todo con un nombre para volver a usarlo cuando quieras.</p>
+      <div class="row"><button type="button" id="importThemes" class="small ghost">Importar tema…</button><button type="button" id="exportThemes" class="small ghost">Exportar mis temas…</button></div>
+      <div class="row my-theme-save">
+        <input type="text" id="themeName" maxlength="30" placeholder="Nombre del tema…" />
+        <button type="button" id="saveMyTheme" class="small"><i data-ic="plus"></i> Guardar tema actual</button>
+      </div>
+      <label class="lib"><input type="checkbox" id="themeWithBg" checked /><span>Incluir el fondo actual (imagen o vídeo, oscurecido y desenfoque)</span></label>
+      <div class="section-label">Colores</div>
+      <div class="colors">
+        <label>Fondo<input type="color" id="cBg" /></label>
+        <label>Paneles<input type="color" id="cPanel" /></label>
+        <label>Texto<input type="color" id="cText" /></label>
+        <label>Acento 1<input type="color" id="cAccent" /></label>
+        <label>Acento 2<input type="color" id="cAccent2" /></label>
+      </div>
+      
+      <div class="section-label">Tema automático</div>
+      <label>Cambiar de tema solo<select id="autoMode"><option value="off">No</option><option value="time">Según la hora (día / noche)</option><option value="system">Según el modo claro u oscuro de Windows</option></select></label>
+      <div id="autoThemeOpts" class="hidden">
+        <label>Tema de día (o modo claro)<select id="autoDay"></select></label>
+        <label>Tema de noche (o modo oscuro)<select id="autoNight"></select></label>
+        <div id="autoHours" class="row"><label>El día empieza<input type="time" id="autoFrom" /></label><label>La noche empieza<input type="time" id="autoTo" /></label></div>
+        <p class="hint">Al cambiar de periodo se aplica el tema elegido. Si pones otro tema a mano, se respeta hasta el siguiente cambio. «La noche empieza» es la hora en que termina el día.</p>
+      </div>
+      <label class="lib"><input type="checkbox" id="transitions" /><span>Transiciones suaves al cambiar de apartado (prueba)</span></label>
+      <label>Tamaño de las portadas<input type="range" id="cardSize" min="90" max="480" step="10" /></label>
+      <label class="field">Forma de las portadas
+        <select id="cardShape">
+          <option value="tall">Vertical (póster)</option>
+          <option value="wide">Horizontal (usa el banner del juego)</option>
+        </select>
+      </label>
+      <label class="lib"><input type="checkbox" id="wideLogos" checked /><span>En las portadas horizontales, mostrar el logo del juego en el centro</span></label>
+      <label class="lib"><input type="checkbox" id="hideNames" /><span>Ocultar los nombres de los juegos (solo se ven las portadas) · recomendable para portadas horizontales</span></label>
+            <label class="field">Portadas animadas (webp, gif)
+        <select id="animMode">
+          <option value="hover">Moverse solo al pasar el ratón (recomendado)</option>
+          <option value="few">Moverse unas pocas a la vez</option>
+          <option value="all">Moverse todas siempre (puede ir lento)</option>
+        </select>
+      </label>
+</section>
+      <section class="settings-page hidden" data-page="bg">
+      <h3 class="page-h">Fondo de la biblioteca</h3>
+      <div class="bg-row">
+        <div id="bgThumb" class="bg-thumb">Sin fondo</div>
+        <div class="bg-btns">
+          <button type="button" id="pickBg">Elegir imagen o vídeo…</button>
+          <button type="button" id="adaptBg" class="ghost">Adaptar colores</button>
+          <button type="button" id="collBgDiag" class="ghost" title="Copia al portapapeles lo que Comptus ve del fondo de la colección que tienes abierta">Diagnóstico del fondo</button>
+          <button type="button" id="clearBg" class="ghost">Quitar fondo</button>
+        </div>
+      </div>
+      <label>Oscurecer<input type="range" id="bgDim" min="0" max="90" step="5" /></label>
+      <label>Desenfoque<input type="range" id="bgBlur" min="0" max="20" step="1" /></label>
+      <label class="lib"><input type="checkbox" id="autoCollBg" /><span>Las colecciones sin fondo propio usan el banner de su juego más jugado</span></label>
+      <label>Transparencia de los recuadros <span id="boxTranspVal" class="hint"></span><input type="range" id="boxTransp" min="0" max="70" step="5" /></label>
+      <label class="lib"><input type="checkbox" id="autoBgColors" /><span>Al elegir un fondo nuevo, adaptar los colores del tema a él (después puedes guardarlo en «Mis temas»)</span></label>
+      <label class="lib"><input type="checkbox" id="gameBg" /><span>En la página de cada juego, usar su banner como fondo (muy oscurecido)</span></label>
+      <div class="section-label">Vídeo de fondo: ahorro de recursos</div>
+      <label class="lib"><input type="checkbox" id="vidPauseBlur" /><span>Pausar el vídeo cuando Comptus no es la ventana activa</span></label>
+      <label class="lib"><input type="checkbox" id="vidPauseBattery" /><span>Pausar el vídeo cuando el equipo funciona con batería</span></label>
+      <label class="lib"><input type="checkbox" id="vidNoBlur" /><span>No desenfocar el vídeo (el desenfoque gasta mucha gráfica; el oscurecido se mantiene)</span></label>
+      <p class="hint">Un vídeo de fondo se reproduce en bucle y sin sonido, y se pausa mientras juegas o con la ventana oculta. Formatos: MP4 (H.264), WebM, M4V, MOV y OGV. Para que vaya fluido usa 1080p y 30 fps; el desenfoque gasta más gráfica con vídeo.</p>
+      </section>
+      <section class="settings-page hidden" data-page="info">
+      <h3 class="page-h">Información de los juegos</h3>
+      <label class="lib"><input type="checkbox" id="autoBackground" /><span>Completar en segundo plano la información y los logros de todos los juegos al abrir el lanzador</span></label>
+      <label class="lib"><input type="checkbox" id="autoInfo" /><span>Descargar la información de cada juego al abrir su página</span></label>
+      <p class="hint">Se consulta la tienda de Steam enviando solo el nombre (o el número) del juego. Si lo desactivas, puedes buscarla a mano en cada juego.</p>
+      <label class="lib"><input type="checkbox" id="autoTrailer" /><span>Reproducir el tráiler del juego al abrir su página (sin sonido)</span></label>
+      <label>Clave de RAWG (opcional, para juegos que no están en Steam)<input id="rawgKey" type="password" placeholder="Pega aquí tu clave" autocomplete="off" spellcheck="false" /></label>
+      <p class="hint">RAWG es una base de datos de juegos con clave gratuita (rawg.io/apidocs). Solo se usa si Steam no encuentra el juego. La información de RAWG viene en inglés.</p>
+      <label class="lib"><input type="checkbox" id="autoTranslate" /><span>Traducir al español las descripciones que vienen en inglés</span></label>
+      <label>Clave de DeepL (opcional, mejora la traducción)<input id="deeplKey" type="password" placeholder="Pega aquí tu clave gratuita de DeepL" autocomplete="off" spellcheck="false" /></label>
+      <p class="hint">Sin clave se usa MyMemory, un traductor gratuito con límite diario. Con una clave del plan gratuito de DeepL la calidad es mejor y hay más cuota. Solo se envía el texto de la descripción al traductor.</p>
+      <button type="button" id="batchBtn"><i data-ic="download"></i> Descargar información e imágenes de todos los juegos</button>
+      <p class="hint">Busca la información, la portada y el banner de los juegos que aún no los tienen. Úsalo cuando ya hayas puesto bien los nombres. Lo que ya personalizaste no se toca.</p>
+      </section>
+      <section class="settings-page hidden" data-page="sgdb">
+      <h3 class="page-h">SteamGridDB: imágenes que faltan</h3>
+      <label>Clave de SteamGridDB<input id="sgdbKey" type="password" placeholder="Pega aquí tu clave" autocomplete="off" spellcheck="false" /></label>
+      <p class="hint">Es gratuita: entra en steamgriddb.com con tu cuenta, abre tu perfil > Preferences > API y copia la clave. Solo se envía a SteamGridDB.</p>
+      <div id="sgdbKeyMsg" class="hint"></div>
+      <label class="lib"><input type="checkbox" id="sgdbCover" checked /><span>Portadas (vertical, 600×900)</span></label>
+      <label class="lib"><input type="checkbox" id="sgdbBanner" checked /><span>Banners (heroes, ~1920×620)</span></label>
+      <label class="lib"><input type="checkbox" id="sgdbLogo" checked /><span>Logos</span></label>
+      <label class="lib"><input type="checkbox" id="sgdbIcon" /><span>Iconos</span></label>
+      <p class="hint"><strong>Sustituir también las automáticas de la tienda</strong> (las que trae Steam, Epic, etc.): solo cambia las que no elegiste tú, y solo si SteamGridDB tiene una.</p>
+      <label class="lib"><input type="checkbox" id="sgdbRepCover" /><span>Cambiar las portadas automáticas</span></label>
+      <label class="lib"><input type="checkbox" id="sgdbRepBanner" /><span>Cambiar los banners automáticos</span></label>
+      <label class="lib"><input type="checkbox" id="sgdbRepLogo" /><span>Cambiar los logos automáticos</span></label>
+      <label class="lib"><input type="checkbox" id="sgdbAuto" checked /><span>Rellenar solo, en segundo plano, lo que falte al abrir Comptus</span></label>
+      <button type="button" id="sgdbBtn"><i data-ic="download"></i> Rellenar ahora lo que falte</button>
+      <button type="button" id="sgdbStop" class="ghost hidden">Cancelar</button>
+      <div id="sgdbStatus" class="hint"></div>
+      <p class="hint">Por defecto solo se rellenan las imágenes que el juego no tiene (con las casillas de arriba también se sustituyen las automáticas de la tienda): nunca se cambia una que ya elegiste ni se pisa un archivo de tu carpeta Comptus Media. Se descarga la imagen estática mejor valorada por la comunidad y se guarda en tu carpeta con el nombre del juego (así puedes cambiarla cuando quieras). Para los juegos que no son de Steam solo se usa si el nombre coincide exactamente; los que no se encuentran se reintentan a las 2 semanas. Las imágenes son de la comunidad de SteamGridDB: respeta a sus autores.</p>
+      </section>
+      <section class="settings-page hidden" data-page="steam">
+      <h3 class="page-h">Steam: logros y biblioteca</h3>
+      <label>Clave de Steam Web API<input id="steamKey" type="password" placeholder="Pega aquí tu clave" autocomplete="off" spellcheck="false" /></label>
+      <p class="hint">Es gratuita: steamcommunity.com/dev/apikey (te pide un dominio, escribe cualquiera, por ejemplo «localhost»). Tu perfil de Steam debe tener «Detalles del juego» en público. La clave solo se envía a Steam.</p>
+      <label>Tu SteamID de 17 dígitos (opcional)<input id="steamId" placeholder="Se detecta solo; escríbelo si falla" autocomplete="off" spellcheck="false" inputmode="numeric" /></label>
+      <label class="lib"><input type="checkbox" id="showOwned" /><span>Mostrar también los juegos que tengo pero no están instalados</span></label>
+      <button type="button" id="syncOwned"><i data-ic="refresh"></i> Sincronizar mis juegos de Steam</button>
+      <p class="hint" id="syncOwnedMsg">Usa la misma clave y SteamID de arriba. Se actualiza solo al abrir el lanzador (cada 12 horas). Los juegos sin instalar tienen el botón «Instalar», que abre la instalación en Steam.</p>
+      </section>
+      <section class="settings-page hidden" data-page="itch">
+      <h3 class="page-h">itch.io: tu biblioteca</h3>
+      <label>Clave de la API de itch.io<input id="itchKey" type="password" placeholder="Pega aquí tu clave" autocomplete="off" spellcheck="false" /></label>
+      <p class="hint">Es gratuita: en itch.io > Settings > API keys > «Generate new API key». Con ella Comptus lista los juegos que compraste o reclamaste en itch.io aunque no estén instalados (el botón «Instalar» abre su página). La clave solo se envía a itch.io. Solo aparecen juegos para Windows o web, sin herramientas ni bandas sonoras.</p>
+      <button type="button" id="itchSync"><i data-ic="refresh"></i> Sincronizar mis juegos de itch.io</button>
+      <p class="hint" id="itchMsg"></p>
+      </section>
+      <section class="settings-page hidden" data-page="epic">
+      <h3 class="page-h">Epic Games: tu biblioteca</h3>
+      <p class="hint" id="epicState">Sin sesión iniciada.</p>
+      <div class="row-btns">
+        <button type="button" id="epicLogin" class="primary"><i data-ic="link"></i> Iniciar sesión en Epic</button>
+        <button type="button" id="epicSync" class="hidden"><i data-ic="refresh"></i> Sincronizar</button>
+        <button type="button" id="epicLogout" class="ghost hidden">Cerrar sesión</button>
+      </div>
+      <p class="hint">Se abre la página oficial de Epic: tu contraseña no pasa por el lanzador, solo se guarda un permiso renovable (cifrado con Windows) para leer qué juegos tienes. Verás tus juegos sin instalar con el botón «Instalar», que abre la instalación en Epic Games Launcher. Se actualiza solo al abrir el lanzador (cada 12 horas).</p>
+      <details class="epic-manual"><summary>¿La ventana no funciona? Usar mi navegador</summary>
+        <p class="hint">1) Pulsa «Abrir en el navegador» e inicia sesión. 2) Epic mostrará un texto con <code>authorizationCode</code>: cópialo entero y pégalo aquí.</p>
+        <button type="button" id="epicOpenBrowser" class="ghost">Abrir en el navegador</button>
+        <label>Código de Epic<input id="epicCode" placeholder='{"authorizationCode":"…"}' autocomplete="off" spellcheck="false" /></label>
+        <button type="button" id="epicCodeGo">Usar este código</button>
+      </details>
+      <p class="hint" id="epicMsg"></p>
+      </section>
+      <section class="settings-page hidden" data-page="xbox">
+      <h3 class="page-h">Xbox: tu biblioteca y logros</h3>
+      <p class="hint" id="xboxState">Sin sesión iniciada.</p>
+      <div class="row-btns">
+        <button type="button" id="xboxLogin" class="primary"><i data-ic="link"></i> Iniciar sesión en Xbox</button>
+        <button type="button" id="xboxSync" class="hidden"><i data-ic="refresh"></i> Sincronizar</button>
+        <button type="button" id="xboxLogout" class="ghost hidden">Cerrar sesión</button>
+        <button type="button" id="xboxCancel" class="ghost hidden">Cancelar</button>
+      </div>
+      <div id="xboxCodeBox" class="xbox-code hidden">
+        <div class="hint">Se abrió la página de Microsoft. Escribe este código allí:</div>
+        <div id="xboxCode" class="xbox-code-big"></div>
+      </div>
+      <p class="hint" id="xboxMsg"></p>
+      <p class="hint">Pulsa «Iniciar sesión»: se abre microsoft.com/link, escribes el código que muestra Comptus y aceptas con tu cuenta de Microsoft. Verás tus juegos de PC del historial de Xbox aunque no estén instalados, y sus logros. Tu contraseña no pasa por Comptus: solo se guarda un permiso renovable, cifrado con Windows. Se actualiza solo al abrir el lanzador (cada 12 horas).</p>
+      <p class="hint">Importante: usa el inicio de sesión de la app de Xbox, no uno propio de Comptus. Es lo que hacen otros programas, pero Microsoft podría cambiarlo en cualquier momento.</p>
+      </section>
+      <section class="settings-page hidden" data-page="overlay">
+      <h3 class="page-h">Overlay y capturas</h3>
+      <label class="lib"><input type="checkbox" id="overlayOn" /><span>Activar el overlay y los atajos mientras juegas</span></label>
+      <div class="hk-row"><span>Abrir / cerrar el overlay</span><input id="hkOverlay" readonly /></div>
+      <div class="hk-row"><span>Tomar captura de pantalla</span><input id="hkShot" readonly /></div>
+      <label class="lib"><input type="checkbox" id="ovAny" /><span>Activar los atajos con cualquier programa en primer plano (por si no se reconoce tu juego; bloquea esas teclas fuera del juego)</span></label>
+      <div class="hk-row"><span>Si algo no funciona</span><button type="button" id="ovDiag">Ver diagnóstico</button></div>
+      <pre id="ovDiagOut" class="hidden" style="white-space:pre-wrap;font-size:12px;user-select:text;max-height:240px;overflow:auto"></pre>
+      <div class="hk-row"><span>Abrir el overlay con el mando</span><select id="ovPad"><option value="selstart">Select + Start</option><option value="sela">Select + A</option><option value="l3r3">Las dos palancas (L3 + R3)</option><option value="guide">Botón Guía / Home</option><option value="custom">Personalizado…</option><option value="off">No usar el mando</option></select></div>
+      <div class="hk-row hidden" id="ovPadCustom"><span>Botones del mando</span><button type="button" id="ovPadRec">Asignar</button> <b id="ovPadLbl"></b></div>
+      <p class="hint">Haz clic en un atajo y pulsa la tecla (o combinación) nueva: puede ser una sola tecla, como F9 o Insert; evita letras sueltas, porque dejarían de escribirse mientras juegas. El overlay funciona sobre juegos en ventana o ventana sin bordes. Las capturas se guardan en la página de cada juego.</p>
+      </section>
+      <section class="settings-page hidden" data-page="backup">
+      <h3 class="page-h">Sistema</h3>
+      <div class="section-label">Inicio y bandeja</div>
+      <label class="lib"><input type="checkbox" id="sysStart" /><span>Abrir Comptus al iniciar Windows</span></label>
+      <label class="lib"><input type="checkbox" id="sysHidden" /><span>Al iniciar con Windows, dejarlo en la bandeja (sin abrir la ventana)</span></label>
+      <label class="lib"><input type="checkbox" id="sysSplash" /><span>Mostrar una pantalla de inicio con el nombre de Comptus al abrir</span></label>
+      <label class="lib"><input type="checkbox" id="sysTray" /><span>Al cerrar la ventana, seguir en la bandeja del sistema</span></label>
+      <p class="hint" id="sysMsg">Comptus siempre deja un icono en la bandeja: clic para abrirlo, clic derecho para buscar, abrir un juego reciente o salir.</p>
+      <div class="section-label">Búsqueda rápida</div>
+      <label class="lib"><input type="checkbox" id="sysSearch" /><span>Activar la búsqueda rápida con un atajo en todo Windows</span></label>
+      <div class="hk-row"><span>Abrir la búsqueda rápida</span><input id="hkSearch" readonly /></div>
+      <p class="hint">Escribe el nombre de un juego y pulsa Enter para abrirlo sin entrar a la biblioteca (Ctrl + Enter abre su página). Sin escribir, muestra los últimos que jugaste. Haz clic en el atajo y pulsa la combinación nueva.</p>
+      <div class="section-label">Avisos</div>
+      <label class="lib"><input type="checkbox" id="sysFree" /><span>Avisarme cuando haya juegos gratis nuevos (Epic Games y Steam)</span></label>
+      <label class="lib"><input type="checkbox" id="sysFreeDlc" /><span>Incluir también DLC y contenido extra</span></label>
+      <label class="lib"><input type="checkbox" id="sysWish" /><span>Avisarme cuando un juego de mi lista de deseados baje de precio</span></label>
+      <label class="lib"><input type="checkbox" id="sysEvent" /><span>Avisarme de eventos y rebajas (un día antes y cuando empiezan)</span></label>
+      <p class="hint">Comptus revisa cada pocas horas y muestra una notificación de Windows; al pulsarla abre la sección Gratis. Solo funciona mientras Comptus esté abierto: para recibirlos siempre, activa «Iniciar con Windows» y «Al cerrar, dejar en la bandeja».</p>
+      <div class="section-label">Partidas guardadas</div>
+      <label class="lib"><input type="checkbox" id="saveAuto" /><span>Copiar las partidas guardadas de un juego al cerrarlo</span></label>
+      <label>Copias que se conservan por juego<input type="number" id="saveKeep" min="1" max="30" step="1" style="width:80px" /></label>
+      <div class="row-btns"><button type="button" id="saveDb" class="ghost small"><i data-ic="refresh"></i> Actualizar la base de guardados</button></div>
+      <p class="hint" id="saveDbMsg">Las rutas donde cada juego guarda su progreso vienen de la base de datos comunitaria Ludusavi (se descarga sola cada dos semanas). Las copias van a «Comptus Media > Partidas guardadas». Es una copia local, no toca la nube de ninguna tienda.</p>
+      <div class="section-label">Modo consola</div>
+      <label class="lib"><input type="checkbox" id="couchStart" /><span>Abrir Comptus directamente en modo consola</span></label>
+      <p class="hint">Vista a pantalla completa para televisor y mando. Se activa con el botón de la barra superior, la tecla F10 o el botón Guía (Xbox / PS) del mando; se sale con B o Esc.</p>
+      <div class="section-label">Mando</div>
+      <label class="lib"><input type="checkbox" id="sysPad" /><span>Navegar por Comptus con un mando (gamepad)</span></label>
+      <p class="hint">Cruceta o palanca izquierda: moverte · A: abrir · B: atrás · X: jugar · Y: menú del juego · LB/RB: cambiar de sección · LT/RT o palanca derecha: desplazarte · Start: ajustes · Select: ¿Qué juego hoy? Solo responde mientras Comptus está en primer plano (al abrir un juego deja de actuar). Pulsa un botón del mando para que lo detecte; al mover el ratón o usar el teclado vuelve la vista normal.</p>
+      <div class="section-label">Actualizaciones</div>
+      <label class="lib"><input type="checkbox" id="updAuto" /><span>Buscar actualizaciones automáticamente</span></label>
+      <div class="row-btns">
+        <button type="button" id="updCheck">Buscar ahora</button>
+        <button type="button" id="updDownload" class="primary hidden">Descargar</button>
+        <button type="button" id="updInstall" class="primary hidden">Reiniciar e instalar</button>
+      </div>
+      <p class="hint" id="updMsg"></p>
+      <div class="section-label">Mis imágenes</div>
+      <p class="hint">Comptus guarda aquí una copia de cada imagen que eliges (portadas, banners, logos, iconos y fondos), así no dependes de dónde estén los originales. También puedes soltar tus imágenes directamente en las carpetas <b>Portadas, Banners, Logos e Iconos</b> con el nombre del juego (o su número de Steam, p. ej. <i>1145360.png</i>) y se usan solas, salvo que hayas elegido otra a mano.</p>
+      <div class="row-btns">
+        <button type="button" id="mdOpen" class="primary">Abrir carpeta de imágenes</button>
+        <button type="button" id="mdImport">Traer mis imágenes actuales a esta carpeta</button>
+      </div>
+      <p class="hint">Carpeta actual: <b id="mdDir">…</b></p>
+      <div class="row-btns"><button type="button" id="mdMove" class="ghost">Crear/mover «Comptus Media» a otra ubicación…</button></div>
+      <p class="hint" id="mdMsg"></p>
+      <div class="section-label">Copias de seguridad</div>
+      <p class="hint">Guarda en un archivo tus juegos añadidos a mano, los datos de cada juego (estados, notas, imágenes elegidas, colecciones…) y tus ajustes y temas. Sirve para cambiar de equipo o por si algo falla.</p>
+      <div class="row-btns">
+        <button type="button" id="bkExport" class="primary"><i data-ic="download"></i> Exportar copia…</button>
+        <button type="button" id="bkImport"><i data-ic="upload"></i> Restaurar copia…</button>
+        <button type="button" id="bkFolder" class="ghost">Abrir copias automáticas</button>
+      </div>
+      <p class="hint" id="bkMsg"></p>
+      <p class="hint">Comptus también hace una copia automática al día (guarda las últimas 7) en la carpeta de datos. Antes de restaurar se guarda una copia de lo actual.</p>
+      <p class="hint">No se incluyen las sesiones de Epic y Xbox (se vuelven a iniciar en el equipo nuevo) ni los archivos de la carpeta «Mis imágenes» (la copia solo apunta a ellos): para cambiar de equipo, copia también esa carpeta (botón «Abrir carpeta de imágenes»). El archivo contiene tus claves de Steam/RAWG si las configuraste: no lo compartas.</p>
+      </section>
+      <section class="settings-page hidden" data-page="about">
+      <h3 class="page-h">Acerca de</h3>
+      <p class="hint" id="appVersion"></p>
+      <p class="hint">Tus datos (juegos, ajustes, colecciones y temas) se guardan en la carpeta <b>%APPDATA%\mi-lanzador-de-juegos</b>.</p>
+      <div class="section-label">Rendimiento</div>
+      <p class="hint">Si algo «se frena» al abrir una ficha o cambiar de sección, abre ese juego o sección y luego pulsa este botón: copia un informe con las pausas y las imágenes lentas para poder encontrar la causa.</p>
+      <button type="button" id="perfCopy" class="ghost">Copiar diagnóstico de rendimiento</button>
+      <p class="hint" id="perfMsg"></p>
+      <button type="button" id="resetTheme" class="ghost">Restablecer tema y tamaño de portadas</button>
+      </section>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="closeTheme" class="primary">Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <form id="editForm" class="modal-box">
+      <h2>Editar juego</h2>
+      <label>Nombre<input id="editName" required /></label>
+      <label>Ejecutable<input id="editExe" readonly /></label>
+      <label>Argumentos de lanzamiento (opcional)<input id="editArgs" placeholder="-windowed -novid" /></label>
+      <div class="cover-row">
+        <img id="editCoverPreview" alt="" />
+        <div>
+          <button type="button" id="pickCover">Elegir portada…</button>
+          <button type="button" id="clearCover" class="ghost">Quitar</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="cancelEdit" class="ghost">Cancelar</button>
+        <button type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="selBar" class="sel-bar hidden">
+    <span id="selCount"></span>
+    <button type="button" id="selAll" class="ghost small">Seleccionar todos</button>
+    <button type="button" id="selAdd" class="primary small"><i data-ic="folder"></i> Añadir a colección <i data-ic="chevD"></i></button>
+    <button type="button" id="selRemove" class="ghost small hidden"></button>
+    <button type="button" id="selCancel" class="ghost small">Cancelar</button>
+  </div>
+
+  <div id="diceModal" class="modal hidden">
+    <div class="modal-box" style="width:420px">
+      <h2>¿Qué juego hoy?</h2>
+      <div class="dice-opts">
+        <select id="diceMode"></select>
+        <label class="dice-chk"><input type="checkbox" id="diceSkip" checked /> Sin completados ni abandonados</label>
+      </div>
+      <div id="diceResult" class="dice-result"></div>
+      <div class="modal-actions">
+        <button type="button" id="diceClose" class="ghost">Cerrar</button>
+        <button type="button" id="diceAgain"><i data-ic="dice"></i> Otro</button>
+        <button type="button" id="diceView">Ver ficha</button>
+        <button type="button" id="dicePlay" class="primary"><i data-ic="play"></i> Jugar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="updModal" class="modal hidden">
+    <div class="modal-box">
+      <h2 id="updmTitle">Hay una versión nueva de Comptus</h2>
+      <p id="updmVer" class="hint"></p>
+      <pre id="updmNotes" class="hidden" style="white-space:pre-wrap;font:12px/1.5 inherit;font-family:inherit;color:var(--muted);max-height:180px;overflow:auto;margin:0;user-select:text"></pre>
+      <div id="updmBar" class="hidden" style="height:6px;border-radius:6px;background:rgba(255,255,255,.1);overflow:hidden"><i id="updmFill" style="display:block;height:100%;width:0;background:var(--accent);transition:width .3s"></i></div>
+      <p id="updmMsg" class="hint"></p>
+      <div class="modal-actions">
+        <button type="button" id="updmLater">Más tarde</button>
+        <button type="button" id="updmSkip" class="ghost">Omitir esta versión</button>
+        <button type="button" id="updmGo" class="primary">Actualizar ahora</button>
+      </div>
+    </div>
+  </div>
+  <div id="collNameModal" class="modal hidden">
+    <form id="collNameForm" class="modal-box">
+      <h2 id="collNameTitle">Nueva colección</h2>
+      <label>Nombre<input id="collNameInput" maxlength="40" placeholder="Ej.: Call of Duty" autocomplete="off" required /></label>
+      <div class="section-label">Icono</div>
+      <div class="icon-pick">
+        <span id="collIconPreview" class="coll-ico big"></span>
+        <input id="collIconInput" maxlength="4" placeholder="Escribe o pega un emoji" autocomplete="off" />
+        <button type="button" id="collIconImg">Imagen…</button>
+        <button type="button" id="collIconClear" class="ghost">Quitar</button>
+      </div>
+      <div id="collEmojis" class="emoji-grid"></div>
+      <div class="modal-actions">
+        <button type="button" id="collNameCancel" class="ghost">Cancelar</button>
+        <button type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="collPickModal" class="modal hidden">
+    <form id="collPickForm" class="modal-box">
+      <h2 id="collPickTitle">Añadir a colección</h2>
+      <div id="collPickList" class="coll-pick"></div>
+      <label>Crear una nueva<span class="inline"><input id="collPickNew" maxlength="40" placeholder="Nombre de la colección" autocomplete="off" /><button type="button" id="collPickCreate">Crear y añadir</button></span></label>
+      <div class="modal-actions"><button type="button" id="collPickClose" class="ghost">Cancelar</button></div>
+    </form>
+  </div>
+
+  <div id="infoModal" class="modal hidden">
+    <form id="infoForm" class="modal-box">
+      <h2>Información del juego</h2>
+      <label>Buscar en la tienda de Steam
+        <span class="inline">
+          <input id="infoTerm" placeholder="Nombre, número (appid) o enlace de la tienda" autocomplete="off" />
+          <button type="button" id="infoSearch">Buscar</button>
+        </span>
+      </label>
+      <p class="hint" id="infoHint">Útil si no se encontró el juego o se emparejó con otro.</p>
+      <div class="section-label">Editar a mano</div>
+      <label>Descripción<textarea id="infoDesc" rows="5"></textarea></label>
+      <label>Desarrollador<input id="infoDev" placeholder="Separa varios con comas" /></label>
+      <label>Editor<input id="infoPub" placeholder="Separa varios con comas" /></label>
+      <label>Fecha de lanzamiento<input id="infoDate" /></label>
+      <label>Géneros<input id="infoGenres" placeholder="Acción, Aventura…" /></label>
+      <div class="modal-actions">
+        <button type="button" id="infoClear" class="ghost">Quitar información</button>
+        <button type="button" id="infoCancel" class="ghost">Cancelar</button>
+        <button type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="batchModal" class="modal hidden">
+    <div class="modal-box">
+      <h2>Descargar información</h2>
+      <div id="batchStatus" class="batch-status"></div>
+      <div class="bar"><div id="batchBar" class="bar-fill"></div></div>
+      <div id="batchResult" class="batch-result"></div>
+      <div class="modal-actions">
+        <button type="button" id="batchCancel" class="ghost">Cancelar descarga</button>
+        <button type="button" id="batchClose" class="primary">Ocultar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="icons.js"></script>
+  <script src="ui-icons.js"></script>
+  <script src="palette.js"></script>
+  <script src="theme-art.js"></script>
+  <script src="vendor/hls.min.js"></script>
+  <script src="dupes.js"></script>
+  <script src="stats.js"></script>
+  <script src="random.js"></script>
+  <script src="padicons.js"></script>
+  <script src="gamepad.js"></script>
+  <script src="renderer.js"></script>
+  <script src="deskfx.js"></script>
+  <script src="deskplus.js"></script>
+  <script src="couch.js"></script>
+</body>
+</html>

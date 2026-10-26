@@ -1,0 +1,64 @@
+{
+  "name": "mi-lanzador-de-juegos",
+  "version": "1.84.16",
+  "description": "Comptus: lanzador unificado para juegos de Steam, Epic Games y juegos locales",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable",
+    "dist:sinicono": "electron-builder --win portable -c.win.signAndEditExecutable=false",
+    "dist:instalador": "electron-builder --win nsis",
+    "dist:instalador:sinicono": "electron-builder --win nsis -c.win.signAndEditExecutable=false",
+    "dist:publicar": "electron-builder --win nsis --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.mateo.gamelauncher",
+    "productName": "Comptus",
+    "files": [
+      "**/*",
+      "!test/**"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "shortcutName": "Comptus",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "deleteAppDataOnUninstall": false,
+      "language": "3082",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "uninstallerSidebar": "build/uninstallerSidebar.bmp",
+      "installerHeader": "build/installerHeader.bmp",
+      "license": "build/licencia.txt",
+      "include": "build/installer.nsh",
+      "runAfterFinish": true,
+      "uninstallDisplayName": "Comptus",
+      "displayLanguageSelector": false,
+      "artifactName": "Comptus-Setup-${version}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "emptystill",
+        "repo": "Comptus-Launcher-Beta",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "author": "Mateo"
+}

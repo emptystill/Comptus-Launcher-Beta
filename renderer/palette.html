@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' https: file: data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>Búsqueda rápida</title>
+  <link rel="stylesheet" href="palette.css" />
+</head>
+<body>
+  <div id="box" class="box">
+    <input id="q" type="text" autofocus placeholder="Buscar un juego… (vacío: los últimos que jugaste)" autocomplete="off" spellcheck="false" />
+    <div id="list" class="list" role="listbox"></div>
+    <div id="foot" class="foot"><span><kbd>↑</kbd><kbd>↓</kbd> elegir</span><span><kbd>Enter</kbd> jugar</span><span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> abrir su página</span><span><kbd>Esc</kbd> cerrar</span></div>
+  </div>
+  <script src="quicksearch.js"></script>
+</body>
+</html>

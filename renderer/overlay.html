@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' https: file: data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>Overlay</title>
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="panel" class="panel hidden">
+    <div class="head">
+      <div id="cover" class="cover"></div>
+      <div class="who">
+        <div id="name" class="name">—</div>
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+    <div class="info">
+      <div><span id="iClock">--:--</span><small>Hora</small></div>
+      <div><span id="iSession">—</span><small>Esta sesión</small></div>
+      <div><span id="iTotal">—</span><small>Total jugado</small></div>
+      <div id="iBatBox" class="hidden"><span id="iBat">—</span><small>Batería</small></div>
+    </div>
+    <div id="mixer" class="mixer hidden"></div>
+    <div class="buttons">
+      <button id="bShot"><i data-ic="camera"></i> Tomar captura</button>
+      <button id="bExit" class="danger"><i data-ic="power"></i> Cerrar el juego</button>
+      <div id="volFallback" class="volrow">
+        <button id="bVolDown" title="Bajar el volumen">Volumen −</button>
+        <button id="bMute" title="Silenciar o activar el sonido">Silenciar</button>
+        <button id="bVolUp" title="Subir el volumen">Volumen +</button>
+      </div>
+      <button id="bLauncher"><i data-ic="monitor"></i> Mostrar el lanzador</button>
+      <button id="bHide" class="ghost">Cerrar overlay</button>
+    </div>
+    <div id="msg" class="msg"></div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+  <script src="ui-icons.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ Leyenda: `[x]` hecho · `[~]` hecho pero sin confirmar en tu equipo · `[ ]` pen
 - [x] Sincronización automática al abrir (cada 12 h)
 - [x] Juegos de Ubisoft comprados en Steam: se incluyen y se unen a su ficha de Steam (ajuste)
 - [ ] EA App, Battle.net, Rockstar, Amazon Games, itch.io
-- [ ] Juegos gratis de Epic de la semana
+- [x] Juegos gratis de Epic y Steam (sección Gratis) — probado con datos de ejemplo
 
 ## Biblioteca y juegos
 - [x] Cuadrícula con portadas, tamaño ajustable (Ctrl + rueda)
@@ -32,9 +32,9 @@ Leyenda: `[x]` hecho · `[~]` hecho pero sin confirmar en tu equipo · `[ ]` pen
 - [~] Apertura rápida (se corrigió el congelamiento inicial)
 - [x] Estados por juego (pendiente, jugando, completado, abandonado) y etiquetas propias, con filtros y búsqueda
 - [x] Unir juegos repetidos entre tiendas en una sola ficha (con elección de versión por defecto)
-- [ ] Estadísticas (horas, más jugados, progreso del año)
+- [~] Estadísticas (horas, más jugados, por mes y por tienda; el historial por mes se llena desde la 1.25.0)
 - [ ] Juego aleatorio («¿qué juego hoy?»)
-- [ ] Gestión de instalados (tamaño en disco, desinstalar desde Comptus)
+- [x] Espacio en disco (ficha, orden y tarjeta en Estadísticas); desinstalar ya existía en el menú del juego — probado con simulaciones
 
 ## Apariencia
 - [x] Temas predefinidos, temas propios guardados
@@ -47,16 +47,166 @@ Leyenda: `[x]` hecho · `[~]` hecho pero sin confirmar en tu equipo · `[ ]` pen
 - [x] Portable e instalador personalizado (`npm run dist`, `npm run dist:instalador`)
 - [x] Copia de seguridad: exportar y restaurar (combinar o reemplazar)
 - [x] Copia automática diaria (últimas 7)
-- [~] Bandeja del sistema, minimizar a la bandeja
-- [~] Iniciar con Windows (opcionalmente oculto) y atajo global para buscar un juego (Ctrl+Alt+Espacio)
-- [~] Actualizaciones automáticas (instalador + GitHub Releases; repositorio emptystill/Comptus-Launcher-Beta ya configurado)
-- [ ] Modo mando (navegar con el gamepad)
-- [ ] Copias de partidas guardadas de juegos sin nube
+- [x] Bandeja del sistema, minimizar a la bandeja
+- [x] Iniciar con Windows (opcionalmente oculto) y atajo global para buscar un juego (Ctrl+Alt+Espacio)
+- [x] Actualizaciones automáticas (instalador + GitHub Releases; probado de 1.24.1 a 1.24.2)
+- [x] Carpeta «Comptus Media» (asistente la primera vez, ubicación elegible/movible, copiar al elegir, autodetectar por nombre, importar las sueltas) — probado con simulaciones
+- [x] ¿Qué juego hoy? (juego aleatorio con grupos) — probado con simulaciones
+- [x] Modo mando (navegar con el gamepad; falta confirmarlo con tu mando)
 
 ## Por confirmar en tu equipo
+- [ ] Arranque (1.43.2; antes de esta versión la pantalla de inicio duraba ~5 s por preparar todas las imágenes): ábrelo dos veces seguidas (la primera no tiene copia guardada y tarda más): la segunda debe mostrar la biblioteca enseguida; que no haya parpadeo negro al maximizar; que abra más rápido (la biblioteca debe verse enseguida con lo guardado; la primera vez tras actualizar aún no hay copia), que en pantalla completa se despliegue desde la pantalla de inicio sin verse ambos, y que ya no haya lag al desplegarse
+- [ ] 1.84.16: «Jugando ahora» en la barra lateral encima de Configuración, visible también dentro de la ficha de un juego.
+- [ ] 1.84.15: escritorio: sin «Inicio»; campana junto al botón de modo consola; barra de tamaño de portadas abajo a la derecha (no estorba la lista ni la ficha).
+- [ ] 1.84.14: escritorio: «Inicio» (filas), píldora «Jugando ahora» (abrir ficha y cerrar con 2 clics), campana de avisos con historial y contador, botón de volumen/energía (confirmar Reiniciar/Apagar).
+- [ ] 1.84.13: modo escritorio: instalar un juego de Steam/Epic y desinstalarlo: capa «Instalando…» en la tarjeta, botón de la ficha desactivado mientras tanto, destello «Instalado»/«Desinstalado» y aviso.
+- [ ] 1.84.12: instalación en curso en modo consola: solo animación «Instalando…» (sin porcentaje ni barra), en la portada y en la ficha.
+- [ ] 1.84.11: menú de opciones de un juego instalado de Steam/Epic en modo consola: «Desinstalar…» al final, confirmación con mando, y que el desinstalador oficial se vea por delante del modo consola.
+- [ ] 1.84.10: instalar un juego de Steam (porcentaje real) y de Epic (sin porcentaje) con el modo consola abierto: capa de progreso en la portada y en la ficha, pausa en ámbar, y al final la animación de «Instalado».
+- [ ] 1.84.9: instalar/desinstalar un juego (desde Steam/Epic) con el modo consola abierto: animación en la portada, sonido y aviso. Probar en Biblioteca, Inicio y ficha.
+- [ ] 1.84.8: barra lateral de secciones a ras del borde (izq. y der.), con el contenido (incluida la ficha del juego) sin chocar con ella; probar en horizontal y vertical.
+- [ ] 1.84.7: en modo consola (filas horizontales) las portadas quedan a ras del nombre, sin invadir la cápsula de ayudas.
+- [ ] 1.84.6: filas horizontales → el nombre del juego queda más abajo (hacia la cápsula) sin mover las portadas.
+- [ ] 1.84.5: Inicio → bajar por las filas: no debe verse ningún corte recto/recuadro sobre la cápsula de ayuda; los bordes superior e inferior se desvanecen.
+- [ ] 1.84.4: el nombre del juego enfocado no queda tapado por la cápsula de ayuda (probar con filas en posición «Baja», horizontal y vertical).
+- [ ] 1.84.3: barra de ayuda de botones → cápsula flotante con efecto cristal (horizontal y vertical, con y sin margen de pantalla).
+- [ ] 1.84.2: estando en el modo consola, Select+Start o el atajo del overlay NO deben abrirlo; dentro de un juego sí, y mientras está abierto el modo consola no se mueve.
+- [ ] 1.84.1: cerrar un juego (sobre todo tras usar el overlay) → vuelve solo al modo consola y se puede usar el mando/teclado sin hacer clic. Si algún juego sigue sin devolver el foco, anotar cuál (y si salió «juego cerrado → se devuelve el foco» en el diagnóstico del overlay).
+- [ ] 1.84.0: modo consola → Ajustes → Distribución → «Margen de pantalla (televisor)»: probar 2–4 % en un televisor; el contenido debe alejarse de los bordes y el fondo seguir a pantalla completa.
+- [ ] 1.83.3: Inicio → las filas «Hace tiempo…», «Mejor valorados» y «Para estrenar» cambian de juegos cada 6 horas (comprobar tras unas horas o al día siguiente).
+- [ ] 1.83.2: Inicio → «Hace tiempo que no juegas» aparece, con juegos instalados primero y luego no instalados.
+- [ ] 1.83.1: Inicio → «Hace tiempo que no juegas» aparece con juegos instalados con horas pero sin partida reciente (o sin fecha).
+- [ ] 1.83.0: Inicio (modo consola) → filas nuevas: Tus favoritos, Los que más has jugado, Hace tiempo que no juegas, Los mejor valorados; comprobar que los datos coinciden con tu biblioteca.
+- [ ] 1.82.1: avisos sobre el juego → jugar en pantalla completa con bordes y esperar un aviso real de gratis/eventos/deseados: debe salir la tarjeta arriba sin robar el foco ni pausar el juego. (Se puede forzar con un aviso de prueba si lo hay.)
+- [ ] 1.82.0: modo consola → avisos de gratis/eventos/deseados se ven dentro del modo consola (tarjeta arriba) y quedan en F2 → «Avisos»; fuera del modo consola siguen siendo notificaciones de Windows. (Para probar: avisos de ajustes → botón de prueba si existe, o esperar un aviso real.)
+- [ ] 1.81.2: tarjeta del juego en ejecución más pequeña (horizontal y vertical).
+- [ ] 1.81.1: tarjeta del juego en ejecución centrada, portada completa y fondo oscurecido mientras corre el juego; se quita al cerrarlo.
+- [ ] 1.81.0: modo consola → con un juego abierto aparece una tarjeta flotante (portada, nombre, «EN EJECUCIÓN», tiempo) en todas las secciones; se desactiva en Ajustes → «Tarjeta del juego en ejecución»; probar en vertical y con secciones a la derecha.
+- [ ] 1.80.1: Inicio (vertical) → al abrir un juego, «Jugando ahora» queda enfocada y completa, sin cortarse arriba.
+- [ ] 1.80.0: modo consola → con un juego abierto, Inicio muestra «Jugando ahora» con el tiempo de sesión; F2/Select+A → «Cerrar «juego»» con confirmación; la fila desaparece al cerrar el juego.
+- [ ] 1.79.0: modo consola → menú del sistema → «Volumen y energía del equipo…»: subir/bajar/silenciar de verdad, bloquear, suspender (¡ojo: probar con calma!), reiniciar y apagar con confirmación.
+- [ ] 1.78.1: Buscar en horizontal → teclado centrado, ↓ baja a resultados y ↑ vuelve al teclado.
+- [ ] 1.78.0: modo consola → Buscar: escribir con el mando, ver resultados, filtrar por tienda (Y), abrir ficha (A) y lanzar; probar en vertical y con secciones a los lados.
+- [ ] 1.77.2: el modo consola se abre en el mismo monitor donde se usó la última vez (probar con el monitor vertical: entrar, cerrar Comptus del todo, volver a abrir) y todos los textos dicen «modo consola».
+- [ ] 1.77.1 barra de ayudas inferior más centrada: confirmar; si aún se ve a un lado, decir hacia dónde y cuánto
+- [ ] 1.77.0 Inicio: tarjetas más grandes; Ajustes > Apariencia > Fondo de Inicio > Imagen propia (elegir imagen, se ve solo en Inicio)
+- [ ] 1.76.2 Inicio: logos centrados sobre el banner en las tarjetas; confirmar tamaño y legibilidad
+- [ ] 1.76.1 barra de secciones centrada y tarjetas de eventos con icono: confirmar
+- [ ] 1.76.0 modo consola > Inicio: ver las filas (gratis, eventos, lista de deseados con tus datos reales), abrir una oferta (se abre en Epic/Steam), A/X sobre un juego, y que cargue rápido sin conexión
+- [ ] 1.75.5 banners claros (fondo blanco): ya no debe notarse el borde izquierdo; confirmar
+- [ ] 1.75.4 banner sin borde visible a la izquierda: confirmar
+- [ ] 1.75.3 degradado izquierdo del banner más suave: confirmar
+- [ ] 1.75.2 «Colores según el juego» más oscuros: confirmar la intensidad
+- [ ] 1.75.1 «Colores según el juego»: ahora la mayoría de juegos deben tener su propio color (antes muchos quedaban en morado); avisar los que sigan sin adaptarse
+- [ ] 1.75.0 modo consola > Ajustes > Apariencia > «Colores según el juego»: al activarla los colores cambian con cada juego; avisar si el tinte es muy fuerte o suave
+- [ ] 1.74.6 logos un poco más grandes en horizontal: confirmar
+- [ ] 1.74.5 logos más grandes en horizontal: confirmar tamaño con tus logos reales
+- [ ] 1.74.4 modo consola: página del juego más pequeña y logos de tamaño parejo (horizontal y vertical); avisar si aún sobra o falta tamaño
+- [ ] 1.74.3 botones proporcionados: revisar tamaños en Xbox, PlayStation y Nintendo
+- [ ] 1.74.2 iconos de Xbox nuevos: confirmar que se ven nítidos con un mando Xbox
+- [ ] 1.74.1 iconos originales: revisar que se vean nítidos en tu pantalla (sobre todo Nintendo y LB/RB/LT/RT de Xbox) y dime si alguno sobra o falta
+- [ ] 1.74.0 modo consola: con un mando real (Xbox / PlayStation / Nintendo) los iconos de botones coinciden; probar «Iconos del mando» manual, «Posición de las secciones» izquierda/derecha (también en vertical) y el reloj más al borde
+- [ ] 1.73.3 modo consola > menú Select+X: «Vista de la lista» alterna fila (horizontal) ↔ cuadrícula (vertical) y se guarda
+- [ ] 1.73.2 modo consola: banner lateral más ancho y con menos velo a la izquierda (zona del título); si aún es mucho, avisar
+- [ ] 1.73.1 modo consola: degradado sobre el banner más suave (lateral e inferior); ajustar «Oscurecer el fondo» si aún lo quieres distinto
+- [ ] 1.73.0 modo consola > Ajustes > Tema de colores: ahora lista los temas del lanzador (ilustrados, con imagen y los míos); el Fondo no cambia solo; «Ilustración del tema» es una opción manual
+- [ ] 1.72.5 modo consola > ficha: botón Logros entra a la lista; ↑↓ selecciona logro a logro; B / ← sale
+- [ ] 1.72.4 modo consola > menú Select+X: «Salir de Comptus por completo» cierra la aplicación entera (guarda antes)
+- [ ] 1.72.4 modo consola > Logros: → entra a la lista de logros y ↑↓ los selecciona uno por uno (se centra el elegido); ← / B sale
+- [ ] 1.72.3 modo consola vertical: la lista ya no deja hueco ni corta en seco las portadas sobre las pistas (se desvanece)
+- [ ] 1.72.2 modo consola vertical: ficha con el panel de tráiler/capturas bajo los botones, logo del título con buen tamaño, letra y portadas más pequeñas (5 por fila), pistas sin pisar la lista
+- [ ] 1.72.1 modo consola: ficha > panel de tráiler/capturas a la derecha (botones Tráiler/Capturas dan el foco; ← → cambia, A pausa/amplía, B sale)
+- [ ] 1.72.0 modo consola: ficha del juego > botones Tráiler y Capturas, visor a pantalla completa (← → cambia, A pausa, B cierra); comprobar que un tráiler de Steam (HLS) se reproduce
+- [ ] 1.71.1 modo consola: pestaña Logros en lista (izquierda) + logros del juego seleccionado (derecha); → entra a desplazar los logros, ← / B vuelve
+- [ ] 1.71.0 modo consola: pestaña Logros (progreso por portada, lista en la ficha), aro dorado + trofeo en juegos al 100 %, Ajustes > General > «Al iniciar un juego» (mantener/minimizar y volver al cerrar el juego)
+- [ ] 1.70.0: el botón del modo consola está en el extremo derecho de la barra; al entrar al modo consola (botón, F10, Guía o al arrancar) aparece una pantalla «Iniciando el modo consola…» con los colores de tu tema del modo consola, dura ~1 s y se desvanece.
+- [ ] 1.69.0 (modo consola): desde cualquier sección (o dentro de una colección) abre Ajustes (Start / Select+X → Ajustes), cambia algo y sal con B: debe devolverte a la misma sección y al mismo juego, no a Biblioteca.
+- [ ] 1.68.0 (modo consola): Y (o «Más opciones») abre las opciones del juego con el estilo del modo consola; Select + X abre el menú del modo consola (ajustes, sonidos, actualizar, guardar, cerrar); B en las pantallas principales ya no cierra el modo consola; al usar el mando el cursor desaparece y el ratón quieto no mueve la selección.
+- [ ] 1.67.0 (modo consola): cambia un ajuste, cierra Comptus del todo y vuelve a abrir el modo consola: debe conservarlo (antes se perdía por un problema de orden al arrancar); en Colecciones solo se anima la portada de la colección enfocada.
+- [ ] 1.66.0 (modo consola): al cambiar de juego el banner ya no se ve brillante y luego se oscurece de golpe; las colecciones con portada animada (webp/gif) se animan y con mejor calidad; Ajustes → General → «Guardar ajustes ahora» (avisa si se guardó) y «Ajustes cargados desde» (dime qué dice tras reiniciar si se vuelven a perder).
+- [ ] 1.65.0 (modo consola): las portadas ya no se oscurecen/parpadean al pasar un rato; en un monitor en vertical se adapta solo (cuadrícula y tamaños mayores; opción Distribución → Automática); cierra Comptus del todo, vuelve a abrir el modo consola y comprueba que conserva tus ajustes (si no, debe salir un aviso); las colecciones usan la misma portada que en el launcher.
+- [ ] 1.64.0 (modo consola): Ajustes con menú lateral por categorías (Apariencia, Distribución, Texto y pantalla, Sonido, General) y vista previa en vivo a la derecha; secciones centradas (Biblioteca, Instalados, Recientes, Favoritos, Más jugados, Colecciones, Ajustes; sin Tiendas); banner de la fila horizontal limitado a la zona de arriba; logos cortados en la cuadrícula corregidos; logo de la tienda en cada portada; Colecciones en tarjetas verticales como en el launcher.
+- [ ] 1.63.0 (modo consola): banner lateral con degradado del tema; en Ajustes: Posición del banner, Separación entre portadas, Altura de la fila, Tamaño (hasta «Muy grandes»), Sonidos y su volumen; en la cuadrícula vertical no debe haber «brincos» al moverte y debe llenar todo el ancho; nueva pestaña «Instalados»; Recientes/Favoritos/Más jugados/Colecciones/Tiendas muestran como máximo 10 juegos no instalados; Biblioteca los muestra todos; suenan efectos al mover, abrir, volver, cambiar de sección y jugar.
+- [ ] 1.62.0 (modo consola): ya no aparece la barra de ayudas del launcher debajo; portadas más pequeñas; en Ajustes del modo consola prueba Distribución (fila/cuadrícula vertical), Desenfocar el fondo, Borde de selección, Esquinas y Mostrar título; la pestaña Biblioteca debe mostrar todos tus juegos (los no instalados salen atenuados) sin importar el filtro del launcher; al abrir la ficha de un juego debe haber una pequeña transición.
+- [ ] 1.61.0 (modo consola rediseñado): abre el modo consola y comprueba: pestañas arriba (Recientes, Favoritos, Más jugados, Biblioteca, Colecciones, Tiendas, Ajustes) que cambian con LB/RB; una sola fila horizontal sin bajar; A abre la ficha del juego (descripción, datos, capturas; X juega); Start o la pestaña Ajustes abre el menú propio (tema, fondo, tamaños, reloj…); que no se vea el banner abajo ni haya saltos verticales al moverte; que los colores no dependan del tema del launcher.
+- [ ] 1.60.0: pulsa el botón de monitor (o F10, o Guía del mando): debe pasar a pantalla completa con filas de portadas; muévete con el mando (A juega, X favorito, Y menú, LB/RB cambian de fila, B sale); lanza un juego y al cerrarlo comprueba que vuelves al modo consola; prueba «Abrir Comptus directamente en modo consola» en Configuración → Sistema; si tienes una tele, mira que el tamaño de letra y portadas se lean desde lejos.
+- [ ] 1.59.3: juega un minuto a un juego de la comunidad (BLACK recomp, Def Jam recomp…), guarda la partida dentro del juego y ciérralo: debe salir un aviso «Detecté dónde guarda…» y «Buscar guardados» debe proponer su carpeta marcada «cambió mientras jugabas». Y revisa si el panel sigue diciendo que falta la base de datos (si sí, copia el «Último intento fallido»).
+- [ ] 1.59.2: en un juego de la comunidad/local, pulsa «Buscar guardados»: debe proponer su carpeta de partidas (mira que la fecha coincida con la última vez que jugaste); añádela y prueba «Copiar ahora». Dime con qué juegos acertó y con cuáles no.
+- [ ] 1.59.1: en un juego local (o uno que diga «No conozco dónde guarda…»), pulsa «Añadir carpeta» y elige su carpeta de partidas; «Copiar ahora» debe copiarla y «Restaurar» devolverla.
+- [ ] 1.59.0: abre un juego conocido (p. ej. Hollow Knight, Stardew Valley, Elden Ring): su ficha debe mostrar «Partidas guardadas» con la ruta; pulsa «Copiar ahora» y comprueba la carpeta `Comptus Media\Partidas guardadas`; juega y ciérralo: debe salir el aviso «Partida copiada»; prueba «Restaurar». La primera vez la base tarda 1–2 minutos en descargarse (Configuración → Sistema → Partidas guardadas muestra el estado).
+- [ ] 1.58.0: Configuración → Apariencia → Tema automático: prueba «Según Windows» (cambia el modo claro/oscuro de Windows y mira si Comptus cambia) y «Según la hora» (pon la hora de cambio unos minutos adelante); cierra y abre Comptus y comprueba que conserva el tema que toca.
+- [ ] 1.57.3: con un juego sonando, el overlay debe mostrar además del volumen general una barra para el juego (🎮) y otras apps con sonido (navegador, Spotify…).
+- [ ] 1.57.2: abre el overlay: debe verse completo (hasta «Cerrar overlay») sin cortes; el mezclador no debe mostrar «Sonidos del sistema» y el juego debe salir marcado con 🎮 si está sonando.
+- [ ] 1.57.1: mueve las barras del overlay: el volumen debe seguir la posición (p. ej. 50 % suena a la mitad) y poder subirse de nuevo sin usar el mezclador de Windows.
+- [ ] 1.57.0: abre el overlay con un juego sonando: deben aparecer «Volumen general» y el juego con barras; arrástralas y comprueba que el sonido cambia; prueba el silencio por fila y, con mando, izquierda/derecha y A. Si no aparecen barras, dime qué mensaje sale bajo los botones.
+- [ ] 1.56.0: abre el overlay dentro de un juego: comprueba hora, sesión, total y batería; prueba Volumen −/+ y Silenciar (con teclado y con el mando).
+- [ ] 1.55.0: con un vídeo de fondo, cambia a otra ventana (debe pausarse y reanudar al volver); prueba las tres casillas de «ahorro de recursos» y mira el uso de GPU en el Administrador de tareas.
+- [ ] 1.54.6: el logo de la barra lateral llena su zona; ensancha y estrecha la barra y comprueba que se escala bien.
+- [ ] 1.54.5: borra (o renombra) el vídeo de fondo de una colección y ábrela: debe avisar y usar el fondo general; devuélvelo y reinicia: vuelve a verse.
+- [ ] 1.54.4: abre una colección y pulsa el botón «Fondo» de la cabecera: el selector debe dejar elegir vídeos (MP4/WebM).
+- [ ] 1.54.3: con «banner del juego más jugado» activado, abre una colección: el banner debe verse entero arriba y fundirse hacia abajo.
+- [ ] 1.54.2: abre una colección, ve a Configuración > Fondo y pulsa «Diagnóstico del fondo»; pega el texto en el chat si el fondo de la colección no se ve.
+- [ ] 1.54.1: activa «Las colecciones sin fondo propio usan el banner de su juego más jugado» y abre varias colecciones.
+- [ ] 1.54.0: clic derecho en una colección > Fondo propio (imagen o vídeo): se ve al abrirla, las demás usan el general; quitarlo; reiniciar y comprobar que se conserva.
+- [ ] 1.53.0: Configuración > Fondo > Transparencia de los recuadros: sube el control y mira la página de un juego, estadísticas y eventos; vuelve a abrir Comptus y comprueba que se conserva.
+- [ ] 1.52.2: en la página de un juego, el desenfoque del fondo es más suave y no hay hueco a la derecha ni desplazamiento lateral.
+- [ ] 1.52.1: abre la página de un juego con banner pequeño: el fondo debe verse desenfocado, aparecer con fundido y no moverse al desplazarte.
+- [ ] 1.52.0: abre la página de varios juegos: el banner debe verse oscurecido de fondo (también al bajar); prueba la casilla en Configuración > Fondo y un juego sin banner.
+- [ ] 1.51.1: Exportar/Importar temas abre la carpeta «My Themes» dentro de Comptus Media; elegir otra carpeta sigue funcionando.
+- [ ] 1.51.0: Mis temas > Exportar (elige una carpeta) e Importar (elige un tema.json de esa carpeta, o llévala a otro PC): el tema vuelve con sus colores y su fondo/vídeo.
+- [ ] 1.49.2: con un vídeo de fondo puesto, cierra y abre Comptus: el vídeo debe estar desde el inicio sin tocar Configuración.
+- [ ] 1.49.1: elige un vídeo de fondo, guarda un tema (casilla «Incluir el fondo actual» marcada), cambia a otro tema y vuelve a pulsar el tuyo: debe volver el vídeo; reinicia Comptus y repítelo.
+- [ ] 1.49.0: en Configuración > Fondo elige una imagen y luego un vídeo: los colores del tema cambian a los del fondo (se ve un parpadeo breve con el vídeo); prueba el botón «Adaptar colores» y desmarcar la opción; guarda el resultado en «Mis temas».
+- [ ] 1.48.0: en Configuración > Fondo, elige un vídeo (MP4/WebM): se ve en bucle sin sonido, se pausa al abrir un juego y al minimizar, y se reanuda al volver; guarda un tema con vídeo y vuelve a aplicarlo.
+- [ ] 1.47.2: abre el overlay con el mando, mueve el ratón: el overlay debe seguir visible y responder (arriba/abajo, A, B). Al cerrar el juego, el lanzador debe quedar con el foco y el mando debe funcionar sin hacer clic.
+- [ ] 1.47.1: en el diagnóstico debe poner «Mando (XInput): lector en marcha · N mando(s)» y, dentro de un juego, Select + A (u otra combinación) debe abrir el overlay.
+- [ ] 1.47.0 (overlay con mando): dentro de un juego, pulsa tu combinación (p. ej. Select + A): debe abrir el overlay. Si no, abre Configuración > Overlay y capturas > «Ver diagnóstico» y mándame la línea «Mando (XInput)» y los últimos eventos. Dime qué mando usas.
+- [ ] 1.46.7: desde la 1.46.6 instalada, actualiza a la 1.46.7: debe abrirse un solo instalador. Si aún salen dos, envíame `updater.log` (si dice «abriendo» una vez o dos).
+- [ ] 1.46.6: desde la 1.46.5 instalada, actualiza a la 1.46.6 con «Reiniciar e instalar»: debe abrirse el instalador normal (con permisos de Windows). En `updater.log` debe verse «abriendo ...Comptus-Setup-1.46.6.exe» y ya no «Install: isSilent: true».
+- [ ] 1.46.5: desde la 1.46.4 instalada, actualiza a la 1.46.5: al pulsar «Reiniciar e instalar» debe salir el instalador (con la ventana de permisos de Windows) a la primera. Si no, mándame `%APPDATA%\mi-lanzador-de-juegos\updater.log`.
+- [ ] 1.46.4: la mejora de cierre de 1.46.3 solo vale al actualizar *desde* 1.46.3. Prueba 1.46.3 → 1.46.4; si el instalador no se abre a la primera, envíame el archivo `%APPDATA%\mi-lanzador-de-juegos\updater.log` (a partir de la 1.46.4 se guarda).
+- [ ] 1.46.3: publica la 1.46.3 en GitHub y, desde la 1.46.2 instalada, pulsa «Reiniciar e instalar»: el instalador debe abrirse a la primera.
+- [ ] 1.46.2: instala la 1.46.1, publica la 1.46.2 en GitHub (instalador + latest.yml + .blockmap) y abre la 1.46.1: debe salir la ventana de actualización con las notas.
+- [ ] 1.46.1 (ventana de actualización): sube una release de GitHub con versión mayor (con latest.yml y el instalador) y abre la versión anterior instalada: a los ~20 s debe salir la ventana con las notas; «Actualizar ahora» descarga y luego «Reiniciar e instalar». Solo funciona con el instalador, no con npm start ni portable.
+- [ ] 1.46.0: con Comptus abierto, instala o desinstala un juego de Steam (y de Epic): en unos segundos tras terminar debe aparecer/desaparecer solo. Con otras tiendas (GOG, Ubisoft…): instala/desinstala, vuelve a la ventana de Comptus pasado ~1 min y debe actualizarse.
+- [ ] 1.45.11: con «Al cerrar la ventana, seguir en la bandeja» desactivado y sin juego abierto, la X debe cerrar Comptus del todo (sin proceso en el Administrador de tareas ni icono en la bandeja). Con la opción activada, sigue en la bandeja. Al abrirlo otra vez, la pantalla de inicio sale solo si está activada.
+- [ ] 1.45.10: en The Division 2, abre el overlay y «Cerrar el juego» (dos pulsaciones): debe cerrarlo ahora.
+- [ ] 1.45.9: en el overlay, «Cerrar el juego» (pulsar dos veces) debe cerrar The Division 2 y otros juegos con anti-trampas. Si dice «No se encontró el proceso», avísame.
+- [ ] 1.45.8: abre tu juego y, con él en primer plano, vuelve a Comptus > «Ver diagnóstico»: debe aparecer la ruta del juego como «juego de la biblioteca» (antes salía «desconocida»).
+- [ ] 1.45.7: abre tu juego (sin bordes) y pulsa el atajo del overlay y el de captura: ahora el diagnóstico debe mostrar la ventana del juego como «juego de la biblioteca». Si aún falla, mándame el diagnóstico otra vez.
+- [ ] 1.45.6: si el overlay no sale en un juego: ábrelo, vuelve a Comptus, ve a Configuración > Overlay y capturas > «Ver diagnóstico» y mándame lo que dice. Prueba también la casilla «cualquier programa».
+- [ ] 1.45.5: con una sola tecla asignada (p. ej. P): en el lanzador, el escritorio o el navegador debe poder escribirse con normalidad; dentro de un juego de tu biblioteca (con la ventana activa) debe abrir el overlay / hacer la captura, con ~1 s de margen tras entrar al juego. Tras Alt+Tab al escritorio vuelve a quedar libre.
+- [ ] 1.45.4: con el escritorio o el navegador en primer plano, el atajo del overlay y el de captura no deben hacer nada. Dentro de un juego de Steam (aunque lo abras desde Steam) deben funcionar; la primera vez puede tardar ~1 s. Prueba el juego en «pantalla completa sin bordes» o ventana si a pantalla completa no se ve el overlay.
+- [ ] 1.45.3: abre un juego de Steam (desde Comptus o desde Steam) y pulsa el atajo del overlay y el del mando: deben abrir el overlay. Con el lanzador en primer plano y sin juego, no deben hacer nada. Si con un juego de Steam sigue sin salir, dime si es a pantalla completa (exclusiva) o en ventana.
+- [ ] 1.45.2: con el lanzador abierto y sin juego, el atajo del overlay y el de captura no deben hacer nada; al abrir un juego desde Comptus sí. «Asignar» en el mando: pulsa Asignar con A, suelta, y luego mantén p. ej. Select + A: debe mostrar «Select + A».
+- [ ] Atajos y mando (1.45.1): asigna una sola tecla (p. ej. F9 para el overlay y F10 para la captura) y comprueba que funcionan dentro del juego; prueba Select + A y la opción «Personalizado» (Asignar) con tu mando.
+- [ ] Overlay con mando (1.45.0): abre un juego desde Comptus y, dentro del juego (ventana sin bordes), pulsa Select + Start: debe salir el overlay; con arriba/abajo + A eliges, con B cierras. Prueba también con L3+R3 y con Guía. En juegos a pantalla completa exclusiva puede no verse el overlay (igual que con el atajo de teclado). Si no reacciona, dime qué mando usas (Xbox, PlayStation, otro).
+- [ ] F5 (1.44.0): pulsa F5 en la biblioteca: debe girar el botón de actualizar y salir «Biblioteca actualizada», sin recargar la ventana ni perder tu posición.
+- [ ] Arranque (1.43.4): la pantalla de inicio debe verse más rápido y animarse sin tirones; al aparecer el lanzador (también maximizado) no debe verse ningún cuadro a medio pintar. Si aún notas un retraso antes de ver la pantalla de inicio, dime cuántos segundos aprox. (puede ser el arranque propio de Electron).
+- [ ] Arranque (1.43.3): al abrir, la pantalla de inicio (~1,5 s) debe dar paso al lanzador con un fundido, sin rectángulo negro ni el texto «Comptus» pegado; prueba también con la ventana maximizada. Si el fundido se ve brusco, dímelo.
+- [ ] Pantalla de inicio (1.42.1): que aparezca centrada al abrir, que el lanzador se despliegue desde ella sin tirones (si va a trompicones, dímelo y lo cambio por un simple fundido), con el color de tu tema, que se cierre sola al cargar la biblioteca y que no salga al iniciar minimizado con Windows
+- [ ] Modo mando (1.41.0): que tu mando se detecte al pulsar un botón, que el foco se mueva bien por la grilla y la barra lateral, A/B/X/Y/LB/RB/Start/Select, que no responda mientras juegas y que al volver de un juego funcione de nuevo
+- [ ] itch.io (1.40.0): con tu clave real, que acepte la clave, que liste tus juegos no instalados con portada y que «Instalar» abra su página
+- [ ] Más bibliotecas (1.39.0): que EA app, Battle.net, Rockstar, Amazon Games e itch.io detecten tus juegos instalados reales (nombre, que se abran, que Battle.net abra por el launcher); anota cuál falla y qué carpeta usa
+- [ ] Portadas horizontales de una sola imagen (1.38.0): que se creen sin tirones, se vean igual de bien y que el scroll mejore
+- [ ] Imágenes de las tiendas en disco: tras abrir Comptus 2 veces, que las portadas/banners de Steam y Epic carguen al instante al desplazarte
+- [ ] SteamGridDB: con tu clave real, que acepte la clave, que rellene portadas/banners/logos y que las imágenes se vean bien (no pude consultar su servidor desde aquí)
+- [ ] Portadas horizontales y ocultar nombres (Apariencia): cómo se ven con tus banners reales
+- [ ] Sección Deseados: lista de Steam (perfil y detalles de juegos públicos) y, sobre todo, la de **Epic** (no pude comprobar que Epic deje leerla con la sesión del lanzador); aviso de rebaja
+- [ ] Barra lateral ajustable (arrastrar el borde, doble clic para restablecer) y logos en Gratis/Eventos
+- [ ] Gratis → «Otras tiendas» (GamerPower): que cargue, los nombres limpios y el botón (no pude consultar GamerPower desde aquí)
+- [ ] Sección Eventos: fechas de `events.json` y aviso de Windows (un día antes / al empezar); probar el `events.json` en el repositorio de GitHub
+- [ ] Aviso de Windows al aparecer un juego gratis nuevo (hay que esperar a una oferta nueva, o para probarlo: cerrar Comptus, borrar una clave de `free-seen.json` (carpeta de datos) y abrirlo de nuevo)
+- [ ] Sección Gratis con las tiendas reales (Epic y Steam): que salgan las ofertas, fechas y «Ya la tienes»
+- [ ] Espacio en disco: que mida bien tus juegos reales de Steam/Epic y el tiempo que tarda la primera vez
+- [ ] ¿Qué juego hoy?: botón del dado, grupos y «Jugar» con juegos reales
+- [ ] Pantalla «Carpeta para tus imágenes» del instalador (compilar con `npm run dist:instalador`) y que Comptus la adopte sin preguntar
+- [ ] Iconos de Comptus.exe y del desinstalador en el Explorador (probable caché de iconos)
+- [ ] Instalador en Archivos de programa: ruta por defecto, permisos de Comptus Media, Comptus Media fuera de Comptus Launcher que sobreviva a desinstalar y actualización automática con permisos de administrador
+- [ ] Carpeta Comptus Media: asistente inicial, «Traer mis imágenes actuales», mover la carpeta, soltar un archivo con el nombre del juego y que aparezca
 - [ ] Estados del botón Jugar con juegos reales de Steam y Epic
 - [ ] Instalador (`npm run dist:instalador`): aspecto y pantallas
 - [ ] Logros de Xbox
-- [ ] Bandeja, inicio con Windows y búsqueda rápida (Ctrl+Alt+Espacio)
-- [ ] Actualizaciones: publicar una release de prueba y comprobar que el instalador la detecta, descarga e instala
+- [x] Búsqueda rápida con Ctrl+Alt+Espacio en el instalador
+- [ ] Estadísticas: que se apunten las sesiones al jugar desde Comptus y salgan en «Por mes»
 - [ ] Restaurar una copia de seguridad (probado solo con simulaciones)
