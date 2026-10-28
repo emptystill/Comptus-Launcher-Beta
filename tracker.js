@@ -64,9 +64,9 @@ function createTracker({ list = listProcesses, kill = killPid, onEnd = () => {},
   sleep = (ms) => new Promise((r) => setTimeout(r, ms)), now = Date.now, selfPid = process.pid,
   startTimeout = 10 * 60 * 1000 } = {}) {
   let active = null;
-  let timer = null;
+  let timer = null, fast = null;
 
-  const stop = () => { clearInterval(timer); timer = null; };
+  const stop = () => { clearInterval(timer); clearInterval(fast); timer = null; fast = null; };
 
   async function matching() {
     const procs = await list();
@@ -95,6 +95,14 @@ function createTracker({ list = listProcesses, kill = killPid, onEnd = () => {},
     }
   }
 
+  // Detección rápida: si todos los procesos vistos ya no existen, se confirma al momento con una consulta (en vez de esperar dos vueltas de 5 s)
+  function fastTick() {
+    const a = active; if (!a || !a.seen || a.fastBusy || now() < (a.fastNext || 0)) return;
+    const ids = [...a.pids, ...a.extra]; if (!ids.length || ids.some(alive)) return;
+    a.fastBusy = true; a.misses = Math.max(a.misses, 1);
+    tick().finally(() => { a.fastBusy = false; if (active === a && a.misses === 0) a.fastNext = now() + 10000; });
+  }
+
   function end() {
     const g = active;
     active = null;
@@ -107,7 +115,7 @@ function createTracker({ list = listProcesses, kill = killPid, onEnd = () => {},
     if (!dir && !pid) return false;
     if (active) end();
     active = { id: game.id, name: game.name, dir, extra: new Set(pid ? [pid] : []), pids: new Set(), startedAt: now(), seen: false, misses: 0, procs: [] };
-    if (interval > 0) timer = setInterval(tick, interval);
+    if (interval > 0) { timer = setInterval(tick, interval); fast = setInterval(fastTick, 1000); }
     return true;
   }
 

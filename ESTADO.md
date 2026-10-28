@@ -1,4 +1,4 @@
-# Comptus — estado del proyecto (versión 1.84.16)
+# Comptus — estado del proyecto (versión 1.84.84)
 
 Leyenda: `[x]` hecho y confirmado por ti · `[~]` hecho, falta confirmarlo en tu equipo · `[ ]` pendiente
 

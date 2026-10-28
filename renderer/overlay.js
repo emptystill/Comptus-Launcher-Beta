@@ -87,6 +87,21 @@ async function loadMixer() {
   fit();
 }
 
+// Música (lo que suena en Windows)
+function drawMusic(s) {
+  const box = $('#music');
+  if (!s || !s.has) { box.classList.add('hidden'); fit(); return; }
+  box.classList.remove('hidden');
+  $('#mTitle').textContent = s.title || 'Sin título';
+  $('#mSub').textContent = [s.artist, s.app].filter(Boolean).join(' · ');
+  $('#mCover').style.backgroundImage = s.thumb ? `url("${s.thumb}")` : '';
+  const pb = $('#mPlay'); pb.replaceChildren(); const ic = document.createElement('i'); ic.dataset.ic = s.playing ? 'pause' : 'play'; pb.append(ic);
+  try { if (typeof hydrateIcons === 'function') hydrateIcons(pb); } catch {}
+  fit();
+}
+try { window.overlay.onMedia(drawMusic); } catch {}
+for (const [id, c] of [['#mPrev', 'prev'], ['#mPlay', 'toggle'], ['#mNext', 'next']]) $(id).onclick = () => { try { window.overlay.mediaCmd(c); } catch {} };
+
 async function showPanel() {
   $('#toast').classList.add('hidden');
   $('#panel').classList.remove('hidden');
@@ -95,6 +110,7 @@ async function showPanel() {
   draw(st);
   startTick();
   fit();
+  try { window.overlay.mediaGet().then(drawMusic).catch(() => {}); } catch {}
   loadMixer();
 }
 
@@ -134,8 +150,8 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') window.ove
 // Mando: el overlay recibe arriba / abajo / A / B desde Comptus (que lee el mando aunque el juego tenga el foco)
 (function () {
   let idx = 0;
-  const btns = () => [...document.querySelectorAll('#panel .mixrow, #panel .buttons button')].filter((b) => !b.disabled && b.offsetParent !== null);
-  function mark() { const l = btns(); document.querySelectorAll('#panel .mixrow, #panel .buttons button').forEach((b) => b.classList.remove('padsel')); if (l.length) { idx = (idx + l.length) % l.length; l[idx].classList.add('padsel'); } }
+  const btns = () => [...document.querySelectorAll('#panel .mixrow, #panel .music button, #panel .buttons button')].filter((b) => !b.disabled && b.offsetParent !== null);
+  function mark() { const l = btns(); document.querySelectorAll('#panel .mixrow, #panel .music button, #panel .buttons button').forEach((b) => b.classList.remove('padsel')); if (l.length) { idx = (idx + l.length) % l.length; l[idx].classList.add('padsel'); } }
   window.overlay.onNav((d) => {
     if ($('#panel').classList.contains('hidden')) return;
     const l = btns();

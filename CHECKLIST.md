@@ -56,6 +56,14 @@ Leyenda: `[x]` hecho · `[~]` hecho pero sin confirmar en tu equipo · `[ ]` pen
 
 ## Por confirmar en tu equipo
 - [ ] Arranque (1.43.2; antes de esta versión la pantalla de inicio duraba ~5 s por preparar todas las imágenes): ábrelo dos veces seguidas (la primera no tiene copia guardada y tarda más): la segunda debe mostrar la biblioteca enseguida; que no haya parpadeo negro al maximizar; que abra más rápido (la biblioteca debe verse enseguida con lo guardado; la primera vez tras actualizar aún no hay copia), que en pantalla completa se despliegue desde la pantalla de inicio sin verse ambos, y que ya no haya lag al desplegarse
+- [ ] 1.84.17: notificaciones de Windows (juegos gratis, eventos, deseados) muestran «Comptus» en vez de «com.mateo.gamelauncher» (versión instalada). Si no cambia, cerrar Comptus por completo y reabrir.
+- [ ] 1.84.24: música: con Spotify sonando, ver el widget del escritorio, el chip y el menú Música del modo consola (Select + X) y el bloque del overlay dentro de un juego; probar Pausa, Siguiente, Anterior y la portada. Si no sale nada, copiar la línea «música:» del diagnóstico.
+- [ ] 1.84.28: Comunidad: añadir un proyecto por enlace, ver su última versión, «Añadir a la biblioteca» con un .exe, quitarlo, y recibir un aviso real cuando un proyecto saque versión nueva.
+- [ ] 1.84.22: repetir Forza en vertical; si se corta, copiar las líneas «vigilante:».
+- [ ] 1.84.21: modo consola vertical: abrir y cerrar Forza; la ventana no debería cortarse mientras el juego cierra. Si pasa, copiar el diagnóstico (líneas «pantalla:» y «se reajusta»).
+- [ ] 1.84.20: modo consola vertical: cerrar un juego (Forza) y comprobar que el corte de la ventana dura mucho menos o ya no se ve. Si pasa, copiar el diagnóstico (líneas «se reajusta» con su hora).
+- [ ] 1.84.19: modo consola vertical: abrir Forza (u otro juego), cerrarlo desde el overlay y comprobar que la ventana no se queda cortada mientras el juego termina de cerrarse. Si pasa, copiar el diagnóstico (debe haber una línea «se reajusta»).
+- [ ] 1.84.18: modo consola vertical: abrir y cerrar un juego (sobre todo el primer arranque tras encender el PC) no deja la ventana cortada a la mitad ni muestra el escritorio; si pasa, copiar el diagnóstico del overlay y ver si dice «la ventana ya no coincide con el monitor».
 - [ ] 1.84.16: «Jugando ahora» en la barra lateral encima de Configuración, visible también dentro de la ficha de un juego.
 - [ ] 1.84.15: escritorio: sin «Inicio»; campana junto al botón de modo consola; barra de tamaño de portadas abajo a la derecha (no estorba la lista ni la ficha).
 - [ ] 1.84.14: escritorio: «Inicio» (filas), píldora «Jugando ahora» (abrir ficha y cerrar con 2 clics), campana de avisos con historial y contador, botón de volumen/energía (confirmar Reiniciar/Apagar).

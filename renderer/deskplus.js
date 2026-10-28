@@ -90,6 +90,7 @@
       armed = true; paintPill(); clearTimeout(armT); armT = setTimeout(() => { armed = false; paintPill(); }, 3500);
     };
     const cfg = $('#openTheme'); if (cfg) cfg.before(pill); else tb.prepend(pill); // en la barra lateral, justo encima de «Configuración»
+    mountMusic(pill);
     // Campana de avisos y menú de energía (antes del botón de modo consola)
     bell = el('button', 'icon-btn'); bell.id = 'bellBtn'; bell.type = 'button'; bell.title = 'Avisos'; bell.append(iconEl('bell'));
     badge = el('span', 'fbadge hidden'); bell.append(badge); bell.onclick = bellMenu;
@@ -98,6 +99,29 @@
     // Barra para cambiar el tamaño de las portadas: abajo a la derecha de la ventana
     const sz = $('#sizeQuick'); if (sz) { sz.classList.add('size-corner'); document.body.append(sz); }
     paintPill();
+  }
+  // ---------- Música (lo que suena en Windows) ----------
+  let mp = null;
+  function paintMusic(s) {
+    if (!mp) return;
+    mp.classList.toggle('hidden', !(s && s.has));
+    if (!s || !s.has) return;
+    mp.querySelector('.mp-n').textContent = s.title || 'Sin título';
+    mp.querySelector('.mp-s').textContent = [s.artist, s.app].filter(Boolean).join(' · ');
+    const im = mp.querySelector('.mp-i'), t = s.thumb ? `url("${s.thumb}")` : ''; if (im.dataset.t !== t) { im.dataset.t = t; im.style.backgroundImage = t; }
+    const pb = mp.querySelector('.mp-play'); const want = s.playing ? 'pause' : 'play'; if (pb.dataset.k !== want) { pb.dataset.k = want; pb.replaceChildren(iconEl(want)); }
+  }
+  function mountMusic(before) {
+    if (!window.api.mediaGet) return;
+    mp = el('div', 'music-pill hidden'); mp.id = 'musicPill';
+    const im = el('div', 'mp-i'), tx = el('div', 'mp-t'); tx.append(el('div', 'mp-n'), el('div', 'mp-s'));
+    const bt = el('div', 'mp-b');
+    for (const [k, ic, tt] of [['prev', 'skipPrev', 'Anterior'], ['toggle', 'pause', 'Pausa / reanudar'], ['next', 'skipNext', 'Siguiente']]) {
+      const b = el('button'); b.type = 'button'; b.title = tt; b.append(iconEl(ic)); if (k === 'toggle') b.classList.add('mp-play'); b.onclick = () => window.api.mediaCmd(k); bt.append(b);
+    }
+    mp.append(im, tx, bt);
+    before.before(mp);
+    try { window.api.onMediaState(paintMusic); window.api.mediaGet().then(paintMusic).catch(() => {}); } catch {}
   }
   root.DeskPlus = { onRun, note };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();

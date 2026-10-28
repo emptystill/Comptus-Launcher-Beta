@@ -1144,3 +1144,299 @@ Funciones del modo consola que también tienen sentido en el escritorio (archivo
 
 ## 1.84.16 · Modo escritorio: «Jugando ahora» en la barra lateral
 - La píldora «Jugando ahora» pasa a la barra lateral, justo encima del botón «Configuración». Así se ve en cualquier pantalla, también en la ficha de un juego. Sigue igual: pulsarla abre la ficha y su «×» cierra el juego con un segundo clic.
+
+## 1.84.17 · Las notificaciones de Windows dicen «Comptus»
+- Las notificaciones (juegos gratis, eventos, lista de deseados) mostraban el identificador interno «com.mateo.gamelauncher» en vez del nombre. Windows no sabía cómo se llama la app porque el acceso directo del menú Inicio que crea el instalador no lleva ese identificador (y la versión portable no tiene acceso directo).
+- Ahora, al abrir Comptus, se registra el nombre «Comptus» (y su icono, si lo encuentra) para ese identificador en el registro del usuario (`HKCU\Software\Classes\AppUserModelId\com.mateo.gamelauncher`). No necesita permisos de administrador, no crea accesos directos y sirve para la versión instalada, la portable y la que ya tengas instalada. Se vuelve a escribir en cada arranque, así que sigue funcionando tras actualizar.
+- Windows puede tardar en actualizar el nombre: si sigue saliendo el identificador, cierra Comptus del todo (también desde la bandeja) y ábrelo otra vez.
+
+## 1.84.18 · Modo consola: la ventana se reajusta al monitor (vertical, tras abrir o cerrar un juego)
+- **Síntoma:** al abrir o cerrar un juego (sobre todo el primer arranque tras encender el PC, con el monitor en vertical) el modo consola se quedaba cortado a la mitad, o parpadeaba mostrando el escritorio.
+- **Causa probable:** muchos juegos a pantalla completa cambian la resolución del monitor al abrirse y la restauran al cerrarse. Comptus se quedaba con el tamaño de la ventana de antes, que ya no coincidía con el monitor.
+- **Arreglo:** con el modo consola abierto, Comptus vigila los cambios de monitor y de tamaño de ventana y, tras cerrarse un juego, vuelve a ajustar la ventana al monitor entero (sale y vuelve a entrar en pantalla completa si hace falta). Lo anota en el diagnóstico del overlay («la ventana ya no coincide con el monitor…»). Como mucho hace 3 reajustes cada 30 s, para evitar bucles.
+
+## 1.84.19 · Modo consola: el reajuste de la ventana también actúa mientras el juego se cierra
+- El diagnóstico de la prueba mostró que el reajuste de la 1.84.18 solo se activaba al terminar el proceso del juego (la ventana medía 1080×1392 en un monitor de 1080×1920): mientras el juego tardaba en cerrarse, Windows no avisaba de ningún cambio y la ventana seguía cortada.
+- Ahora, con el modo consola a la vista, Comptus comprueba **cada 2 segundos** que la ventana cubra el monitor entero (y también al recuperar el foco) y la reajusta en cuanto no coincida. Mantiene el límite de 3 reajustes cada 30 s.
+
+## 1.84.29 · Comunidad: enlaces que no son de GitHub
+
+El campo de «Comunidad» acepta ahora también:
+- **itch.io** (`usuario.itch.io/juego`): usa el feed de devlog del juego. Avisa de las entradas de devlog del autor, no de cada archivo nuevo; si el autor no publica devlog, no hay feed y Comptus lo dice.
+- **GitLab** (etiquetas), **Codeberg** (lanzamientos), **SourceForge** (archivos) y **cualquier dirección de feed RSS o Atom**.
+- **ModDB** no se puede leer solo con el enlace de la página (no pude comprobar que ofrezca un feed público): Comptus lo explica y deja pegar la dirección RSS si la página la muestra.
+En la ficha, «Última publicación» sustituye a «Última versión» cuando el origen no es un repositorio de código.
+
+## 1.84.28 · Comunidad: tu lista de proyectos con avisos de versiones nuevas
+
+Nuevo apartado «Comunidad» en la barra lateral (entre Eventos y Ocultos) para guardar los ports de PC y descompilaciones de la comunidad que te interesan. Sin catálogo propio: tú pegas el enlace de GitHub (o «usuario/proyecto») y Comptus lo comprueba.
+- **Ficha:** última versión y fecha (del feed público de lanzamientos; si no hay lanzamientos usa la última etiqueta), «Abrir página» y «Quitar».
+- **Avisos:** cada 3 h (y al arrancar) busca versiones nuevas y avisa en la campana y en el modo consola. Al añadir un proyecto se anota su versión actual para no avisar de lo que ya existía.
+- **Añadir a la biblioteca:** eliges el ejecutable que ya descargaste y se registra como juego local; el proyecto sale marcado «En tu biblioteca».
+- **Ideas para empezar:** ocho proyectos conocidos para añadir con un clic.
+- Comptus no descarga ni incluye juegos ni ROMs. Se guarda en `community.json` dentro de la carpeta de datos de Comptus.
+
+## 1.84.27 · Música: método correcto para leer la portada
+
+Error mío: el método de .NET para convertir la portada de Windows en un flujo se llama `AsStream` (con `IRandomAccessStream`) o `AsStreamForRead` (con `IInputStream`), no `AsStreamForRead` con `IRandomAccessStream`. Ahora se llama directamente por reflexión (sin conversiones de tipo de PowerShell, que fallaban con «no se puede convertir System.__ComObject»).
+
+## 1.84.26 · Música: arreglo de la lectura de portadas
+
+El diagnóstico de 1.84.25 mostró que PowerShell no encontraba el método de lectura (`AsStreamForRead`) ni `GetInputStreamAt` porque no tenía cargados los tipos de Windows para esos flujos. Ahora se cargan (`IRandomAccessStream`, `IInputStream`, `DataReader`) y se prueban tres métodos en orden (conversión de tipo, llamada directa por reflexión y `DataReader`); el diagnóstico indica cuál falla (A, C o B).
+
+## 1.84.25 · Música: portadas más robustas
+
+Con Spotify la música se veía pero no cargaban las portadas. Ahora la portada se lee con dos métodos (si falla el primero se prueba el segundo), se reintenta hasta 8 veces al cambiar de canción y, si no se consigue, «Ver diagnóstico» muestra una línea «música: no se pudo leer la portada (motivo)».
+
+## 1.84.24 · Música: lo que suena en Windows (overlay, modo consola y escritorio)
+
+Comptus muestra lo que suena en el reproductor activo de Windows (Spotify, YouTube Music, el navegador…) y permite pausar, pasar a la siguiente y volver a la anterior. Usa los controles multimedia del sistema: no necesita cuentas, claves ni Premium.
+- **Overlay:** bloque con portada, título y artista y tres botones; se maneja con el mando como el resto.
+- **Modo consola:** chip «♪ título — artista» arriba y entrada «Música» en el menú del sistema (Select + X) con Pausar/Reanudar, Siguiente y Anterior.
+- **Escritorio:** widget en la barra lateral, encima de «Jugando ahora».
+- **Ajuste:** Configuración → Sistema → «Mostrar la música que suena» (activado por defecto). Solo se consulta mientras Comptus o el overlay están a la vista; si no hay nada que mostrar, el proceso se cierra solo a los 60 s.
+- Si algo falla, «Ver diagnóstico» muestra una línea «música: no se pudo leer el reproductor de Windows (motivo)». Solo funciona en Windows 10 (1809) o superior.
+- Módulo nuevo `nowplaying.js` (un PowerShell que se queda abierto, igual que el mezclador de volumen).
+
+## 1.84.23 · Vuelve el comportamiento de 1.84.22
+
+El reajuste inmediato (0/80/250 ms y vigilante cada 150 ms) empeoró el parpadeo: se movía la ventana mientras Windows aún cambiaba la resolución. Se restauran los tiempos de 1.84.22 (700 ms y vigilante cada 0,6 s).
+
+## 1.84.22 · Modo consola: el vigilante explica por qué no reajusta
+
+El diagnóstico de 1.84.21 mostró que el monitor ya informaba 1080x1920 mientras la ventana seguía en 1080x1392, y que ningún reajuste se disparó hasta cerrar el juego.
+- El reajuste ya no exige estar en pantalla completa para corregir una ventana más pequeña que el tamaño recordado.
+- Si la ventana es más pequeña, el diagnóstico registra cada 3 s «vigilante: ventana WxH < WxH · visible · minimizada · pantallaCompleta · reajustando» para saber qué lo impide.
+
+## 1.84.21 · Modo consola: la ventana recuerda su tamaño bueno
+
+El diagnóstico de 1.84.20 mostró que el reajuste solo ocurría tras cerrarse el proceso del juego: mientras el juego seguía «cerrando», Windows seguía diciendo que el monitor medía 1080x1392 (modo del juego) y la ventana, al coincidir con ese dato, parecía correcta.
+- Al entrar en modo consola se guarda el tamaño real del monitor (`couchGood`). Si luego la ventana queda más pequeña que ese tamaño, se reajusta a él aunque Windows siga informando del modo del juego.
+- El diagnóstico añade una línea «pantalla: WxH (escala) · ventana WxH» cada vez que cambian las pantallas.
+
+## 1.84.20 · Modo consola: el reajuste de la ventana es más rápido y sin parpadeo
+- La 1.84.19 corregía la ventana cortada pero tardaba unos 2 s en notarlo y, para arreglarla, salía y volvía a entrar en pantalla completa (se veía el escritorio un instante).
+- Ahora la ventana se vigila cada 0,6 s (y al instante al cambiar de tamaño o recuperar el foco) y primero se ajusta **sin salir de pantalla completa**; solo si Windows no lo acepta se sale y se vuelve a entrar. Límite: 6 reajustes cada 30 s.
+
+## 1.84.30 · Cambiar el ejecutable al editar un juego
+- En «Editar juego» el campo Ejecutable ya no está bloqueado: puedes escribir la ruta o pulsar **Cambiar…** para elegir otro archivo. Avisa si otro juego ya usa ese ejecutable.
+
+## 1.84.31 · Modo consola: estilo de interfaz «Xbox 360»
+- Nueva opción **Estilo de interfaz** (Ajustes del modo consola → Apariencia): *Clásico de Comptus* o *Xbox 360*.
+- Xbox 360: secciones como títulos finos con subrayado verde, cintas verdes animadas de fondo, portadas con marco blanco y brillo, y marco verde con etiqueta en la que está enfocada. Inspirado en el estilo, sin logos ni marcas.
+- Añade los temas de color «Xbox 360 (claro)» y «Xbox 360 (oscuro)»; al elegir el estilo se pone el oscuro, y al volver al clásico se recupera tu tema anterior.
+- Próximo: Steam Deck / Big Picture.
+
+## 1.84.32 · Modo consola: cambiar de monitor con Win+Mayús+flecha
+- El vigilante que mantiene la ventana cubriendo el monitor la devolvía a la fuerza al monitor anterior (el recordado). Ahora, si el centro de la ventana pasa a otro monitor, se entiende que lo moviste tú: se recuerda el nuevo monitor y la ventana se ajusta a él.
+- En el diagnóstico aparece «la ventana se movió a otro monitor».
+
+## 1.84.33 · Estilo Xbox 360: ahora con «blades»
+- Rediseño del estilo Xbox 360 como el panel original: las secciones son **tiras verticales**; la activa se despliega como un panel grande y las demás quedan a los lados (las anteriores a la izquierda, las siguientes a la derecha).
+- En Biblioteca, Instalados, Recientes, etc.: lista vertical de juegos con la fila enfocada en verde brillante y, a la derecha, la vista previa enmarcada del juego con su título y tiempo jugado.
+- Controles: ↑↓ eligen juego, ◀▶ cambian de blade (dentro de una colección, ◀ vuelve). Inicio, Buscar y Ajustes se muestran dentro del panel activo; el detalle del juego sigue a pantalla completa.
+- En monitor vertical la vista previa se oculta y la lista ocupa el panel.
+
+## 1.84.34 · Estilo Xbox 360: arreglo de choques
+- Con las secciones puestas a la izquierda/derecha (iconos) o con margen de pantalla, el estilo Xbox 360 se descuadraba y todo se montaba. Ahora este estilo siempre usa los blades (ignora la posición de secciones) y respeta el margen de pantalla.
+
+## 1.84.35 · Xbox 360: panel moderno (el de 2011 en adelante)
+- «Estilo de interfaz» ahora tiene tres opciones: *Clásico de Comptus*, **Xbox 360 (panel moderno)** y *Xbox 360 (blades clásico)* (el de la 1.84.33).
+- Panel moderno: fondo casi negro, títulos de sección grandes, finos y en minúscula (la activa en blanco y las demás apagadas), mosaicos planos sin esquinas redondeadas con marco verde al enfocarlos y el nombre dentro del mosaico.
+- Nuevo tema de color «Xbox 360 (moderno)». Ambos estilos ignoran la posición de las secciones.
+
+## 1.84.36 · Xbox 360 (panel moderno) rehecho según el panel de 2011-2014
+- Fondo gris en degradado (oscuro arriba, claro abajo), secciones en minúscula y fina en una sola fila (la activa en blanco), y los juegos en **mosaico de 3 filas** de losetas planas pegadas con el nombre en una franja oscura abajo; la enfocada «salta» con sombra.
+- Controles: ↑↓ dentro de la columna, ◀▶ de columna en columna; en el borde pasa a la sección vecina.
+- Título y datos del juego enfocado bajo el mosaico, ayudas de botones abajo a la izquierda sin caja, Ajustes en panel oscuro con fila verde.
+- Tema «Xbox 360 (moderno)» ajustado (verde #119f11).
+
+## 1.84.37 · Xbox 360 (panel moderno): cada pantalla como la original
+En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita ahora el panel de 2011-2014: inicio en mosaico de fichas verdes, biblioteca en tarjetas claras con cinta, página del juego con fichas verdes de acción, ajustes (lista clara a la izquierda y panel gris a la derecha), menú F2 tipo Xbox Guide (filas claras, selección verde) y lista de logros (filas blancas sobre negro, selección verde). Solo estilo inspirado; sin logos ni marcas.
+
+## 1.84.38 · Xbox 360 (panel moderno): ajustes de diseño
+- Opciones exclusivas del estilo: en Ajustes ya no aparecen las del tema clásico (tema de colores, banner, distribución, portadas…) y salen las propias: *Fondo de pantalla* (gris / banner del juego / imagen propia), *Elegir imagen de fondo…*, *Tamaño de las tarjetas* y *Sonidos del menú Xbox 360*. No tocan los ajustes del tema clásico.
+- Sin logos de los juegos en el estilo (solo el nombre en texto).
+- Inicio más despejado: una ficha grande, accesos a Biblioteca/Buscar/Recientes/Favoritos/Ajustes y pocas portadas.
+- Tarjetas más grandes y mejor repartidas; el icono de la tienda va en la cinta naranja, en lugar de su nombre.
+- Página del juego: fichas más pequeñas, descripción/logros a la izquierda y vídeo a la derecha, sin solaparse.
+- Sonidos propios del estilo (sintetizados, no son los originales).
+
+## 1.84.39 · Xbox 360 (panel moderno): logos, inicio ordenado y Guía de Xbox
+- Los logos de los juegos vuelven, pero ajustados al área del título (biblioteca y página del juego), sin invadir lo demás.
+- El icono de la tienda va a la derecha de la cinta naranja; el aviso «No instalado» baja debajo de la cinta.
+- Inicio: rejilla que se adapta a la altura (no se corta), sin huecos aunque falte alguna sección.
+- F2 / botón central del mando abre una Guía con blades verticales (Juegos y apps, Comptus, Multimedia, Ajustes): casi todo cuelga de ahí, incluidos Logros, Colecciones y Buscar; muestra batería y hora.
+
+## 1.84.40 · Xbox 360 (panel moderno): página del juego como en el vídeo
+- La página del juego tiene pestañas **resumen · detalles · logros · galería** (las dos últimas solo si el juego tiene logros o tráilers/capturas). ◀ ▶ y Av Pág / Re Pág (o LB/RB) cambian de pestaña; Esc/B vuelve a la biblioteca.
+- Resumen: fichas verdes (Jugar, Favorito, Tráiler, Capturas, Más opciones), portada, datos y columna de desarrollador/editor/género.
+- Detalles: tres columnas (datos, tu biblioteca, descripción). Logros: la lista blanca. Galería: tráilers y capturas.
+- Biblioteca: «n de total» bajo el título. Guía más pequeña, como en el vídeo.
+
+## 1.84.41 · Xbox 360 (panel moderno): logos en su sitio y resumen con tráiler
+- Los logos del juego ya no se salen de su zona: antes el tema clásico les forzaba una altura enorme y quedaban tapados por las tarjetas. Ahora miden como mucho ~6,5 % (biblioteca) y ~8 % (página del juego) del alto de pantalla y se dibujan por encima de las tarjetas.
+- Biblioteca: tarjetas algo más pequeñas y la fila más abajo, para que quepan el logo, los datos y «n de total» sin pisarse.
+- Resumen del juego: vuelve el tráiler/capturas (panel con miniaturas) junto a las fichas; los datos de desarrollador/editor pasan a la pestaña «detalles», así no se montan.
+
+## 1.84.42 · Xbox 360: resumen del juego mejor repartido
+El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
+
+## 1.84.84 · La Guía no se corta
+- La Guía (Xbox 360) es más ancha en ventanas estrechas o cuadradas (mínimo 1060 px, hasta el 94 % de la ventana) y las pestañas laterales son más finas, así que los textos de «Mi perfil» y «Logros» ya no salen cortados con «…» ni la vista previa queda aplastada.
+
+## 1.84.83 · Mi perfil y vibración al cambiar de sección
+- Xbox 360: la Guía (F2 / botón Guía) tiene un nuevo bloque «Mi perfil» entre «Juegos y apps» y «Logros»: foto grande, nombre, gamerscore (logros), juegos al 100 %, tiempo jugado, tamaño de la biblioteca y última partida. Desde él se puede cambiar la foto y el nombre, o saltar a cada sección.
+- Nueva opción «Vibración al cambiar de sección (Xbox 360)» (Ajustes › Sonido, activada): un toque muy corto del mando al pasar de una sección a otra.
+
+## 1.84.82 · Q/E en Buscar
+- En la sección Buscar, con el campo vacío, Q y E vuelven a cambiar de sección (ya no se escriben). En cuanto hay texto, todas las letras se escriben con normalidad. Av Pág / Re Pág siempre cambian de sección.
+
+## 1.84.81 · Teclado físico en el cuadro del nombre
+- Al escribir el nombre del perfil con el teclado del PC, la tecla correspondiente del teclado en pantalla se marca al pulsarla (también ⌫ y Espacio). Después de teclear, Enter guarda el nombre; si te mueves con las flechas, Enter vuelve a pulsar la tecla marcada como antes.
+
+## 1.84.80 · Vibración del mando
+- Xbox 360: el mando vibra al desbloquear un logro (dos pulsos cortos; tres y más fuertes si el logro es raro). Opción «Vibración del mando (Xbox 360)» en Ajustes › Sonido, activada por defecto; al activarla da un pulso de prueba. Solo funciona con mandos que Windows/Chromium exponen con vibración (Xbox y la mayoría de los compatibles).
+
+## 1.84.79 · Destello al cambiar de sección
+- Con «Fondo en movimiento» activado, la copia temporal de la pantalla que se usa en la transición entre secciones dibujaba también las cintas de luz y producía un destello blanco. Ahora no las dibuja. Además, el fundido del fondo al cambiar de imagen vuelve a funcionar junto con el movimiento.
+
+## 1.84.78 · Fondo en movimiento más visible
+- El fondo en movimiento ahora usa dos cintas de luz que cruzan la pantalla en direcciones opuestas (ciclos de 24 y 31 s) y la imagen de fondo se desplaza y hace zoom suave (26 s). Funciona sobre fondos oscuros de juego, donde antes apenas se notaba.
+
+## 1.84.77 · Fondo en movimiento
+- Xbox 360: nueva opción «Fondo en movimiento (Xbox 360)» (Ajustes › Apariencia, desactivada por defecto). Unos destellos suaves se desplazan muy despacio sobre el fondo y, si usas una imagen de fondo, esta se desliza ligeramente. Respeta la opción de «reducir movimiento» de Windows.
+
+## 1.84.76 · Perfil en la esquina
+- Xbox 360: tu foto de perfil y tu nombre aparecen arriba a la derecha, junto al reloj, en todas las pantallas (igual que el gamertag del dashboard real). Se actualizan al cambiar la foto o el nombre. No se muestran en modo vertical.
+
+## 1.84.75 · Corrección del selector de foto
+- La cuadrícula del selector ya no se sale de la tarjeta cuando la ventana es pequeña: las casillas se ajustan al ancho disponible.
+
+## 1.84.74 · Selector de foto de perfil
+- Xbox 360: «Foto de perfil» (Ajustes › General) abre una cuadrícula como la de logros con las 15 imágenes predeterminadas, la inicial de tu nombre y un «＋» para elegir una imagen propia. Navegas con las flechas/cruceta, A/Enter elige, B/Esc vuelve; también funciona con el ratón. La imagen en uso lleva una marca ✓. «Elegir una imagen propia…» sigue como fila aparte.
+
+## 1.84.73 · Fotos de perfil del usuario
+- Xbox 360: las fotos de perfil predeterminadas ahora son las 15 imágenes que aportó el usuario (`renderer/perfiles/*.png`), en lugar de las ilustraciones propias. Se eligen en Ajustes › General › «Foto de perfil predeterminada»; sigue disponible «Foto de perfil (Xbox 360)…» para usar una imagen propia.
+
+## 1.84.72 · Fotos de perfil predeterminadas
+- Ajustes > General > «Foto de perfil predeterminada»: 12 imágenes propias (mando, trofeo, estrella, cohete, planeta, rayo, corona, diana, llama, escudo, fantasma, robot) con estilo de gamerpic. Se cambian con ←/→. Siguen disponibles «Foto de perfil (Xbox 360)…» (tu propia imagen) y «Quitar la foto de perfil».
+- Están en `renderer/perfiles/` (SVG); puedes añadir o cambiar archivos allí.
+
+## 1.84.71 · Foto de perfil
+- Ajustes > General > «Foto de perfil (Xbox 360)…» elige una imagen de tu PC; sale en la Guía en lugar de la inicial, más grande y con borde blanco. «Quitar la foto de perfil» (aparece cuando hay una) vuelve a la inicial.
+
+## 1.84.70 · Nombre del perfil sin parpadeo al escribir
+- El cuadro ya no se redibuja con cada letra (repetía su animación y parpadeaba); ahora solo se actualiza el texto y la tecla marcada.
+
+## 1.84.69 · Nombre del perfil editable
+- Ajustes > General > «Nombre del perfil (Xbox 360)»: abre un cuadro con teclado en pantalla (mando: ←↑↓→ mover, A escribir, X borrar, Y espacio, B cancelar) y también acepta el teclado físico. Máx. 20 caracteres.
+- El nombre aparece en la Guía junto al avatar. Si lo dejas vacío se usa el de tu usuario de Windows.
+
+## 1.84.68 · Perfil en la Guía
+- La Guía muestra tu perfil: un avatar con la inicial y tu nombre de usuario de Windows, junto al puntaje de logros («G … logros · N juegos al 100 %»).
+- Para cambiar el nombre mostrado hará falta una opción de ajustes (pendiente).
+
+## 1.84.67 · Arranque con el mando de Comptus
+- En la pantalla de arranque del estilo Xbox 360, la esfera se sustituyó por el mando del logo de Comptus: se dibuja el contorno en verde, se encienden la cruceta y los botones, se rellena con degradado verde con el destello y aparece el nombre.
+
+## 1.84.66 · Pantalla de arranque estilo Xbox 360
+- Al entrar al modo consola con el estilo Xbox 360: fondo negro, la esfera de cuatro cuadrantes verdes se enciende uno a uno, destello verde y aparece «COMPTUS · modo consola». Dura unos 3 s.
+- Suena `startup.mp3` durante el arranque (se apaga suave al terminar) y después `welcome.mp3` al abrirse el panel.
+- El estilo clásico mantiene su pantalla de arranque de siempre.
+
+## 1.84.65 · Guía: sección de Logros más visual
+- Solo la sección «Logros» de la Guía lleva iconos reales de cada logro y el panel de vista previa a la derecha (icono grande, juego, fecha, % de jugadores y descripción). Las demás secciones quedan como antes.
+
+## 1.84.64 · Guía (F2): puntaje de logros y logros recientes
+- La Guía muestra arriba tu puntaje total («G 1.234 logros · N juegos al 100 %», suma de los logros de toda la biblioteca).
+- Nueva sección «Logros» en la Guía con los últimos 8 logros desbloqueados (solo de juegos cuya lista ya se cargó) y un acceso a «Ver todos los logros».
+
+## 1.84.63 · Sonido de entrada al modo consola
+- Al entrar al modo consola suena `welcome.mp3` (el que enviaste, normalizado al volumen de los demás). Para cambiarlo: sustituye ese mp3 por otro con el mismo nombre.
+
+## 1.84.62 · Cambio de sección rápido sin capas apiladas
+- Si pasas varias secciones muy seguido, ya no se apilan copias de las secciones intermedias: mientras la cinta se mueve, las pulsaciones se suman y al terminar va directo a la sección final (nunca hay más de una copia saliente).
+- Movimiento un poco más ágil (0,36 s).
+
+## 1.84.61 · Corregido: los mosaicos se «recargaban» 0,7 s después de cambiar de sección
+- Al terminar el cambio de sección se quitaba demasiado pronto la marca interna y la animación de entrada de cada mosaico arrancaba de golpe (pantalla vacía y mosaicos apareciendo uno a uno). Ahora la marca se mantiene hasta que termina la entrada.
+
+## 1.84.60 · Portadas listas antes de cambiar de sección
+- Antes de deslizar a otra sección, el launcher decodifica en segundo plano las primeras 16 portadas de la sección de destino (máx. 0,2 s) y las mantiene en memoria, para que entren ya pintadas y no «se vuelvan a cargar».
+- Pulsaciones seguidas de Q/E se siguen sumando.
+
+## 1.84.59 · Cinta de secciones continua, sin recargar
+- Al cambiar de sección las dos (la que sale y la que entra) se mueven a la vez y pegadas, como una sola cinta, sin hueco vacío en medio.
+- Los mosaicos ya no se «cargan de nuevo» uno a uno al cambiar de sección.
+- La sección que sale conserva su estilo hasta desaparecer (antes cambiaba de aspecto a mitad de camino).
+
+## 1.84.58 · Cinta de secciones sin copias (corrige el fallo visual en Logros)
+- El cambio de sección ya no usa una copia de la sección anterior (se re-estilaba a mitad de animación y salían filas grises en Logros). Ahora la sección sale deslizando (0,16 s) y la nueva entra desde el lado contrario, siempre en la dirección del cambio.
+- Pulsaciones seguidas de Q/E o LB/RB se suman y se llega directo a la sección final.
+
+## 1.84.57 · Cambio de sección tipo cinta (Xbox 360)
+- Al cambiar de sección (LB/RB, Q/E, clic), la sección que sale se desliza y se desvanece hacia un lado mientras la nueva entra desde el otro, con un frenado suave. Va en la dirección del cambio.
+
+## 1.84.56 · Globo de «Logro desbloqueado» (Xbox 360)
+- En el estilo Xbox 360, al desbloquear un logro sale un globo verde con el icono y el nombre del logro, que sube desde abajo, se queda unos segundos y se esconde. Si hay varios, salen uno tras otro (máx. 3). Suena el sonido de logro como antes.
+- En el estilo clásico se mantiene el aviso de siempre.
+
+## 1.84.55 · Logros sin doble animación y letra más fina en Xbox 360
+- Al abrir los logros desde la sección «Logros», el panel se pintaba primero como «resumen» y luego otra vez como «logros», por eso se veía repetido. Ahora abre directo en logros.
+- Estilo Xbox 360: letra Segoe UI Light/Semilight (más fina, como la del 360).
+
+## 1.84.54 · Corrección: el difuminado a negro cubre toda la pantalla
+- La capa de difuminado quedaba por debajo de la lista y del título del juego, así que al jugar se veía el fondo negro con las tarjetas encima. Ahora tapa todo.
+- Si el juego no se puede abrir, la pantalla negra se quita al momento.
+
+## 1.84.53 · Vuelta rápida al cerrar un juego, difuminado a negro también en el clásico y fuera «blades clásico»
+- Al cerrar un juego Comptus lo detecta en cuanto el proceso desaparece (antes esperaba dos vueltas de 5 s, hasta unos 10–15 s).
+- Al volver, el Inicio ya no repite la animación de entrada ni parpadea los colores de relleno de las imágenes.
+- El efecto de difuminado a negro al pulsar Jugar (sin tarjeta de «en ejecución») ahora vale también para el estilo clásico de Comptus.
+- Se elimina el estilo «Xbox 360 (blades clásico)»; quien lo tuviera puesto pasa al clásico de Comptus.
+
+## 1.84.52 · Xbox 360: al jugar, la pantalla se difumina a negro
+- Con este estilo ya no sale la tarjeta de «en ejecución». Al pulsar Jugar la pantalla se difumina y se oscurece hasta quedar en negro, y al cerrar el juego vuelve con el mismo fundido. Los demás estilos no cambian.
+
+## 1.84.51 · Xbox 360: Buscar de primera, fondo sin saltos y sonido al desbloquear logros
+- Con el estilo Xbox 360 la primera sección es Buscar y después Inicio (como «bing | home» de la consola); al entrar sigue abriendo Inicio.
+- El fondo de los juegos solo hace un fundido al cambiar (antes tenía un pequeño zoom que se notaba al cargar).
+- Logros nuevos: mientras juegas (cada 3 min) y unos segundos después de cerrar el juego, Comptus comprueba si se desbloqueó alguno (Steam, Epic y Xbox con sesión). Si es así suena el sonido de logro (el de logro raro si lo tiene menos del 10 % de jugadores) y sale un aviso con su nombre.
+- Requiere haber abierto antes los logros de ese juego al menos una vez (para saber cuáles ya tenías).
+
+## 1.84.50 · Xbox 360: imagen de fondo solo para Inicio
+- Nuevos ajustes «Imagen solo para Inicio» y «Elegir imagen para Inicio (Xbox 360)…»: esa imagen se ve únicamente en Inicio; en el resto de secciones sigue el fondo normal. Se pueden combinar con oscurecer y desenfocar.
+
+## 1.84.49 · Xbox 360: siempre arranca en Inicio y fondo oscurecible/desenfocable
+- Al entrar al modo consola con este estilo siempre aparece Inicio (Buscar sigue siendo la segunda sección).
+- Nuevos ajustes en Fondo: «Oscurecer el fondo (Xbox 360)» (0–90 %) y «Desenfocar el fondo (Xbox 360)» (0–30 px). Solo afectan a este estilo.
+
+## 1.84.48 · Xbox 360: Inicio más ligero que rota y secciones solo con LB/RB, Q/E o clic
+- Inicio: dos páginas como máximo (la segunda sin columna derecha) y el contenido rota cada vez que entras al modo consola; «Continuar» siempre muestra lo último que jugaste.
+- Las flechas ya no cambian de sección al llegar al borde del Inicio o de Colecciones. Se cambia con LB/RB, con Q y E (o Av Pág/Re Pág) o haciendo clic. En Buscar, Q y E escriben letras.
+
+## 1.84.47 · Xbox 360: Inicio con la distribución de la consola y sonidos en mejor calidad
+- Inicio: columna estrecha | tarjeta destacada 2×2 con dos anchas debajo | columna estrecha, y la página siguiente continúa el patrón (la columna verde de accesos queda asomando a la derecha). El contenido sigue siendo variado.
+- Sonidos de mayor calidad (mp3) en `renderer/sonidos/x360/`: mover, seleccionar, jugar, volver, página izquierda/derecha según hacia dónde cambias de sección, Guía y entrada al modo consola.
+
+## 1.84.46 · Xbox 360: sonidos reales de la interfaz
+- Los sonidos del estilo Xbox 360 (mover, cambiar de sección, aceptar, volver, menú…) se recortaron del vídeo de recorrido y están en `renderer/sonidos/x360/`. Si falta un archivo suena el sintetizado.
+- Son sonidos de Microsoft: uso personal, no subirlos a un repositorio público.
+
+## 1.84.45 · Xbox 360: sin cortes, sin «brinco», Inicio más variado y sin colores por juego
+- La loseta seleccionada ya no se corta por la izquierda ni tapa a las vecinas (margen del mosaico y menos aumento en las grandes).
+- Al cambiar de sección, la primera loseta ya no da un salto al terminar la animación.
+- Inicio: las losetas se reparten por turnos entre «Continuar», «Gratis», «Más jugado», «Casi completado», «Eventos», «Favorito», «Ofertas», «Vuelve a jugar», «Mejor valorado» y «Para estrenar», con una etiqueta verde de categoría.
+- Con este estilo se desactiva el cambio de color del tema según el juego.
+
+## 1.84.44 · Xbox 360: logros centrados, colecciones como el Inicio y animaciones de la consola
+- Logros: el panel queda centrado, con el fondo oscuro como en la consola, y ya no se ve la lista de juegos detrás.
+- Logros secretos de Steam: el texto explica que Steam no publica la descripción hasta desbloquearlos.
+- Colecciones: mosaico de 3 filas con losetas grandes, igual que el Inicio; se navega por posición.
+- Animaciones: las losetas entran en cascada desde el lado del que vienes, las fichas del juego se despliegan, el contenido de cada pestaña del juego se desliza y los iconos de logros aparecen en secuencia.
+
+## 1.84.43 · Xbox 360: solo la hora, logros como en la consola y Guía animada
+- Arriba solo se ve la hora (sin batería ni el reproductor de música).
+- Logros: la pestaña «Logros» es una lista de juegos de ancho completo (filas blancas, selección verde) y, al abrir uno, la pestaña «logros» de su página muestra la cabecera gris con el logro elegido (nombre, descripción, porcentaje y fecha) y una rejilla de iconos de 8 columnas con el seleccionado en verde, como en la Xbox 360. Arreglado el panel que se salía por abajo.
+- Guía (F2 / botón central): se despliega con animación desde el centro, las filas entran en cascada y al cambiar de blade el contenido se desliza; el cambio de fila es suave.

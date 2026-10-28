@@ -335,7 +335,7 @@ function visibleGames() {
     // ...ni cuando hay algún filtro del panel activo (así «Todos» muestra de verdad todos)
     if (onlyInstalled && state.filter === 'all' && activeFilterCount() === 0 && g.installed === false) return false;
     switch (state.filter) {
-      case 'all': case 'collections': case 'stats': case 'free': case 'events': case 'wish': return true; // en «colecciones» la lista lateral muestra todos
+      case 'all': case 'collections': case 'stats': case 'free': case 'events': case 'wish': case 'community': return true; // en «colecciones» la lista lateral muestra todos
       case 'favorites': return g.favorite;
       case 'recent': return !!g.lastPlayed;
       case 'notinstalled': return g.installed === false;
@@ -348,7 +348,7 @@ function visibleGames() {
     }
   });
   if (q) list = list.filter((g) => g.name.toLowerCase().includes(q) || gameTags(g).some((t) => t.toLowerCase().includes(q)));
-  if (state.filter !== 'collections' && state.filter !== 'stats' && state.filter !== 'free' && state.filter !== 'events' && state.filter !== 'wish') list = list.filter(matchesFilters);
+  if (state.filter !== 'collections' && state.filter !== 'stats' && state.filter !== 'free' && state.filter !== 'events' && state.filter !== 'wish' && state.filter !== 'community') list = list.filter(matchesFilters);
 
   const by = {
     name: (a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }),
@@ -1044,6 +1044,76 @@ function renderEvents() {
 }
 window.api.onOpenEvents && window.api.onOpenEvents(() => { state.filter = 'events'; state.detailId = null; render(); });
 
+// ---------- Comunidad: mi lista de proyectos de GitHub ----------
+let cmData = null, cmLoading = false, cmMsg = '', cmReset = false;
+const CM_IDEAS = [['HarbourMasters/Shipwright', 'Ship of Harkinian (Zelda OoT)'], ['HarbourMasters/2ship2harkinian', '2 Ship (Majora\'s Mask)'], ['HarbourMasters/Starship', 'Starship (Star Fox 64)'], ['HarbourMasters/SpaghettiKart', 'Spaghetti Kart'], ['Zelda64Recomp/Zelda64Recomp', 'Zelda 64: Recompiled'], ['Eukaryot/sonic3air', 'Sonic 3 A.I.R.'], ['OpenRCT2/OpenRCT2', 'OpenRCT2'], ['OpenTTD/OpenTTD', 'OpenTTD']];
+async function loadCommunity(force) {
+  if (!window.api.communityList || cmLoading) return;
+  cmLoading = true; if (state.filter === 'community') renderCommunity();
+  try { const d = await window.api.communityList(!!force); cmData = { items: (d && d.items) || [], at: Date.now() }; } catch { /* sin datos */ }
+  cmLoading = false;
+  if (state.filter === 'community' && !state.detailId) renderCommunity();
+}
+async function cmAdd(input) {
+  input = String(input || '').trim(); if (!input) return;
+  cmMsg = 'Comprobando…'; renderCommunity();
+  const r = await window.api.communityAdd(input);
+  if (r && r.ok) { cmData = { items: r.items, at: Date.now() }; cmMsg = ''; cmReset = true; toast('Proyecto añadido a tu lista'); }
+  else cmMsg = (r && r.error) || 'No se pudo añadir.';
+  renderCommunity();
+}
+function renderCommunity() {
+  const box = $('#communityPage');
+  const keep = box.querySelector('.cm-in'), typed = keep && !cmReset ? keep.value : '', hadFocus = keep && document.activeElement === keep;
+  cmReset = false;
+  const head = el('div', 'fr-head'); head.append(el('h1', null, 'Comunidad'));
+  const rf = el('button', 'ghost small', cmLoading ? 'Actualizando…' : '[[refresh]] Buscar novedades'); rf.disabled = cmLoading; rf.onclick = () => loadCommunity(true);
+  head.append(el('span', 'page-fill'), rf);
+  const info = el('p', 'hint', 'Guarda aquí los ports de PC y descompilaciones de la comunidad que te interesan y Comptus te avisa cuando saquen una versión nueva (campana y modo consola). Funciona con GitHub, GitLab, Codeberg, SourceForge, itch.io (avisa de las entradas de devlog del autor, no de cada archivo) y cualquier feed RSS. Comptus no descarga ni incluye juegos ni ROMs: cada proyecto se descarga desde su página y necesita tus propios archivos del juego.');
+  const form = el('div', 'cm-form');
+  const inp = el('input', 'cm-in'); inp.type = 'text'; inp.placeholder = 'Enlace del proyecto: GitHub, itch.io, GitLab, Codeberg, SourceForge o un feed RSS'; inp.value = typed;
+  const add = el('button', 'primary', '[[plus]] Añadir'); add.type = 'button';
+  add.onclick = () => cmAdd(inp.value); inp.onkeydown = (e) => { if (e.key === 'Enter') cmAdd(inp.value); };
+  form.append(inp, add);
+  const msg = el('p', 'hint cm-msg', cmMsg);
+  const items = cmData ? cmData.items : [];
+  const fmt = (t) => (t ? new Date(t).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }) : '');
+  const grid = el('div', 'ev-grid');
+  for (const e of items) {
+    const c = el('div', 'ev-card cm-card');
+    const top = el('div', 'ev-top');
+    if (e.gameId) top.append(el('span', 'ev-pill live', 'En tu biblioteca'));
+    top.append(el('span', 'ev-pill kind', e.label || e.repo));
+    c.append(top, el('div', 'ev-name', e.name));
+    const rel = e.release;
+    c.append(el('div', 'ev-when', rel ? `${e.kind === 'github' || e.kind === 'gitea' || e.kind === 'gitlab' ? 'Última versión' : 'Última publicación'}: ${rel.tag}${rel.at ? ' · ' + fmt(rel.at) : ''}` : e.state === 'norelease' ? 'Todavía sin versiones publicadas.' : e.state === 'nofeed' || e.state === 'notfeed' ? 'Esta página no ofrece avisos de novedades.' : e.state === 'missing' ? 'No se encontró el repositorio (puede haber cambiado de nombre).' : cmLoading ? 'Comprobando…' : 'No se pudo comprobar la última versión.'));
+    const act = el('div', 'fr-actions');
+    const open = el('button', 'primary', 'Abrir página'); open.type = 'button'; open.onclick = () => window.api.communityOpen((rel && rel.url) || e.page || `https://github.com/${e.repo}`);
+    act.append(open);
+    if (e.gameId) {
+      const g = state.games.find((x) => x.id === e.gameId);
+      if (g) { const go = el('button', '', 'Ver en la biblioteca'); go.type = 'button'; go.onclick = () => { state.filter = 'all'; state.detailId = g.id; render(); }; act.append(go); }
+    } else {
+      const lk = el('button', '', '[[plus]] Añadir a la biblioteca'); lk.type = 'button'; lk.title = 'Elige el ejecutable que ya descargaste';
+      lk.onclick = async () => { const g = await window.api.communityLink(e.id); if (!g) return; await load(); toast(`«${g.name}» añadido a la biblioteca`); loadCommunity(true); };
+      act.append(lk);
+    }
+    const rm = el('button', 'ghost', '[[trash]] Quitar'); rm.type = 'button';
+    rm.onclick = async () => { if (!confirm(`¿Quitar «${e.name}» de tu lista?`)) return; const r = await window.api.communityRemove(e.id); if (r && r.ok) { cmData = { items: r.items, at: Date.now() }; renderCommunity(); } };
+    act.append(rm);
+    c.append(act); grid.append(c);
+  }
+  const sec = el('section', 'fr-sec');
+  if (items.length) sec.append(grid); else sec.append(el('p', 'hint', cmData ? 'Todavía no has guardado ningún proyecto. Pega un enlace de GitHub arriba o elige una de las ideas.' : 'Cargando…'));
+  const ideas = el('section', 'fr-sec'); ideas.append(el('h2', null, 'Ideas para empezar'));
+  const chips = el('div', 'ach-tabs');
+  for (const [repo, label] of CM_IDEAS) { if (items.some((i) => i.repo.toLowerCase() === repo.toLowerCase())) continue; const b = el('button', 'ghost small', label); b.type = 'button'; b.title = 'github.com/' + repo; b.onclick = () => cmAdd(repo); chips.append(b); }
+  ideas.append(chips, el('p', 'hint', 'Son proyectos conocidos de listas públicas de la comunidad; Comptus comprueba que existan al añadirlos.'));
+  box.replaceChildren(head, info, form, msg, sec, chips.children.length ? ideas : el('span'));
+  if (hadFocus) { const n = box.querySelector('.cm-in'); if (n) { n.focus(); try { n.setSelectionRange(typed.length, typed.length); } catch {} } }
+}
+window.api.onOpenCommunity && window.api.onOpenCommunity(() => { state.filter = 'community'; state.detailId = null; render(); });
+
 // ---------- Render ----------
 // Portadas ya vistas: se guardan las cargadas (para que al volver a una biblioteca salgan al instante, sin el blanco de la
 // carga diferida) y las que fallaron (para poner la letra directamente sin volver a pedirlas por internet)
@@ -1283,24 +1353,27 @@ function render() {
   const inFree = state.filter === 'free' && !inDetail;
   const inEvents = state.filter === 'events' && !inDetail;
   const inWish = state.filter === 'wish' && !inDetail;
+  const inCommunity = state.filter === 'community' && !inDetail;
   { // transición suave al entrar a otro apartado
     const key = `${state.filter}|${state.detailId || ''}`;
     if (key !== lastViewKey) {
       const first = lastViewKey === null; lastViewKey = key;
-      if (!first) playIn(inDetail ? '#detail' : inStats ? '#statsPage' : inFree ? '#freePage' : inWish ? '#wishPage' : inEvents ? '#eventsPage' : '#grid');
+      if (!first) playIn(inDetail ? '#detail' : inStats ? '#statsPage' : inFree ? '#freePage' : inWish ? '#wishPage' : inEvents ? '#eventsPage' : inCommunity ? '#communityPage' : '#grid');
     }
   }
   $('#statsPage').classList.toggle('hidden', !inStats);
   $('#freePage').classList.toggle('hidden', !inFree);
   $('#eventsPage').classList.toggle('hidden', !inEvents);
   $('#wishPage').classList.toggle('hidden', !inWish);
-  updatePageTitle(inDetail || inStats || inFree || inEvents || inWish);
+  $('#communityPage').classList.toggle('hidden', !inCommunity);
+  updatePageTitle(inDetail || inStats || inFree || inEvents || inWish || inCommunity);
   if (!inDetail) destroyTrailer();
-  document.querySelector('.toolbar').classList.toggle('hidden', inDetail || inFree || inEvents || inWish);
+  document.querySelector('.toolbar').classList.toggle('hidden', inDetail || inFree || inEvents || inWish || inCommunity);
   document.querySelector('.toolbar').classList.toggle('stats-mode', inStats);
   $('#statsBtn').classList.toggle('on', inStats);
   $('#detail').classList.toggle('hidden', !inDetail);
   if (inStats) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderStats(); return; }
+  if (inCommunity) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderCommunity(); if (!cmLoading && (!cmData || Date.now() - cmData.at > 600000)) loadCommunity(false); return; }
   if (inEvents) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderEvents(); if (!evLoading && (!evData || Date.now() - evData.at > 3600000)) loadEvents(false); return; }
   if (inWish) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderWish(); if (!wishLoading && (!wishData || Date.now() - wishData.updated > 3600000)) loadWish(false); return; }
   if (inFree) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderFree(); if (!freeLoading && (!freeData || Date.now() - freeData.updated > 3600000)) loadFree(false); return; }
@@ -1529,7 +1602,7 @@ async function launch(g) {
   }
   const res = await window.api.launch(g.id);
   if (res.ok) toast(res.installing ? `Abriendo la instalación de ${g.name}…` : `Abriendo ${g.name}…`);
-  else toast(res.error || 'No se pudo abrir el juego');
+  else { toast(res.error || 'No se pudo abrir el juego'); try { if (window.Couch && Couch.launchFailed) Couch.launchFailed(); } catch {} }
   setTimeout(load, 500);
 }
 
@@ -1542,6 +1615,7 @@ function openEdit(g) {
   updateCoverPreview();
   $('#modal').classList.remove('hidden');
 }
+$('#pickExe').onclick = async () => { const p = await window.api.pickExe(); if (p) $('#editExe').value = p; };
 function closeEdit() { $('#modal').classList.add('hidden'); editing = null; }
 function updateCoverPreview() {
   const img = $('#editCoverPreview');
@@ -2169,7 +2243,7 @@ function renderDetail() {
   }
   mainCol.append(about);
 
-  // --- Logros (juegos de Steam y de Epic) ---
+  // --- Logros (juegos de Steam, Epic y Xbox) ---
   if ((g.source === 'steam' && g.appid) || (g.source === 'epic' && g.epicNs) || (g.source === 'xbox' && g.xboxTitleId)) {
     const ach = el('div', 'panel');
     ach.append(el('h3', null, 'Logros'));
@@ -3848,12 +3922,12 @@ async function refreshSystem() {
     $('#sysTray').checked = !!st.closeToTray; $('#sysSearch').checked = st.quickSearch !== false;
     $('#sysHidden').disabled = !st.startWithWindows;
     $('#updAuto').checked = st.autoUpdate !== false;
-    $('#sysEvent').checked = st.eventNotify !== false; $('#sysWish').checked = st.wishNotify !== false; $('#sysFree').checked = st.freeNotify !== false; $('#sysFreeDlc').checked = !!st.freeNotifyDlc; $('#sysFreeDlc').disabled = st.freeNotify === false;
+    $('#sysEvent').checked = st.eventNotify !== false; $('#sysWish').checked = st.wishNotify !== false; $('#sysMusic').checked = st.nowPlaying !== false; $('#sysFree').checked = st.freeNotify !== false; $('#sysFreeDlc').checked = !!st.freeNotifyDlc; $('#sysFreeDlc').disabled = st.freeNotify === false;
     if (window.api.updateState) window.api.updateState().then(paintUpdate).catch(() => {});
     $('#sysStart').title = st.packaged ? '' : 'Solo funciona en la versión instalada o portable (no al ejecutar desde el código)';
   } catch { /* sin acceso */ }
 }
-for (const [id, key] of [['sysStart', 'startWithWindows'], ['sysSplash', 'splash'], ['sysHidden', 'startHidden'], ['sysTray', 'closeToTray'], ['sysSearch', 'quickSearch'], ['sysFree', 'freeNotify'], ['sysFreeDlc', 'freeNotifyDlc'], ['sysEvent', 'eventNotify'], ['sysWish', 'wishNotify']]) {
+for (const [id, key] of [['sysStart', 'startWithWindows'], ['sysSplash', 'splash'], ['sysHidden', 'startHidden'], ['sysTray', 'closeToTray'], ['sysSearch', 'quickSearch'], ['sysFree', 'freeNotify'], ['sysFreeDlc', 'freeNotifyDlc'], ['sysEvent', 'eventNotify'], ['sysWish', 'wishNotify'], ['sysMusic', 'nowPlaying']]) {
   $('#' + id).onchange = async (e) => { await window.api.systemSet({ [key]: e.target.checked }); refreshSystem(); };
 }
 // Actualizaciones
@@ -3952,11 +4026,13 @@ $('#infoForm').onsubmit = async (e) => {
 
 $('#editForm').onsubmit = async (e) => {
   e.preventDefault();
-  await window.api.editLocal(editing.id, {
+  const r = await window.api.editLocal(editing.id, {
+    exe: $('#editExe').value.trim(),
     name: $('#editName').value.trim() || editing.name,
     args: $('#editArgs').value.trim(),
     cover: editCover,
   });
+  if (r && r.duplicate) { toast('Ya tienes otro juego con ese ejecutable'); return; }
   closeEdit();
   await load();
 };
@@ -3980,6 +4056,7 @@ window.api.diskSizes && window.api.diskSizes().then((d) => { if (d) { diskScanni
   } catch { /* sin asistente */ }
 })();
 window.api.onGameState(applyRunState);
+try { window.api.onAchUnlocked((p) => { try { if (window.Couch && Couch.achUnlocked) Couch.achUnlocked(p); } catch {} try { toast('🏆 Logro desbloqueado: ' + (p.list[0] ? p.list[0].name : '') + ' — ' + p.game); } catch {} }); } catch {}
 window.api.gameState().then(applyRunState).catch(() => {});
 
 (async () => {

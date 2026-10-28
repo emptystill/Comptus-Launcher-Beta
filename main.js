@@ -537,6 +537,19 @@ async function getWish(force) {
 ipcMain.handle('wish:get', async (_e, force) => { try { return await getWish(!!force); } catch (e) { return { steam: [], epic: [], errors: { all: String((e && e.message) || e) }, linked: {}, updated: 0 }; } });
 // Avisa cuando un juego de tu lista de deseados baja de precio o se vuelve gratis
 // Avisos: con el modo consola abierto se muestran dentro de él (las notificaciones de Windows no se ven en pantalla completa)
+// Windows no sabe cómo se llama la app (la versión portable no se registra y el instalador no crea su acceso directo con el identificador),
+// así que en las notificaciones enseña el identificador interno («com.mateo.gamelauncher»). Se registra aquí el nombre y el icono
+// para ese identificador (HKCU, sin permisos de administrador); vale para el instalador, el portable y la versión instalada ya existente.
+function registerToastIdentity() {
+  if (process.platform !== 'win32' || !app.isPackaged) return;
+  try {
+    const key = 'HKCU\\Software\\Classes\\AppUserModelId\\com.mateo.gamelauncher';
+    const add = (name, value) => execFile('reg', ['add', key, '/v', name, '/t', 'REG_SZ', '/d', value, '/f'], { windowsHide: true }, () => {});
+    add('DisplayName', 'Comptus');
+    const src = [path.join(__dirname, 'build', 'icon.png'), path.join(__dirname, 'renderer', 'icon.png')].find((p) => { try { return fs.existsSync(p); } catch { return false; } });
+    if (src) { const dst = path.join(app.getPath('userData'), 'toast-icon.png'); try { fs.copyFileSync(src, dst); add('IconUri', dst); } catch {} }
+  } catch { /* sin registro: las notificaciones salen con el identificador, como antes */ }
+}
 function sendNotice(kind, o, open) {
   try { if (win && !win.isDestroyed()) win.webContents.send('app:notice', { kind, title: o.title, body: o.body, open }); } catch {} // historial de avisos del modo escritorio
   try { if (couchOn && win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()) { win.webContents.send('couch:notice', { kind, title: o.title, body: o.body }); return; } } catch {}
@@ -611,6 +624,97 @@ async function checkEventNotify() {
 }
 ipcMain.handle('events:check', () => checkEventNotify());
 
+// ---------- Comunidad: tu lista de proyectos de GitHub (ports y descompilaciones) con aviso de versiones nuevas ----------
+const communityMod = require('./community');
+const communityFile = () => path.join(app.getPath('userData'), 'community.json');
+function readCommunity() { try { const j = JSON.parse(fs.readFileSync(communityFile(), 'utf8')); return Array.isArray(j.items) ? j.items : []; } catch { return []; } }
+function writeCommunity(items) { try { fs.writeFileSync(communityFile(), JSON.stringify({ items })); } catch { /* sin permiso */ } }
+async function communityFeed(repo, kind) {
+  const r = await net.fetch(`https://github.com/${repo}/${kind}.atom`, { redirect: 'follow' });
+  if (r.status === 404) return { missing: true };
+  if (!r.ok) throw new Error('http ' + r.status);
+  return { release: communityMod.parseAtom(await r.text()) };
+}
+async function communityFetchFeed(feedUrl) {
+  try {
+    const r = await net.fetch(feedUrl, { redirect: 'follow', headers: { 'User-Agent': 'Comptus', Accept: 'application/atom+xml, application/rss+xml, application/xml, text/xml, */*' } });
+    if (r.status === 404 || r.status === 410) return { state: 'nofeed', release: null };
+    if (!r.ok) throw new Error('http ' + r.status);
+    const txt = await r.text();
+    if (!/<(feed|rss|rdf:RDF)[\s>]/i.test(txt)) return { state: 'notfeed', release: null };
+    const release = communityMod.parseFeed(txt);
+    return release ? { state: 'ok', release } : { state: 'norelease', release: null };
+  } catch { return { state: 'error', release: null }; }
+}
+async function communityFetchItem(it) { return it.feed ? communityFetchFeed(it.feed) : communityFetch(it.repo); }
+async function communityFetch(repo) {
+  try {
+    let f = await communityFeed(repo, 'releases');
+    if (f.missing) return { state: 'missing', release: null };
+    if (!f.release) { try { f = await communityFeed(repo, 'tags'); } catch { f = { release: null }; } } // sin lanzamientos: se mira la última etiqueta
+    return f.release ? { state: 'ok', release: f.release } : { state: 'norelease', release: null };
+  } catch { return { state: 'error', release: null }; }
+}
+async function refreshCommunity(force) {
+  const items = readCommunity(); let dirty = false;
+  for (const it of items) {
+    if (!force && it.checkedAt && Date.now() - it.checkedAt < 3 * 3600 * 1000) continue;
+    const r = await communityFetchItem(it);
+    if (r.state === 'error') { if (!it.release) it.state = 'error'; } else { it.state = r.state; it.release = r.release; }
+    it.checkedAt = Date.now(); dirty = true;
+  }
+  if (dirty) writeCommunity(items);
+  return items;
+}
+function communityView(items) {
+  const games = new Set((cache || []).map((g) => g.id));
+  return items.map((i) => ({ id: i.id, repo: i.repo || '', kind: i.kind || 'github', label: i.label || i.repo || '', page: i.page || (i.repo ? `https://github.com/${i.repo}` : ''), name: i.name, state: i.state || 'error', release: i.release || null, gameId: i.gameId && games.has(i.gameId) ? i.gameId : null, addedAt: i.addedAt, seen: i.seen || '' }));
+}
+ipcMain.handle('community:list', async (_e, force) => { try { return { ok: true, items: communityView(await refreshCommunity(!!force)) }; } catch { return { ok: true, items: communityView(readCommunity()) }; } });
+ipcMain.handle('community:add', async (_e, input) => {
+  const src = communityMod.parseSource(input);
+  if (!src) return { ok: false, error: 'No reconozco ese enlace. Puede ser de GitHub (github.com/usuario/proyecto), itch.io, GitLab, Codeberg, SourceForge o la dirección de un feed RSS.' };
+  if (src.kind === 'moddb') return { ok: false, error: 'ModDB no tiene un aviso de novedades que Comptus pueda leer por el enlace de la página. Si la página muestra un icono RSS, copia esa dirección y pégala aquí.' };
+  const items = readCommunity();
+  if (items.some((i) => i.id === src.id)) return { ok: false, error: 'Ese proyecto ya está en tu lista.' };
+  const r = src.kind === 'github' ? await communityFetch(src.repo) : await communityFetchFeed(src.feed);
+  if (r.state === 'missing') return { ok: false, error: 'No existe ese repositorio en GitHub (o es privado).' };
+  if (r.state === 'nofeed') return { ok: false, error: src.kind === 'itch' ? 'Ese juego de itch.io no tiene feed de novedades (el autor no ha publicado ninguna entrada de devlog).' : 'Esa página no ofrece un feed de novedades.' };
+  if (r.state === 'notfeed') return { ok: false, error: 'Esa dirección no es un feed RSS o Atom, así que no puedo saber cuándo cambia.' };
+  if (r.state === 'error') return { ok: false, error: 'No se pudo comprobar la página ahora. Revisa tu conexión e inténtalo de nuevo.' };
+  items.push({ id: src.id, kind: src.kind, repo: src.repo || '', label: src.label, page: src.page, feed: src.feed || '', name: src.name, addedAt: Date.now(), checkedAt: Date.now(), state: r.state, release: r.release, seen: r.release ? r.release.tag : '-', gameId: null });
+  writeCommunity(items);
+  return { ok: true, items: communityView(items) };
+});
+ipcMain.handle('community:remove', (_e, id) => { writeCommunity(readCommunity().filter((i) => i.id !== id)); return { ok: true, items: communityView(readCommunity()) }; });
+ipcMain.handle('community:open', async (_e, url) => {
+  if (!/^https?:\/\/[^\s]+$/.test(String(url))) return { ok: false };
+  await shell.openExternal(url); return { ok: true };
+});
+// Registra como juego el ejecutable del proyecto que ya descargaste (Comptus no descarga nada)
+ipcMain.handle('community:link', async (_e, id) => {
+  const items = readCommunity(), it = items.find((i) => i.id === id); if (!it) return null;
+  const res = await dialog.showOpenDialog(win, { title: 'Elige el ejecutable del proyecto que ya descargaste', properties: ['openFile'], filters: [{ name: 'Ejecutables', extensions: ['exe', 'bat', 'lnk'] }, { name: 'Todos los archivos', extensions: ['*'] }] });
+  if (res.canceled || !res.filePaths[0]) return null;
+  const exe = res.filePaths[0], store = loadStore();
+  let g = store.local.find((x) => x.exe.toLowerCase() === exe.toLowerCase());
+  if (!g) { g = { id: `local:${randomUUID()}`, name: it.name, exe, args: '', cover: null }; store.local.push(g); saveStore(store); }
+  it.gameId = g.id; writeCommunity(items);
+  return g;
+});
+// Aviso cuando un proyecto de tu lista saca una versión distinta a la que ya viste
+async function checkCommunityNotify() {
+  try {
+    const items = await refreshCommunity(true);
+    const fresh = communityMod.changed(items);
+    for (const it of items) if (it.release) it.seen = it.release.tag;
+    writeCommunity(items);
+    for (const f of fresh) sendNotice('community', { title: `Novedad en ${f.name}`, body: (f.feed ? 'Nueva publicación: ' : 'Nueva versión: ') + f.release.tag }, 'open:community');
+    return fresh.length;
+  } catch (e) { if (process.env.COMPTUS_DEBUG) console.error('community check', e); return 0; }
+}
+ipcMain.handle('community:check', () => checkCommunityNotify());
+
 // Avisos de juegos gratis nuevos (mientras Comptus esté abierto, también en la bandeja)
 const seenFile = () => path.join(app.getPath('userData'), 'free-seen.json');
 let freeNotifTimer = null;
@@ -636,8 +740,8 @@ async function checkFreeNotify() {
 ipcMain.handle('free:check', () => checkFreeNotify()); // (también lo usan las pruebas)
 function startFreeNotify() {
   clearInterval(freeNotifTimer);
-  setTimeout(() => { checkFreeNotify(); checkEventNotify(); checkWishNotify(); }, 30000);
-  freeNotifTimer = setInterval(() => { checkFreeNotify(); checkEventNotify(); checkWishNotify(); }, 3 * 3600 * 1000);
+  setTimeout(() => { checkFreeNotify(); checkEventNotify(); checkWishNotify(); checkCommunityNotify(); }, 30000);
+  freeNotifTimer = setInterval(() => { checkFreeNotify(); checkEventNotify(); checkWishNotify(); checkCommunityNotify(); }, 3 * 3600 * 1000);
 }
 
 // ---------- Espacio en disco ----------
@@ -957,10 +1061,12 @@ ipcMain.handle('link:open', async (_e, url) => {
 // Modo consola: pasa la ventana a pantalla completa y, al salir, la deja como estaba
 let couchOn = false, couchMoveT = null, couchMoveHooked = false, couchSaved = '';
 // Recuerda en qué monitor se usa el modo consola para volver a abrirlo ahí
+// Monitor donde está el centro de la ventana (con Win+Mayús+flecha la ventana puede cambiar de monitor sin cambiar aún de tamaño)
+function couchWinDisplay() { const b = win.getBounds(); return screen.getDisplayNearestPoint({ x: Math.round(b.x + b.width / 2), y: Math.round(b.y + b.height / 2) }); }
 function rememberCouchDisplay() {
   if (!couchOn || !win || win.isDestroyed()) return;
   try {
-    const d = screen.getDisplayMatching(win.getBounds());
+    const d = couchWinDisplay();
     const v = { id: d.id, x: d.bounds.x, y: d.bounds.y, w: d.bounds.width, h: d.bounds.height };
     const key = JSON.stringify(v);
     if (key === couchSaved) return;
@@ -976,6 +1082,57 @@ function savedCouchDisplay() {
     const all = screen.getAllDisplays();
     return all.find((d) => d.id === v.id) || all.find((d) => d.bounds.x === v.x && d.bounds.y === v.y && d.bounds.width === v.w && d.bounds.height === v.h) || null;
   } catch { return null; }
+}
+// Modo consola: si Windows cambia la resolución del monitor (un juego a pantalla completa la cambia al abrirse y la restaura al cerrarse,
+// sobre todo en monitores en vertical) la ventana se queda con el tamaño de antes: cortada a la mitad o con el escritorio a la vista.
+// Aquí se vuelve a ajustar al monitor entero en cuanto cambian los monitores, la ventana o termina un juego.
+let couchFitting = false, couchFitT = null, couchFitHooked = false, couchFitLog = [], couchGood = null;
+function couchTargetDisplay() { try { return savedCouchDisplay() || screen.getDisplayMatching(win.getBounds()); } catch { return null; } }
+function refitCouch(force) {
+  if (!couchOn || !win || win.isDestroyed() || couchFitting || win.isMinimized() || !win.isVisible()) return;
+  try {
+    let d = couchTargetDisplay(); if (!d) return;
+    const b0 = win.getBounds();
+    // Si la persona movió la ventana a otro monitor (Win+Mayús+flecha), se queda allí: se recuerda el nuevo y se ajusta a él
+    try { const cur = couchWinDisplay(); if (cur && cur.id !== d.id) { dlog('modo consola: la ventana se movió a otro monitor (' + cur.bounds.width + 'x' + cur.bounds.height + '), se queda allí'); couchGood = null; couchSaved = ''; rememberCouchDisplay(); d = cur; couchFitLog = []; } } catch {}
+    let t = d.bounds;
+    // Windows a veces sigue diciendo que el monitor es más pequeño mientras un juego mantiene su modo de pantalla: si la ventana quedó más pequeña que cuando entró, se usa ese tamaño
+    if (couchGood && (b0.width < couchGood.width - 2 || b0.height < couchGood.height - 2)) t = couchGood;
+    else if (win.isFullScreen() && !(couchGood && (b0.width < couchGood.width - 2 || b0.height < couchGood.height - 2)) && (!couchGood || (d.bounds.width * d.bounds.height >= couchGood.width * couchGood.height && Math.abs(b0.width - d.bounds.width) <= 2 && Math.abs(b0.height - d.bounds.height) <= 2))) couchGood = { ...d.bounds };
+    const same = (b) => Math.abs(b.x - t.x) <= 2 && Math.abs(b.y - t.y) <= 2 && Math.abs(b.width - t.width) <= 2 && Math.abs(b.height - t.height) <= 2;
+    const b = b0;
+    if (same(b) && win.isFullScreen() && !force) return;
+    const nowT = Date.now(); couchFitLog = couchFitLog.filter((x) => nowT - x < 30000); if (couchFitLog.length >= 6) return; couchFitLog.push(nowT); // como mucho 6 reajustes cada 30 s (evita un bucle si el tamaño no cuadra)
+    couchFitting = true;
+    try { dlog('modo consola: la ventana ya no coincide con el monitor (' + b.width + 'x' + b.height + ' → ' + t.width + 'x' + t.height + '), se reajusta'); } catch {}
+    try { win.setBounds(t); } catch {} // primero se intenta sin salir de pantalla completa (sin parpadeo)
+    setTimeout(() => {
+      try {
+        if (win.isDestroyed() || !couchOn) { couchFitting = false; return; }
+        if (same(win.getBounds()) && win.isFullScreen()) { couchFitting = false; return; }
+        if (win.isFullScreen()) win.setFullScreen(false); // si no basta, se sale y se vuelve a entrar
+        setTimeout(() => {
+          try { if (!win.isDestroyed() && couchOn) { win.setBounds(t); win.setFullScreen(true); } } catch {}
+          setTimeout(() => { couchFitting = false; }, 500);
+        }, 150);
+      } catch { couchFitting = false; }
+    }, 150);
+  } catch { couchFitting = false; }
+}
+function scheduleCouchFit(delays) { clearTimeout(couchFitT); (delays || [500]).forEach((ms, i) => { const t = setTimeout(() => refitCouch(), ms); if (i === 0) couchFitT = t; }); }
+function hookCouchFit() {
+  if (couchFitHooked) return; couchFitHooked = true;
+  const go = () => { try { const d = couchTargetDisplay(); if (d) dlog('pantalla: ' + d.bounds.width + 'x' + d.bounds.height + ' (escala ' + d.scaleFactor + ') · ventana ' + win.getBounds().width + 'x' + win.getBounds().height); } catch {} scheduleCouchFit([700, 2500]); };
+  try { screen.on('display-metrics-changed', go); screen.on('display-added', go); screen.on('display-removed', go); } catch {}
+  try { win.on('resize', () => { if (couchOn && !couchFitting) scheduleCouchFit([120]); }); win.on('restore', go); win.on('show', go); win.on('focus', () => { if (couchOn) scheduleCouchFit([100, 800]); }); } catch {}
+  // Vigilante: mientras el modo consola está a la vista, cada 0,6 s comprueba que la ventana cubra el monitor (hay cambios que Windows no avisa)
+  let lastWhy = 0;
+  setInterval(() => { try {
+    if (!couchOn || !win || win.isDestroyed()) return;
+    const b = win.getBounds(), g = couchGood;
+    if (g && (b.width < g.width - 2 || b.height < g.height - 2) && Date.now() - lastWhy > 3000) { lastWhy = Date.now(); dlog('vigilante: ventana ' + b.width + 'x' + b.height + ' < ' + g.width + 'x' + g.height + ' · visible=' + win.isVisible() + ' minimizada=' + win.isMinimized() + ' pantallaCompleta=' + win.isFullScreen() + ' reajustando=' + couchFitting); }
+    if (win.isVisible() && !win.isMinimized()) refitCouch();
+  } catch {} }, 600);
 }
 ipcMain.handle('couch:fullscreen', (_e, on, restoreFs) => {
   if (!win || win.isDestroyed()) return { ok: false };
@@ -995,12 +1152,12 @@ ipcMain.handle('couch:fullscreen', (_e, on, restoreFs) => {
       }
     } catch {}
     win.setFullScreen(true); try { win.setMenuBarVisibility(false); } catch {}
-    couchOn = true;
+    couchOn = true; couchGood = null; hookCouchFit(); setTimeout(() => { try { if (couchOn && win.isFullScreen()) { const d = couchTargetDisplay(); const w = win.getBounds(); if (d && Math.abs(w.width - d.bounds.width) <= 2 && Math.abs(w.height - d.bounds.height) <= 2) couchGood = { ...d.bounds }; } } catch {} }, 1500);
     if (!couchMoveHooked) { couchMoveHooked = true; win.on('move', () => { clearTimeout(couchMoveT); couchMoveT = setTimeout(rememberCouchDisplay, 700); }); }
     setTimeout(rememberCouchDisplay, 900);
     return { ok: true, was };
   }
-  rememberCouchDisplay(); couchOn = false;
+  rememberCouchDisplay(); couchOn = false; couchGood = null;
   if (!restoreFs) win.setFullScreen(false);
   return { ok: true };
 });
@@ -1200,10 +1357,24 @@ ipcMain.handle('local:add', async () => {
   return game;
 });
 
+ipcMain.handle('local:pickExe', async () => {
+  const res = await dialog.showOpenDialog(win, {
+    title: 'Elige el ejecutable del juego',
+    properties: ['openFile'],
+    filters: [{ name: 'Ejecutables', extensions: ['exe', 'bat', 'lnk'] }, { name: 'Todos los archivos', extensions: ['*'] }],
+  });
+  return res.canceled || !res.filePaths[0] ? null : res.filePaths[0];
+});
+
 ipcMain.handle('local:edit', (_e, id, patch) => {
   const store = loadStore();
   const g = store.local.find((x) => x.id === id);
   if (!g) return null;
+  if (typeof patch.exe === 'string' && patch.exe.trim() && patch.exe !== g.exe) {
+    const exe = patch.exe.trim();
+    if (store.local.some((x) => x.id !== id && x.exe.toLowerCase() === exe.toLowerCase())) return { duplicate: true };
+    g.exe = exe;
+  }
   for (const k of ['name', 'args', 'cover']) if (k in patch) g[k] = k === 'cover' && typeof patch[k] === 'string' ? media.toToken(userDir(), 'cover', patch[k], g.name) : patch[k];
   saveStore(store);
   return g;
@@ -1390,7 +1561,7 @@ async function resolveSteamId(settings) {
   if (steamPathCache === undefined) steamPathCache = await findSteamPath().catch(() => null);
   return steamPathCache ? detectSteamId(steamPathCache, { parseVdf, getCI, fs, path }) : null;
 }
-ipcMain.handle('achievements:get', async (_e, id, force) => {
+async function getAch(id, force) {
   const g = cache.find((x) => x.id === id);
   if (g && g.source === 'epic' && g.epicNs) return epicAchievements(g, force);
   if (g && g.source === 'xbox' && g.xboxTitleId) return xboxAchievements(g, force);
@@ -1404,7 +1575,26 @@ ipcMain.handle('achievements:get', async (_e, id, force) => {
   if (res.data) { updateMeta(id, { achievements: res.data }); return { ok: true, data: res.data }; }
   // si falla pero hay datos guardados, se enseñan como están (con el motivo)
   return { ok: false, code: res.code, error: res.error, data: saved };
-});
+}
+ipcMain.handle('achievements:get', (_e, id, force) => getAch(id, force));
+ipcMain.handle('app:userName', () => { try { return require('os').userInfo().username || ''; } catch { return ''; } });
+
+// ---------- Logros nuevos: se avisa (sonido + aviso) al desbloquear uno mientras juegas o al cerrar el juego ----------
+async function detectNewAch(g) {
+  try {
+    if (!g || !(g.source === 'steam' || g.source === 'epic' || g.source === 'xbox')) return;
+    const before = ((loadStore().meta[g.id] || {}).achievements || {}).list;
+    if (!Array.isArray(before)) return; // sin lista previa no se sabe qué es nuevo
+    const had = new Set(before.filter((a) => a.achieved).map((a) => a.id));
+    const r = await getAch(g.id, true); const list = r && r.data && Array.isArray(r.data.list) ? r.data.list : null; if (!list) return;
+    const fresh = list.filter((a) => a.achieved && !had.has(a.id));
+    if (!fresh.length) return;
+    const rare = fresh.some((a) => a.percent != null && a.percent < 10);
+    if (win && !win.isDestroyed()) win.webContents.send('ach:unlocked', { id: g.id, game: g.name, rare, list: fresh.map((a) => ({ name: a.name, description: a.description, percent: a.percent, icon: a.icon })) });
+    try { showToast('🏆 Logro desbloqueado: ' + fresh[0].name + (fresh.length > 1 ? ` (+${fresh.length - 1})` : ''), 5200); } catch {}
+  } catch (e) { try { dlog('logros nuevos: ' + (e && e.message)); } catch {} }
+}
+setInterval(() => { try { const a = tracker.active; if (a) { const g = cache.find((x) => x.id === a.id) || a; detectNewAch(g); } } catch {} }, 180000);
 
 // ---------- Juegos que tienes pero no están instalados ----------
 const OWNED_STALE_MS = 12 * 60 * 60 * 1000;
@@ -2023,7 +2213,7 @@ ipcMain.handle('update:install', () => updater.install());
 // ---------- Sistema: bandeja, inicio con Windows y búsqueda rápida ----------
 const sysSettings = () => {
   const s = loadStore().settings;
-  return { startWithWindows: !!s.startWithWindows, startHidden: !!s.startHidden, closeToTray: !!s.closeToTray, quickSearch: s.quickSearch !== false, autoUpdate: s.autoUpdate !== false, freeNotify: s.freeNotify !== false, freeNotifyDlc: !!s.freeNotifyDlc, eventNotify: s.eventNotify !== false, wishNotify: s.wishNotify !== false, splash: s.splash !== false };
+  return { startWithWindows: !!s.startWithWindows, startHidden: !!s.startHidden, closeToTray: !!s.closeToTray, quickSearch: s.quickSearch !== false, autoUpdate: s.autoUpdate !== false, freeNotify: s.freeNotify !== false, freeNotifyDlc: !!s.freeNotifyDlc, eventNotify: s.eventNotify !== false, wishNotify: s.wishNotify !== false, splash: s.splash !== false, nowPlaying: s.nowPlaying !== false };
 };
 const exePath = () => process.env.PORTABLE_EXECUTABLE_FILE || process.execPath; // en la versión portable, el .exe original
 function loginEnabled() { // ¿está en el arranque de Windows? (cuenta también lo que escribió el instalador)
@@ -2045,8 +2235,9 @@ ipcMain.handle('system:get', () => systemState());
 ipcMain.handle('system:set', (_e, patch) => {
   const store = loadStore();
   const next = { ...store.settings };
-  for (const k of ['startWithWindows', 'startHidden', 'closeToTray', 'quickSearch', 'autoUpdate', 'freeNotify', 'freeNotifyDlc', 'eventNotify', 'wishNotify', 'splash']) if (typeof (patch || {})[k] === 'boolean') next[k] = patch[k];
+  for (const k of ['startWithWindows', 'startHidden', 'closeToTray', 'quickSearch', 'autoUpdate', 'freeNotify', 'freeNotifyDlc', 'eventNotify', 'wishNotify', 'splash', 'nowPlaying']) if (typeof (patch || {})[k] === 'boolean') next[k] = patch[k];
   store.settings = next; saveStore(store);
+  if (patch && 'nowPlaying' in patch) { try { npApplySetting(); } catch {} }
   applyLoginItem();
   registerHotkeys();
   return systemState();
@@ -2340,13 +2531,14 @@ function bringMainFront() {
     } catch {}
   };
   go(true); setTimeout(() => go(false), 500); setTimeout(() => go(false), 1500); setTimeout(() => go(false), 3500);
+  if (couchOn) scheduleCouchFit([1200, 3000, 6000]); // el juego pudo cambiar la resolución y restaurarla al cerrarse
 }
 function onGameEnd(g) {
   stopping = false;
   logSession(g);
   autoBackupSaves(g);
   detectSavesAfter(g);
-  if (g) sendGameState(g.id, null);
+  if (g) { sendGameState(g.id, null); setTimeout(() => detectNewAch(cache.find((x) => x.id === g.id) || g), 6000); }
   if (overlay && !overlay.isDestroyed()) overlay.hide();
   if (win && !win.isDestroyed()) {
     win.webContents.send('library:changed');
@@ -2399,6 +2591,45 @@ ipcMain.handle('overlay:state', () => {
     accent: (loadStore().settings.theme || {}).accent || null,
   };
 });
+// «Sonando ahora»: lo que suena en Windows (Spotify y otros) con pausa / siguiente / anterior; ver nowplaying.js
+const nowPlaying = require('./nowplaying').createNowPlaying();
+let npLastErr = '', npLastThumbErr = '', npState = { has: false }, npThumb = { key: '', data: '' }, npJson = '', npBusy = false;
+const npEnabled = () => process.platform === 'win32' && loadStore().settings.nowPlaying !== false;
+const npWanted = () => npEnabled() && ((win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()) || (overlay && !overlay.isDestroyed() && overlay.isVisible()));
+const npApp = (id) => String(id || '').split('!').pop().replace(/\.exe$/i, '').replace(/_.*$/, '').slice(0, 40);
+function npBroadcast() {
+  try { if (win && !win.isDestroyed()) win.webContents.send('media:state', npState); } catch {}
+  try { if (overlay && !overlay.isDestroyed()) overlay.webContents.send('media:state', npState); } catch {}
+}
+async function npPoll(force) {
+  if (!npEnabled()) return { has: false, disabled: true };
+  if (npBusy || (!force && !npWanted())) return npState;
+  npBusy = true;
+  try {
+    const r = await nowPlaying.get();
+    let s = { has: false };
+    if (!r.ok) { s = { has: false, error: String(r.error || '').slice(0, 200) }; if (s.error !== npLastErr) { npLastErr = s.error; try { dlog('música: no se pudo leer el reproductor de Windows (' + s.error + ')'); } catch {} } if (process.env.COMPTUS_DEBUG) console.error('now playing', r.error); }
+    else if (r.data && r.data.has) {
+      const d = r.data;
+      if (d.thumb) npThumb = { key: d.key, data: d.thumb };
+      if (d.thumbErr && d.thumbErr !== npLastThumbErr) { npLastThumbErr = d.thumbErr; try { dlog('música: no se pudo leer la portada (' + d.thumbErr + ')'); } catch {} }
+      s = { has: true, title: d.title || '', artist: d.artist || '', album: d.album || '', app: npApp(d.app), playing: !!d.playing, key: d.key, thumb: npThumb.key === d.key ? npThumb.data : '' };
+    }
+    const j = JSON.stringify(s);
+    if (j !== npJson) { npJson = j; npState = s; npBroadcast(); }
+  } catch { /* se reintenta en el siguiente ciclo */ } finally { npBusy = false; }
+  return npState;
+}
+function npApplySetting() { if (!npEnabled()) { nowPlaying.stop(); npState = { has: false }; npJson = ''; npBroadcast(); } else npPoll(true); }
+setInterval(() => { npPoll(false); }, 2000);
+ipcMain.handle('media:get', () => npPoll(true));
+ipcMain.handle('media:cmd', async (_e, c) => {
+  if (!npEnabled()) return { ok: false };
+  const r = await nowPlaying.cmd(c);
+  setTimeout(() => npPoll(true), 350);
+  return { ok: !!r.ok };
+});
+
 // Mezclador de volumen (general y por aplicación) con sliders; ver mixer.js
 const mixer = require('./mixer').createMixer();
 ipcMain.handle('overlay:mixer:list', async () => {
@@ -2589,7 +2820,7 @@ if (!gotLock) app.quit();
 else if (app.on) {
   app.on('second-instance', () => showMain());
 }
-app.on('before-quit', () => { quitting = true; try { mixer.stop(); } catch {} stopPadWatch(); stopFgWatch(); stopLibraryWatch(); try { if (tray) { tray.destroy(); tray = null; } } catch {} flushStore(true); });
+app.on('before-quit', () => { quitting = true; try { mixer.stop(); } catch {} try { nowPlaying.stop(); } catch {} stopPadWatch(); stopFgWatch(); stopLibraryWatch(); try { if (tray) { tray.destroy(); tray = null; } } catch {} flushStore(true); });
 app.on('will-quit', () => { flushStore(true); if (globalShortcut) globalShortcut.unregisterAll(); });
 
 // Los tráilers de la tienda se reproducen desde la CDN de Steam: se permite leerlos desde la ventana de la app
@@ -2605,7 +2836,7 @@ function allowSteamVideo() {
 app.whenReady().then(() => { if (!gotLock) return; if (!process.argv.includes('--oculto') && sysSettings().splash !== false) openSplash(); /* lo primero: que se vea cuanto antes */
   // El resto del arranque (copias, bandeja, ventana principal…) bloquea el hilo principal: se hace cuando la pantalla de inicio ya se ve (o a los 700 ms como máximo)
   let started = false;
-  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { if (app.isPackaged) app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem();
+  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { if (app.isPackaged) app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem();
   updater.start(); setTimeout(() => { try { getSaves().update(false); } catch {} }, 90000); setTimeout(async () => { await autoSyncOwned().catch(() => {}); backgroundInfo().catch(() => {}); setTimeout(() => startDiskScan(false).catch(() => {}), 15000); startFreeNotify(); backgroundSgdb(); }, 4000); };
   if (splash) { afterSplash = rest; setTimeout(() => { afterSplash = null; rest(); }, 700); } else rest(); });
 app.on('window-all-closed', () => app.quit());

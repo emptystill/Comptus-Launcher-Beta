@@ -18,6 +18,7 @@
       <button class="filter" data-filter="wish"><i data-ic="heart"></i> Deseados <span class="count" data-count="wish"></span></button>
       <button class="filter" data-filter="free"><i data-ic="gift"></i> Gratis <span class="count" data-count="free"></span></button>
       <button class="filter" data-filter="events"><i data-ic="calendar"></i> Eventos <span class="count" data-count="events"></span></button>
+      <button class="filter" data-filter="community"><i data-ic="globe"></i> Comunidad</button>
       <button class="filter" data-filter="hidden"><i data-ic="eyeOff"></i> Ocultos <span class="count" data-count="hidden"></span></button>
       <div class="nav-title collapsible" data-sec="sources" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span>Bibliotecas</div>
       <div id="sourceFilters"></div>
@@ -65,6 +66,7 @@
     <section id="freePage" class="stats-page hidden"></section>
     <section id="wishPage" class="stats-page hidden"></section>
     <section id="eventsPage" class="stats-page hidden"></section>
+    <section id="communityPage" class="stats-page hidden"></section>
   </main>
 
   <aside id="filterSide" class="filter-side" aria-hidden="true"><div class="filter-inner"><div class="fhead"></div><div class="fbody"></div></div></aside>
@@ -281,6 +283,7 @@
       <div class="section-label">Avisos</div>
       <label class="lib"><input type="checkbox" id="sysFree" /><span>Avisarme cuando haya juegos gratis nuevos (Epic Games y Steam)</span></label>
       <label class="lib"><input type="checkbox" id="sysFreeDlc" /><span>Incluir también DLC y contenido extra</span></label>
+      <label class="lib"><input type="checkbox" id="sysMusic" /><span>Mostrar la música que suena (Spotify y otros reproductores) con botones de pausa y siguiente</span></label>
       <label class="lib"><input type="checkbox" id="sysWish" /><span>Avisarme cuando un juego de mi lista de deseados baje de precio</span></label>
       <label class="lib"><input type="checkbox" id="sysEvent" /><span>Avisarme de eventos y rebajas (un día antes y cuando empiezan)</span></label>
       <p class="hint">Comptus revisa cada pocas horas y muestra una notificación de Windows; al pulsarla abre la sección Gratis. Solo funciona mientras Comptus esté abierto: para recibirlos siempre, activa «Iniciar con Windows» y «Al cerrar, dejar en la bandeja».</p>
@@ -345,7 +348,7 @@
     <form id="editForm" class="modal-box">
       <h2>Editar juego</h2>
       <label>Nombre<input id="editName" required /></label>
-      <label>Ejecutable<input id="editExe" readonly /></label>
+      <label>Ejecutable<span style="display:flex;gap:6px"><input id="editExe" style="flex:1" /><button type="button" id="pickExe">Cambiar…</button></span></label>
       <label>Argumentos de lanzamiento (opcional)<input id="editArgs" placeholder="-windowed -novid" /></label>
       <div class="cover-row">
         <img id="editCoverPreview" alt="" />

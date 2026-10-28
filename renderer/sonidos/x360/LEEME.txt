@@ -1,0 +1,5 @@
+Sonidos del estilo "Xbox 360 (panel moderno)" (los que me pasaste en mejor calidad, normalizados).
+move = mover · select = Enter/abrir · select_alt = jugar · back = volver · tab_left/tab_right = cambiar de sección
+menu = Guía (F2) · welcome = entrar al modo consola · enter = sin usar · achievement, achievement_rare, download, startup = sin usar todavía
+Para cambiar uno, sustituye el .mp3 por otro con el mismo nombre. Si borras un archivo, ese sonido vuelve a ser el sintetizado.
+Ojo: son sonidos de Microsoft. Para uso personal está bien; no los subas a un repositorio público.

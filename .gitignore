@@ -1,4 +1,8 @@
 node_modules/
 dist/
+out/
+*.exe
+*.zip
 *.log
-.env
+.DS_Store
+Thumbs.db

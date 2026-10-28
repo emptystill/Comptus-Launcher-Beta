@@ -1,0 +1,1019 @@
+{
+ "_nota": "Lista basada en listas públicas de la comunidad (readonlymemo.com, awesome-decomp-games y awesome-unofficial-pc-ports, octubre de 2026). «verified» true = aparece en esas listas; false = escrita de memoria. Comptus comprueba en vivo si cada repositorio existe y muestra su última versión.",
+ "projects": [
+  {
+   "id": "shipwright",
+   "name": "Ship of Harkinian",
+   "repo": "HarbourMasters/Shipwright",
+   "game": "The Legend of Zelda: Ocarina of Time",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC con resolución alta, pantalla ancha, mandos modernos, mods y aleatorizador.",
+   "tags": [
+    "Zelda",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "2ship",
+   "name": "2 Ship 2 Harkinian",
+   "repo": "HarbourMasters/2ship2harkinian",
+   "game": "The Legend of Zelda: Majora's Mask",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Majora's Mask de la familia Harbour Masters.",
+   "tags": [
+    "Zelda",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "starship",
+   "name": "Starship",
+   "repo": "HarbourMasters/Starship",
+   "game": "Star Fox 64",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Star Fox 64.",
+   "tags": [
+    "Star Fox",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "spaghettikart",
+   "name": "Spaghetti Kart",
+   "repo": "HarbourMasters/SpaghettiKart",
+   "game": "Mario Kart 64",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Mario Kart 64.",
+   "tags": [
+    "Mario Kart",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "ghostship",
+   "name": "Ghostship",
+   "repo": "HarbourMasters/Ghostship",
+   "game": "Super Mario 64",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Super Mario 64 de la familia Harbour Masters.",
+   "tags": [
+    "Mario",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "lighthouse",
+   "name": "Lighthouse",
+   "repo": "HarbourMasters/Lighthouse",
+   "game": "Banjo-Kazooie",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Banjo-Kazooie (el proyecto indica que usa ayuda de IA en parte del código).",
+   "tags": [
+    "Banjo",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "paperboat",
+   "name": "PaperBoat",
+   "repo": "HarbourMasters/PaperBoat",
+   "game": "Paper Mario",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Paper Mario (el proyecto indica que usa ayuda de IA en parte del código).",
+   "tags": [
+    "Mario",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "perfectdark",
+   "name": "Perfect Dark",
+   "repo": "fgsfdsfgs/perfect_dark",
+   "game": "Perfect Dark",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC a partir de la descompilación; hay versiones de desarrollo compiladas.",
+   "tags": [
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "dusklight",
+   "name": "Dusklight",
+   "repo": "TwilitRealm/dusklight",
+   "game": "The Legend of Zelda: Twilight Princess",
+   "platform": "GameCube",
+   "desc": "Port de PC de Twilight Princess.",
+   "tags": [
+    "Zelda",
+    "GameCube",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "zelda64recomp",
+   "name": "Zelda 64: Recompiled",
+   "repo": "Zelda64Recomp/Zelda64Recomp",
+   "game": "The Legend of Zelda: Majora's Mask",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Majora's Mask con mods y mejoras gráficas.",
+   "tags": [
+    "Zelda",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "banjorecomp",
+   "name": "Banjo: Recompiled",
+   "repo": "BanjoRecomp/BanjoRecomp",
+   "game": "Banjo-Kazooie",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Banjo-Kazooie.",
+   "tags": [
+    "Banjo",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "dk64recomp",
+   "name": "DK64: Recompiled",
+   "repo": "Rainchus/Donkey-Kong-64-Recompiled",
+   "game": "Donkey Kong 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Donkey Kong 64.",
+   "tags": [
+    "Donkey Kong",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "dinorecomp",
+   "name": "Dinosaur Planet: Recompiled",
+   "repo": "DinosaurPlanetRecomp/dino-recomp",
+   "game": "Dinosaur Planet",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación del juego cancelado Dinosaur Planet.",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sf64recomp",
+   "name": "Star Fox 64: Recompiled",
+   "repo": "sonicdcer/Starfox64Recomp",
+   "game": "Star Fox 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Star Fox 64.",
+   "tags": [
+    "Star Fox",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "mk64recomp",
+   "name": "Mario Kart 64: Recompiled",
+   "repo": "sonicdcer/MarioKart64Recomp",
+   "game": "Mario Kart 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Mario Kart 64.",
+   "tags": [
+    "Mario Kart",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "bm64recomp",
+   "name": "Bomberman 64: Recompiled",
+   "repo": "RevoSucks/BM64Recomp",
+   "game": "Bomberman 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Bomberman 64.",
+   "tags": [
+    "Bomberman",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "bmherorecomp",
+   "name": "Bomberman Hero: Recompiled",
+   "repo": "RevoSucks/BMHeroRecomp",
+   "game": "Bomberman Hero",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Bomberman Hero.",
+   "tags": [
+    "Bomberman",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "drmario64",
+   "name": "Dr. Mario 64: Recompiled",
+   "repo": "theboy181/drmario64_recomp_plus",
+   "game": "Dr. Mario 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Dr. Mario 64.",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "hm64recomp",
+   "name": "Harvest Moon 64: Recompiled",
+   "repo": "HarvestMoon64Recomp/HarvestMoon64Recomp",
+   "game": "Harvest Moon 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Harvest Moon 64.",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "megaman64",
+   "name": "Mega Man 64: Recompiled",
+   "repo": "MegaMan64Recomp/MegaMan64Recompiled",
+   "game": "Mega Man 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Mega Man 64.",
+   "tags": [
+    "Mega Man",
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sbk2recomp",
+   "name": "Snowboard Kids 2: Recompiled",
+   "repo": "cdlewis/snowboardkids2-recomp",
+   "game": "Snowboard Kids 2",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Snowboard Kids 2.",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "quest64",
+   "name": "Quest 64: Recompiled",
+   "repo": "Rainchus/Quest64-Recomp",
+   "game": "Quest 64",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Quest 64 (versión muy temprana).",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "goemon64",
+   "name": "Goemon 64: Recompiled",
+   "repo": "klorfmorf/Goemon64Recomp",
+   "game": "Mystical Ninja Starring Goemon",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Goemon 64 (en desarrollo).",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "zelda3",
+   "name": "Zelda 3 (A Link to the Past)",
+   "repo": "snesrev/zelda3",
+   "game": "The Legend of Zelda: A Link to the Past",
+   "platform": "SNES",
+   "desc": "Port de PC a partir de la descompilación del juego de SNES.",
+   "tags": [
+    "Zelda",
+    "SNES",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sa2",
+   "name": "Sonic Advance 2",
+   "repo": "SAT-R/sa2",
+   "game": "Sonic Advance 2",
+   "platform": "Game Boy Advance",
+   "desc": "Descompilación jugable en PC (sin terminar).",
+   "tags": [
+    "Sonic",
+    "GBA",
+    "descompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "psydoom",
+   "name": "PsyDoom",
+   "repo": "BodbDearg/PsyDoom",
+   "game": "Doom (PlayStation)",
+   "platform": "PlayStation",
+   "desc": "Port de PC del Doom de PlayStation.",
+   "tags": [
+    "Doom",
+    "PS1",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "redriver2",
+   "name": "REDRIVER2",
+   "repo": "OpenDriver2/REDRIVER2",
+   "game": "Driver 2",
+   "platform": "PlayStation",
+   "desc": "Descompilación y port de PC de Driver 2.",
+   "tags": [
+    "PS1",
+    "descompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "wipeout",
+   "name": "WipEout Phantom Edition",
+   "repo": "wipeout-phantom-edition/wipeout-phantom-edition",
+   "game": "WipEout",
+   "platform": "PlayStation",
+   "desc": "Versión mejorada de WipEout para PC.",
+   "tags": [
+    "PS1",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "symphony",
+   "name": "Symphony of the Night: Recomp",
+   "repo": "BlackLabelHQ/SymphonyRecomp",
+   "game": "Castlevania: Symphony of the Night",
+   "platform": "PlayStation",
+   "desc": "Recompilación del clásico de PlayStation.",
+   "tags": [
+    "Castlevania",
+    "PS1",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "unleashed",
+   "name": "Unleashed Recompiled",
+   "repo": "hedge-dev/UnleashedRecomp",
+   "game": "Sonic Unleashed",
+   "platform": "Xbox 360",
+   "desc": "Recompilación estática de Sonic Unleashed para PC.",
+   "tags": [
+    "Sonic",
+    "Xbox 360",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "reblue",
+   "name": "re:Blue",
+   "repo": "zolaware/reblue",
+   "game": "Blue Dragon",
+   "platform": "Xbox 360",
+   "desc": "Recompilación de Blue Dragon.",
+   "tags": [
+    "Xbox 360",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "kameo",
+   "name": "Kameo Re:Powered",
+   "repo": "birabittoh/KameoRePowered",
+   "game": "Kameo: Elements of Power",
+   "platform": "Xbox 360",
+   "desc": "Recompilación de Kameo.",
+   "tags": [
+    "Xbox 360",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "gen2recomped",
+   "name": "Gen2 Recomped",
+   "repo": "UNDERdecoded/Gen2Recomped",
+   "game": "Pokémon Oro, Plata y Cristal",
+   "platform": "Game Boy Color",
+   "desc": "Recompilación de Pokémon de segunda generación.",
+   "tags": [
+    "Pokémon",
+    "GBC",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sonicmania",
+   "name": "Sonic Mania (descompilación)",
+   "repo": "RSDKModding/Sonic-Mania-Decompilation",
+   "game": "Sonic Mania",
+   "platform": "PC / consolas",
+   "desc": "Descompilación de Sonic Mania sobre RSDKv5.",
+   "tags": [
+    "Sonic",
+    "descompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "rsdkv4",
+   "name": "RSDKv4 (Sonic 1 y 2)",
+   "repo": "RSDKModding/RSDKv4-Decompilation",
+   "game": "Sonic the Hedgehog 1 y 2 (remasterizados)",
+   "platform": "PC / móvil",
+   "desc": "Descompilación del motor RSDKv4.",
+   "tags": [
+    "Sonic",
+    "descompilación"
+   ],
+   "verified": false
+  },
+  {
+   "id": "rsdkv3",
+   "name": "RSDKv3 (Sonic CD)",
+   "repo": "RSDKModding/RSDKv3-Decompilation",
+   "game": "Sonic CD (remasterizado)",
+   "platform": "PC / móvil",
+   "desc": "Descompilación del motor RSDKv3.",
+   "tags": [
+    "Sonic",
+    "descompilación"
+   ],
+   "verified": false
+  },
+  {
+   "id": "sm64coopdx",
+   "name": "SM64 Coop Deluxe",
+   "repo": "coop-deluxe/sm64coopdx",
+   "game": "Super Mario 64",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC con modo cooperativo y mods.",
+   "tags": [
+    "Mario",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sm64ex",
+   "name": "SM64 PC (sm64ex)",
+   "repo": "sm64pc/sm64ex",
+   "game": "Super Mario 64",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC a partir de la descompilación; se compila con tu propia ROM.",
+   "tags": [
+    "Mario",
+    "N64",
+    "port"
+   ],
+   "verified": false
+  },
+  {
+   "id": "openrct2",
+   "name": "OpenRCT2",
+   "repo": "OpenRCT2/OpenRCT2",
+   "game": "RollerCoaster Tycoon 2",
+   "platform": "PC",
+   "desc": "Reimplementación abierta con mejoras y multijugador.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "openttd",
+   "name": "OpenTTD",
+   "repo": "OpenTTD/OpenTTD",
+   "game": "Transport Tycoon Deluxe",
+   "platform": "PC",
+   "desc": "Reimplementación abierta del clásico de transporte.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "openmw",
+   "name": "OpenMW",
+   "repo": "OpenMW/openmw",
+   "game": "The Elder Scrolls III: Morrowind",
+   "platform": "PC",
+   "desc": "Motor abierto para jugar Morrowind y sus mods.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "devilutionx",
+   "name": "DevilutionX",
+   "repo": "diasurgical/DevilutionX",
+   "game": "Diablo y Hellfire",
+   "platform": "PC",
+   "desc": "Port moderno de Diablo (necesita los archivos del juego).",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "vcmi",
+   "name": "VCMI",
+   "repo": "vcmi/vcmi",
+   "game": "Heroes of Might and Magic III",
+   "platform": "PC",
+   "desc": "Motor abierto para Heroes III.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "julius",
+   "name": "Julius",
+   "repo": "bvschaik/julius",
+   "game": "Caesar III",
+   "platform": "PC",
+   "desc": "Reimplementación abierta de Caesar III.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "dethrace",
+   "name": "Dethrace",
+   "repo": "dethrace-labs/dethrace",
+   "game": "Carmageddon",
+   "platform": "PC",
+   "desc": "Reimplementación abierta de Carmageddon.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "isle",
+   "name": "isle-portable",
+   "repo": "isledecomp/isle-portable",
+   "game": "LEGO Island",
+   "platform": "PC",
+   "desc": "Port multiplataforma a partir de la descompilación de LEGO Island.",
+   "tags": [
+    "descompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "corsixth",
+   "name": "CorsixTH",
+   "repo": "CorsixTH/CorsixTH",
+   "game": "Theme Hospital",
+   "platform": "PC",
+   "desc": "Reimplementación abierta de Theme Hospital.",
+   "tags": [
+    "motor abierto"
+   ],
+   "verified": true
+  },
+  {
+   "id": "spacecadet",
+   "name": "Space Cadet Pinball",
+   "repo": "k4zmu2a/SpaceCadetPinball",
+   "game": "3D Pinball: Space Cadet",
+   "platform": "PC",
+   "desc": "Descompilación del pinball clásico de Windows.",
+   "tags": [
+    "descompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "harbour",
+   "name": "Harbour",
+   "repo": "ThatCodingFrog/Harbour",
+   "game": "Varios ports de PC",
+   "platform": "PC",
+   "desc": "Otro launcher que descarga, actualiza y lanza ports de consolas antiguas.",
+   "tags": [
+    "herramienta"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sonic3air",
+   "name": "Sonic 3 A.I.R.",
+   "repo": "Eukaryot/sonic3air",
+   "game": "Sonic 3 & Knuckles",
+   "platform": "Mega Drive",
+   "desc": "Motor que reimplementa Sonic 3 & Knuckles con extras y mods.",
+   "tags": [
+    "Sonic",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sonic2recomp",
+   "name": "Sonic 2 (recompilación)",
+   "repo": "mstan/SonicTheHedgehog2Recomp",
+   "game": "Sonic the Hedgehog 2",
+   "platform": "Mega Drive",
+   "desc": "Recompilación estática de Sonic 2 de Mega Drive.",
+   "tags": [
+    "Sonic",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "cannonball",
+   "name": "Cannonball",
+   "repo": "djyt/cannonball",
+   "game": "OutRun",
+   "platform": "Arcade / Sega",
+   "desc": "Motor abierto que reimplementa OutRun.",
+   "tags": [
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "smas",
+   "name": "SMAS Launcher (Super Mario World)",
+   "repo": "qurious-pixel/SMAS_Launcher",
+   "game": "Super Mario World",
+   "platform": "SNES",
+   "desc": "Launcher para el port de PC de Super Mario World.",
+   "tags": [
+    "Mario",
+    "SNES",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "supermetroid",
+   "name": "Super Metroid Launcher",
+   "repo": "RadzPrower/Super-Metroid-Launcher",
+   "game": "Super Metroid",
+   "platform": "SNES",
+   "desc": "Launcher para el port de PC de Super Metroid.",
+   "tags": [
+    "Metroid",
+    "SNES",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "fzero",
+   "name": "F-Zero (recompilación)",
+   "repo": "craigshaw/FZeroRecomp",
+   "game": "F-Zero",
+   "platform": "SNES",
+   "desc": "Recompilación estática de F-Zero.",
+   "tags": [
+    "F-Zero",
+    "SNES",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "zeldanes",
+   "name": "The Legend of Zelda (NES, recompilación)",
+   "repo": "mstan/LegendOfZeldaNESRecomp",
+   "game": "The Legend of Zelda",
+   "platform": "NES",
+   "desc": "Recompilación estática del Zelda original.",
+   "tags": [
+    "Zelda",
+    "NES",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "metroidnes",
+   "name": "Metroid (NES, recompilación)",
+   "repo": "mstan/MetroidNESRecomp",
+   "game": "Metroid",
+   "platform": "NES",
+   "desc": "Recompilación estática del Metroid original.",
+   "tags": [
+    "Metroid",
+    "NES",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "drmariones",
+   "name": "Dr. Mario (NES, recompilación)",
+   "repo": "mstan/DrMarioNesRecomp",
+   "game": "Dr. Mario",
+   "platform": "NES",
+   "desc": "Recompilación estática de Dr. Mario.",
+   "tags": [
+    "Mario",
+    "NES",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "tmc",
+   "name": "Minish Cap (auto-tmc)",
+   "repo": "StonedModder/auto-tmc",
+   "game": "The Legend of Zelda: The Minish Cap",
+   "platform": "Game Boy Advance",
+   "desc": "Port de PC a partir de la descompilación de The Minish Cap.",
+   "tags": [
+    "Zelda",
+    "GBA",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "mmzero",
+   "name": "Mega Man Zero (recompilación)",
+   "repo": "mstan/MegaManZeroRecomp",
+   "game": "Mega Man Zero",
+   "platform": "Game Boy Advance",
+   "desc": "Recompilación estática de Mega Man Zero.",
+   "tags": [
+    "Mega Man",
+    "GBA",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "acgc",
+   "name": "Animal Crossing (port de PC)",
+   "repo": "flyngmt/ACGC-PC-Port",
+   "game": "Animal Crossing",
+   "platform": "GameCube",
+   "desc": "Port de PC de Animal Crossing de GameCube.",
+   "tags": [
+    "Animal Crossing",
+    "GameCube",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sunpad",
+   "name": "SunPad (Mario Sunshine)",
+   "repo": "chrissotraidis/sunpad",
+   "game": "Super Mario Sunshine",
+   "platform": "GameCube",
+   "desc": "Proyecto para jugar Super Mario Sunshine en PC.",
+   "tags": [
+    "Mario",
+    "GameCube",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "lod",
+   "name": "Severed Chains (Legend of Dragoon)",
+   "repo": "Legend-of-Dragoon-Modding/Legend-of-Dragoon-Java",
+   "game": "The Legend of Dragoon",
+   "platform": "PlayStation",
+   "desc": "Reimplementación de The Legend of Dragoon con mods.",
+   "tags": [
+    "PS1",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "legaia",
+   "name": "Legend of Legaia (recompilación)",
+   "repo": "SamSteProjects/legend-of-legaia-recomp",
+   "game": "Legend of Legaia",
+   "platform": "PlayStation",
+   "desc": "Recompilación de Legend of Legaia.",
+   "tags": [
+    "PS1",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "tomba2",
+   "name": "Tomba! 2 (recompilación)",
+   "repo": "mstan/Tomba2Recomp",
+   "game": "Tomba! 2",
+   "platform": "PlayStation",
+   "desc": "Recompilación de Tomba! 2.",
+   "tags": [
+    "PS1",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "medievil",
+   "name": "MediEvil (recompilación)",
+   "repo": "BlackLabelHQ/MediEvilRecomp",
+   "game": "MediEvil",
+   "platform": "PlayStation",
+   "desc": "Recompilación de MediEvil.",
+   "tags": [
+    "PS1",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "klonoa",
+   "name": "Klonoa: Door to Phantomile",
+   "repo": "TechnicallyComputers/Klonoa-Door-to-Phantomile",
+   "game": "Klonoa: Door to Phantomile",
+   "platform": "PlayStation",
+   "desc": "Port de PC de Klonoa.",
+   "tags": [
+    "PS1",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "ridgeracer",
+   "name": "Ridge Racer (descompilación)",
+   "repo": "kazuyette/rr-decomp",
+   "game": "Ridge Racer",
+   "platform": "PlayStation",
+   "desc": "Descompilación de Ridge Racer.",
+   "tags": [
+    "PS1",
+    "descompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "opengoal",
+   "name": "OpenGOAL (Jak and Daxter)",
+   "repo": "open-goal/jak-project",
+   "game": "Jak and Daxter 1, 2 y 3",
+   "platform": "PlayStation 2",
+   "desc": "Port de PC de la trilogía Jak and Daxter con mejoras gráficas y mods.",
+   "tags": [
+    "Jak",
+    "PS2",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "marathon",
+   "name": "Marathon Recompiled",
+   "repo": "sonicnext-dev/MarathonRecomp",
+   "game": "Sonic the Hedgehog (2006)",
+   "platform": "Xbox 360",
+   "desc": "Recompilación de Sonic 2006 (en desarrollo).",
+   "tags": [
+    "Sonic",
+    "Xbox 360",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "renut",
+   "name": "reNut (Nuts & Bolts)",
+   "repo": "masterspike52/reNut",
+   "game": "Banjo-Kazooie: Nuts & Bolts",
+   "platform": "Xbox 360",
+   "desc": "Recompilación de Banjo-Kazooie: Nuts & Bolts.",
+   "tags": [
+    "Banjo",
+    "Xbox 360",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "tip",
+   "name": "Viva Piñata: TiP Recomp",
+   "repo": "SolarCookies/TiP-Recomp",
+   "game": "Viva Piñata: Trouble in Paradise",
+   "platform": "Xbox 360",
+   "desc": "Recompilación de Viva Piñata: Trouble in Paradise.",
+   "tags": [
+    "Xbox 360",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "battleship",
+   "name": "BattleShip (Smash 64)",
+   "repo": "JRickey/BattleShip",
+   "game": "Super Smash Bros.",
+   "platform": "Nintendo 64",
+   "desc": "Port de PC de Super Smash Bros. (N64).",
+   "tags": [
+    "Smash",
+    "N64",
+    "port"
+   ],
+   "verified": true
+  },
+  {
+   "id": "dnzh",
+   "name": "Duke Nukem: Zero Hour Recomp",
+   "repo": "sonicdcer/DNZHRecomp",
+   "game": "Duke Nukem: Zero Hour",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Duke Nukem: Zero Hour.",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "chameleon",
+   "name": "Chameleon Twist Recomp",
+   "repo": "Rainchus/ChameleonTwist1-JP-Recomp",
+   "game": "Chameleon Twist",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Chameleon Twist (versión japonesa).",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  },
+  {
+   "id": "sssv",
+   "name": "Space Station Silicon Valley Recomp",
+   "repo": "Cellenseres/SSSV_Recomp",
+   "game": "Space Station Silicon Valley",
+   "platform": "Nintendo 64",
+   "desc": "Recompilación estática de Space Station Silicon Valley.",
+   "tags": [
+    "N64",
+    "recompilación"
+   ],
+   "verified": true
+  }
+ ]
+}

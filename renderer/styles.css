@@ -903,7 +903,7 @@ main.vid-noblur.has-bg .bg-layer { filter: none !important; }
 @keyframes ccfade { from { opacity: .3; } to { opacity: 1; } }
 #couch .cc-shade { position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--cc-bg) 55%, transparent) 0%, color-mix(in srgb, var(--cc-bg) calc(var(--cc-dim) * 100% * .55), transparent) 30%, color-mix(in srgb, var(--cc-bg) calc(var(--cc-dim) * 100%), transparent) 60%, var(--cc-bg) 100%), linear-gradient(90deg, color-mix(in srgb, var(--cc-bg) 80%, transparent) 0%, transparent 60%); }
 #couch.plain .cc-shade { background: var(--cc-bg); }
-#couch > :not(.cc-bg):not(.cc-shade) { position: relative; z-index: 1; }
+#couch > :not(.cc-bg):not(.cc-shade):not(.cc-ribbon) { position: relative; z-index: 1; }
 #couch .cc-top { display: flex; align-items: center; gap: .9em; padding: 1.1em 3vw .4em; flex: 0 0 auto; }
 #couch .cc-lb, #couch .cc-rb { padding: .15em .7em; border-radius: .5em; background: color-mix(in srgb, var(--cc-text) 16%, transparent); font-size: .75em; font-weight: 700; opacity: .85; }
 #couch .cc-tabs { display: flex; flex-direction: row; gap: .3em; overflow: hidden; font-size: .92em; min-width: 0; min-height: 0; max-height: none; padding: 0; flex: 0 1 auto; }
@@ -1519,3 +1519,647 @@ body:has(.toolbar.hidden) #sizeQuick.size-corner, body.couch-on #sizeQuick.size-
 /* 1.84.16 · «Jugando ahora» en la barra lateral, encima de Configuración */
 .sidebar .now-pill { max-width: none; width: 100%; box-sizing: border-box; margin: 0 0 8px; }
 .sidebar .now-pill .np-t { flex: 1; }
+
+/* 1.84.24 música (Sonando ahora) */
+#couch .cc-music { font-size: .95em; font-weight: 600; color: var(--cc-text); max-width: 22em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: .25em .8em; border-radius: 99em; background: color-mix(in srgb, var(--cc-accent) 18%, transparent); border: var(--cc-bw, .07em) solid color-mix(in srgb, var(--cc-accent) 45%, transparent); }
+#couch .cc-music.hidden { display: none; }
+#couch.portrait .cc-music { max-width: 14em; }
+.music-pill { display: flex; align-items: center; gap: 8px; width: 100%; box-sizing: border-box; margin: 0 0 8px; padding: 6px; border-radius: 12px; background: var(--panel); border: 1px solid var(--border); }
+.music-pill.hidden { display: none; }
+.music-pill .mp-i { width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; background: #2a2e3a center / cover no-repeat; }
+.music-pill .mp-t { flex: 1; min-width: 0; }
+.music-pill .mp-n { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.music-pill .mp-s { font-size: 11px; color: var(--muted, #9aa1b2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.music-pill .mp-b { display: flex; gap: 2px; }
+.music-pill .mp-b button { padding: 4px 5px; border-radius: 8px; background: none; border: 1px solid transparent; cursor: pointer; line-height: 0; }
+.music-pill .mp-b button:hover { border-color: var(--accent); }
+.music-pill .mp-b .ic { margin: 0; width: 1.1em; height: 1.1em; }
+
+/* 1.84.28 Comunidad: mi lista de proyectos */
+.cm-form { display: flex; gap: 8px; margin: 10px 0 4px; max-width: 760px; }
+.cm-in { flex: 1; min-width: 0; }
+.cm-msg { min-height: 1.2em; margin: 2px 0 10px; }
+
+/* 1.84.31 Modo consola: estilo «Xbox 360» (inspirado, sin marcas) */
+#couch .cc-ribbon { display: none; position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+#couch .cc-ribbon svg { width: 100%; height: 100%; }
+#couch.ui-x360b .cc-ribbon { display: block; }
+#couch .cc-ribbon .r { transform-origin: 50% 60%; animation: ccrib 16s ease-in-out infinite alternate; }
+#couch .cc-ribbon .r2 { animation-duration: 21s; animation-delay: -6s; }
+#couch .cc-ribbon .r3 { animation-duration: 26s; animation-delay: -11s; }
+@keyframes ccrib { from { transform: translate(-3%, 2%) scaleY(1); } to { transform: translate(3%, -3%) scaleY(1.22); } }
+#couch.ui-x360b .cc-title { font-weight: 300; text-shadow: none; letter-spacing: -.01em; }
+#couch.ui-x360b .cc-title img { filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
+#couch.ui-x360b .cc-src { color: var(--cc-accent); opacity: 1; font-weight: 700; }
+#couch.ui-x360b .cc-cover { border: .16em solid color-mix(in srgb, #fff 88%, transparent); border-radius: .3em; box-shadow: 0 .3em .9em rgba(0,0,0,.28); overflow: hidden; }
+#couch.ui-x360b .cc-cover::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(255,255,255,.3), rgba(255,255,255,0) 42%); }
+#couch.ui-x360b .cc-tile.sel { transform: scale(1.1); }
+#couch.ui-x360b .cc-tile.sel .cc-cover { box-shadow: 0 0 0 .2em var(--cc-accent), 0 0 1.5em color-mix(in srgb, var(--cc-accent) 70%, transparent), 0 .8em 1.6em rgba(0,0,0,.35); }
+#couch.ui-x360b .cc-tile.sel .cc-name { opacity: 1; background: var(--cc-accent); color: var(--cc-on, #fff); padding: .25em .6em; border-radius: .25em; text-align: center; font-weight: 600; }
+#couch.ui-x360b .cc-hints { background: linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--cc-bg), var(--cc-text) 8%) 60%); }
+#couch.ui-x360b .cc-h-title, #couch.ui-x360b .cc-sr-head, #couch.ui-x360b .cc-subtitle { text-shadow: none; font-weight: 600; }
+#couch.ui-x360b:not(.x360-dark) .cc-h-title { color: color-mix(in srgb, var(--cc-text) 85%, var(--cc-accent2)); }
+
+/* 1.84.33 Xbox 360: «blades» (paneles verticales). La sección activa se despliega y las demás quedan como tiras a los lados */
+#couch.ui-x360b { --bl-w: 4.4vw; --bl-g: .55vw; --bl-b: 0; --bl-a: 0;
+  --bl-l: calc(3vw + var(--cc-sx, 0px) + var(--bl-b) * (var(--bl-w) + var(--bl-g))); --bl-r: calc(3vw + var(--cc-sx, 0px) + var(--bl-a) * (var(--bl-w) + var(--bl-g)));
+  --bl-top: calc(22vh + var(--cc-sy, 0px)); --bl-bot: calc(11vh + var(--cc-sy, 0px)); --bl-pw: 25vw; }
+#couch.ui-x360b > .cc-top { position: static !important; }
+#couch.ui-x360b .cc-lb, #couch.ui-x360b .cc-rb { display: none !important; }
+#couch.ui-x360b .cc-sys { top: 3.6vh; transform: none; right: 3vw; }
+#couch.ui-x360b .cc-tabs { position: absolute; left: 3vw; right: 3vw; top: 10vh; bottom: 8.5vh; max-width: none; display: flex; flex-direction: row; gap: var(--bl-g); overflow: visible; font-size: 1em; z-index: 2; pointer-events: none; }
+#couch.ui-x360b .cc-tab { pointer-events: auto; position: relative; flex: 0 0 var(--bl-w); height: 100%; border-radius: .55em; border: 1px solid color-mix(in srgb, #fff 65%, transparent); padding: 1.1em 0 0; opacity: 1; font-size: 1.05em; font-weight: 600; letter-spacing: .04em; writing-mode: vertical-rl; text-orientation: mixed; text-align: start; color: color-mix(in srgb, var(--cc-text) 78%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cc-panel) 62%, transparent), color-mix(in srgb, var(--cc-panel) 30%, transparent)); box-shadow: 0 .25em .8em rgba(0,0,0,.14); display: flex; align-items: flex-start; justify-content: center; overflow: hidden; }
+#couch.ui-x360b .cc-tab::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 22%; background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0)); pointer-events: none; }
+#couch.ui-x360b .cc-tab.on { flex: 1 1 auto; writing-mode: horizontal-tb; justify-content: flex-start; align-items: flex-start; padding: .9em 1.3em; font-size: 1.55em; font-weight: 300; letter-spacing: 0; color: var(--cc-text); border-bottom: 1px solid color-mix(in srgb, #fff 65%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cc-panel) 82%, transparent), color-mix(in srgb, var(--cc-panel) 50%, transparent)); }
+#couch.ui-x360b .cc-tab.on::after { content: ''; position: absolute; left: 1.3em; right: 1.3em; top: 3.3em; height: .1em; background: linear-gradient(90deg, var(--cc-accent), transparent); }
+/* contenido dentro del blade activo */
+#couch.ui-x360b .cc-listwrap, #couch.ui-x360b .cc-hero, #couch.ui-x360b .cc-home, #couch.ui-x360b .cc-search { position: absolute !important; left: calc(var(--bl-l) + 1.3vw); right: calc(var(--bl-r) + 1.3vw); top: var(--bl-top); bottom: var(--bl-bot); padding: 0; max-width: none; z-index: 3; }
+#couch.ui-x360b .cc-home, #couch.ui-x360b .cc-search { overflow: hidden auto; }
+#couch.ui-x360b.bl-rows .cc-listwrap { right: auto; width: calc(100vw - var(--bl-l) - var(--bl-r) - var(--bl-pw) - 3.4vw); display: flex; flex-direction: column; }
+#couch.ui-x360b.bl-rows .cc-strip { flex: 1 1 auto; min-height: 0; flex-direction: column; flex-wrap: nowrap; gap: .3em; padding: .3em .2em .8em; overflow-x: hidden; overflow-y: auto; display: flex; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 .8em, #000 calc(100% - 1.2em), transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 .8em, #000 calc(100% - 1.2em), transparent 100%); }
+#couch.ui-x360b.bl-rows .cc-tile { display: flex; align-items: center; gap: .8em; width: 100%; min-width: 0; padding: .3em .6em .3em .35em; border-radius: .4em; transform: none; transition: background .12s; }
+#couch.ui-x360b.bl-rows .cc-tile.sel { transform: none; background: linear-gradient(180deg, #9bdc64, #4e9f2a 55%, #3d8a1f); color: #fff; box-shadow: 0 .15em .6em rgba(40,110,20,.45), inset 0 1px 0 rgba(255,255,255,.55); }
+#couch.ui-x360b.bl-rows .cc-cover { width: 2.5em; aspect-ratio: 1; flex: 0 0 auto; border-width: .1em; border-radius: .25em; font-size: .9em; }
+#couch.ui-x360b.bl-rows .cc-tile.sel .cc-cover { box-shadow: 0 0 0 .1em rgba(255,255,255,.85); }
+#couch.ui-x360b.bl-rows .cc-name { margin: 0; opacity: 1; font-size: 1.02em; flex: 1; min-width: 0; background: none !important; padding: 0 !important; text-align: start !important; color: inherit; }
+#couch.ui-x360b.bl-rows .cc-tile.sel .cc-name { color: #fff; }
+#couch.ui-x360b.bl-rows .cc-store, #couch.ui-x360b.bl-rows .cc-ptxt, #couch.ui-x360b.bl-rows .cc-prog { display: none; }
+#couch.ui-x360b.bl-rows .cc-run, #couch.ui-x360b.bl-rows .cc-ni, #couch.ui-x360b.bl-rows .cc-count { position: static; margin-left: auto; flex: none; }
+/* vista previa del juego (parte derecha del blade) */
+#couch.ui-x360b .cc-bg { display: none; }
+#couch.ui-x360b.bl-rows .cc-bg { display: block; inset: auto; left: auto; bottom: auto; right: calc(var(--bl-r) + 1.3vw); top: var(--bl-top); width: var(--bl-pw); height: calc(var(--bl-pw) * .5625); border-radius: .4em; border: .22em solid #fff; box-shadow: 0 .5em 1.4em rgba(0,0,0,.3); -webkit-mask-image: none; mask-image: none; filter: none; z-index: 3; background-size: cover; background-position: center; }
+#couch.ui-x360b.bl-rows .cc-shade { display: none; }
+#couch.ui-x360b.bl-rows .cc-hero { left: auto; width: var(--bl-pw); top: calc(var(--bl-top) + var(--bl-pw) * .5625 + 1.2vh); bottom: var(--bl-bot); height: auto; justify-content: flex-start; overflow: hidden; }
+#couch.ui-x360b.bl-rows .cc-title { font-size: 1.7em; height: auto; display: block; white-space: normal; }
+#couch.ui-x360b.bl-rows .cc-title img { max-height: 3.2em; }
+#couch.ui-x360b .cc-hero.empty { visibility: hidden; }
+#couch.ui-x360b .cc-settings { left: calc(var(--bl-l) + 1vw); right: calc(var(--bl-r) + 1vw); width: auto; top: var(--bl-top); bottom: var(--bl-bot); border-radius: .4em; z-index: 3; }
+#couch.ui-x360b.bl-det .cc-tabs { display: none; }
+#couch.ui-x360b .cc-subtitle { padding: 0 0 .3em; }
+#couch.ui-x360b .cc-h-title { margin-left: 0; margin-right: 0; }
+#couch.ui-x360b .cc-strip { padding-left: .2em; padding-right: .2em; }
+#couch.ui-x360b .cc-tabs { max-width: none !important; width: auto !important; font-size: 1em !important; gap: var(--bl-g) !important; left: calc(3vw + var(--cc-sx, 0px)) !important; right: calc(3vw + var(--cc-sx, 0px)) !important; overflow: visible !important; padding: 0 !important; }
+#couch.ui-x360b.portrait .cc-tabs { font-size: 1em !important; }
+#couch.ui-x360b.portrait { --bl-w: 7.5vw; --bl-g: 1vw; --bl-pw: 0vw; }
+#couch.ui-x360b.portrait.bl-rows .cc-bg, #couch.ui-x360b.portrait.bl-rows .cc-hero { display: none; }
+#couch.ui-x360b.portrait.bl-rows .cc-listwrap { right: calc(var(--bl-r) + 1.3vw); width: auto; }
+#couch.ui-x360b.setmode .cc-listwrap, #couch.ui-x360b.setmode .cc-hero { display: none !important; }
+#couch.ui-x360b .cc-settings { overflow: hidden; }
+
+#couch.ui-x360b .cc-tabs { top: calc(10vh + var(--cc-sy, 0px)) !important; bottom: calc(8.5vh + var(--cc-sy, 0px)) !important; height: auto !important; transform: none !important; position: absolute !important; flex-direction: row !important; align-items: stretch !important; max-height: none !important; }
+#couch.ui-x360b .cc-sys { top: calc(3.6vh + var(--cc-sy, 0px)); right: calc(3vw + var(--cc-sx, 0px)); }
+#couch.ui-x360b .cc-tab.ico { padding: 1.1em 0 0; }
+#couch.ui-x360b .cc-home, #couch.ui-x360b .cc-search { top: calc(var(--bl-top) + 2.2vh); }
+
+/* 1.84.36 Xbox 360 «panel moderno» fiel al panel de 2011-2014: fondo gris degradado, secciones finas en minúscula y mosaico de losetas planas */
+#couch.ui-x360 { background: radial-gradient(120% 80% at 50% 105%, #d9dadb 0%, rgba(217,218,219,0) 60%), linear-gradient(180deg, #4a4d4e 0%, #6f7273 34%, #a5a7a8 72%, #cbcccd 100%); --x3-t: 17.4vh; --x3-g: .35vh; }
+#couch.ui-x360 .cc-shade, #couch.ui-x360 .cc-ribbon { display: none; }
+#couch.ui-x360 .cc-bg { display: none; }
+#couch.ui-x360.bl-det .cc-bg { display: block; inset: -3%; width: auto; height: auto; -webkit-mask-image: none; mask-image: none; }
+#couch.ui-x360.bl-det .cc-shade { display: block; background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.72)); }
+#couch.ui-x360.bl-det .cc-tabs { visibility: hidden; }
+#couch.ui-x360 > .cc-top { justify-content: flex-start !important; padding: 11vh 0 0 calc(6vw + var(--cc-sx, 0px)) !important; }
+#couch.ui-x360 .cc-lb, #couch.ui-x360 .cc-rb { display: none !important; }
+#couch.ui-x360 .cc-sys { top: calc(4vh + var(--cc-sy, 0px)); transform: none; right: calc(3vw + var(--cc-sx, 0px)); }
+#couch.ui-x360 .cc-tabs { font-size: 1.75em !important; gap: 1.1em !important; max-width: calc(88vw - var(--cc-sx, 0px)) !important; -webkit-mask-image: none; mask-image: none; overflow: hidden; }
+#couch.ui-x360 .cc-tab { background: none !important; color: #fff !important; opacity: .46; font-weight: 300; padding: 0 .05em; border-radius: 0; text-transform: lowercase; letter-spacing: -.01em; text-shadow: 0 1px 4px rgba(0,0,0,.35); transition: opacity .15s; }
+#couch.ui-x360 .cc-tab.on { opacity: 1; font-weight: 400; background: none !important; }
+#couch.ui-x360 .cc-clock, #couch.ui-x360 .cc-bat { color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+/* biblioteca: tarjetas claras como la tienda de juegos del Xbox 360 */
+#couch .cc-sub { display: none; }
+#couch.ui-x360.x3-cards .cc-listwrap { position: absolute !important; left: calc(6vw + var(--cc-sx, 0px)); right: 0; top: calc(25vh + var(--cc-sy, 0px)); bottom: calc(9vh + var(--cc-sy, 0px)); padding: 0; z-index: 3; display: flex; flex-direction: column; }
+#couch.ui-x360.x3-cards .cc-subtitle { position: absolute; top: -9.5vh; left: 0; color: #fff; font-size: 1.15em; font-weight: 300; text-shadow: 0 1px 4px rgba(0,0,0,.4); padding: 0; text-transform: none; }
+#couch.ui-x360.x3-cards .cc-strip { flex: 1 1 auto; display: flex; flex-direction: row; align-items: flex-start; gap: .6vw; padding: 1.4vh 4vw 2vh 1vw; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; -webkit-mask-image: none; mask-image: none; }
+#couch.ui-x360.x3-cards .cc-tile { flex: 0 0 auto; width: 15.6vw; min-width: 0; margin-top: 3.4vh; padding: .7vw .7vw .6em; background: #ededee; border-radius: 0; color: #2a2d2e; box-shadow: 0 .2vh .5vh rgba(0,0,0,.18); transition: transform .14s, margin .14s, background .14s, box-shadow .14s; transform-origin: 50% 0; }
+#couch.ui-x360.x3-cards .cc-tile.sel { transform: scale(1.07); margin-top: 0; background: #fbfbfb; z-index: 5; box-shadow: 0 1.4vh 3vh rgba(0,0,0,.45); }
+#couch.ui-x360.x3-cards .cc-cover { position: relative; width: 100%; aspect-ratio: 3 / 4; border: 0; border-radius: 0 !important; box-shadow: none; filter: none; font-size: 3.4em; margin-top: 2.2em; }
+#couch.ui-x360.x3-cards .cc-cover::before { content: attr(data-src); position: absolute; left: 0; right: 0; top: -2.2em; height: 2.2em; display: flex; align-items: center; padding: 0 .5em; font-size: .24em; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #fff; background: linear-gradient(90deg, #f28a1e 0 62%, #ffb04a 62% 100%); }
+#couch.ui-x360.x3-cards .cc-cover::after { display: none; }
+#couch.ui-x360.x3-cards .cc-name { opacity: 1 !important; margin: .55em 0 0; font-size: .95em; font-weight: 500; color: #2a2d2e; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; min-height: 2.4em; text-align: left; }
+#couch.ui-x360.x3-cards .cc-sub { display: block; font-size: .78em; color: #2f8a2f; margin-top: .25em; padding-right: 2em; }
+#couch.ui-x360.x3-cards .cc-store { top: auto; bottom: .5em; right: .5em; width: 1.8em; height: 1.8em; background: none; color: #555; }
+#couch.ui-x360.x3-cards .cc-ptxt, #couch.ui-x360.x3-cards .cc-prog { display: none; }
+#couch.ui-x360.x3-cards .cc-run, #couch.ui-x360.x3-cards .cc-ni, #couch.ui-x360.x3-cards .cc-count { border-radius: 0; top: 2.8em; left: .4em; font-size: .62em; }
+#couch.ui-x360.x3-cards .cc-count { left: auto; right: .4em; }
+#couch.ui-x360.x3-cards .cc-coll-over { display: none; }
+#couch.ui-x360.x3-cards .cc-cover.coll { aspect-ratio: 3 / 4; }
+#couch.ui-x360.x3-cards .cc-hero { position: absolute !important; left: auto; right: calc(6vw + var(--cc-sx, 0px)); top: calc(14.5vh + var(--cc-sy, 0px)); bottom: auto; max-width: 40vw; padding: 0; height: auto; min-height: 0; z-index: 3; gap: 0; text-align: right; align-items: flex-end; }
+#couch.ui-x360.x3-cards .cc-src { display: none; }
+#couch.ui-x360.x3-cards .cc-title { font-size: 1.7em; font-weight: 400; height: auto; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); max-width: 40vw; }
+#couch.ui-x360.x3-cards .cc-title img { max-height: 2.2em; }
+#couch.ui-x360.x3-cards .cc-meta { color: #fff; font-size: .95em; opacity: .9; }
+/* inicio y ajustes */
+#couch.ui-x360 .cc-home, #couch.ui-x360 .cc-search { position: absolute !important; left: calc(3vw + var(--cc-sx, 0px)); right: 0; top: calc(23vh + var(--cc-sy, 0px)); bottom: calc(9vh + var(--cc-sy, 0px)); padding: 0; z-index: 3; overflow: hidden auto; }
+#couch.ui-x360 .cc-h-title, #couch.ui-x360 .cc-sr-head { color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); font-weight: 400; font-size: 1.15em; margin-left: 3vw; }
+#couch.ui-x360 .cc-hc { border-radius: 0; border-width: 0; background: rgba(20,22,22,.55); color: #fff; }
+#couch.ui-x360 .cc-hc.sel { transform: translate(-.3%, -1%) scale(1.06); box-shadow: 0 0 0 .1em rgba(255,255,255,.85), 0 1.2vh 2.4vh rgba(0,0,0,.5); }
+#couch.ui-x360 .cc-settings { left: calc(6vw + var(--cc-sx, 0px)); top: calc(21vh + var(--cc-sy, 0px)); bottom: calc(10vh + var(--cc-sy, 0px)); border-radius: 0; color: #fff; }
+#couch.ui-x360 .cc-s-row.sel, #couch.ui-x360 .cc-s-cat.sel { border-color: transparent; background: #0f9d0f; color: #fff; }
+/* barra de ayuda abajo a la izquierda, sin caja */
+#couch.ui-x360 .cc-hints { background: none; border-radius: 0; box-shadow: none; justify-content: flex-start; padding: 0 0 3.2vh calc(6vw + var(--cc-sx, 0px)); left: 0; right: auto; width: auto; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.45); border: 0; }
+#couch.ui-x360 .cc-hints b { background: rgba(255,255,255,.22); color: #fff; }
+#couch.ui-x360 { --x3-t: 16vh; }
+#couch.ui-x360 .cc-tabs { font-size: 1.45em !important; gap: 1em !important; max-width: none !important; overflow: visible !important; flex-wrap: nowrap; }
+#couch.ui-x360 .cc-hints { position: absolute !important; left: 0 !important; right: auto !important; bottom: 0 !important; transform: none !important; max-width: none !important; width: auto !important; flex-wrap: nowrap !important; background: none !important; box-shadow: none !important; border: 0 !important; border-radius: 0 !important; padding: 0 0 3vh calc(6vw + var(--cc-sx, 0px)) !important; gap: 1.6em !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+#couch.ui-x360.setmode .cc-listwrap, #couch.ui-x360.setmode .cc-hero { display: none !important; }
+#couch.ui-x360 .cc-settings { width: min(66vw, 1150px); }
+#couch.ui-x360.x3-cards .cc-listwrap { top: calc(28vh + var(--cc-sy, 0px)); bottom: calc(8vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.x3-cards .cc-hero { top: calc(19.5vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.x3-cards .cc-tile { width: 14vw; padding: .6vw .6vw .5em; margin-top: 3.2vh; }
+#couch.ui-x360.x3-cards .cc-cover { aspect-ratio: 4 / 5; margin-top: 3.2vh; font-size: 2.6em; }
+#couch.ui-x360.x3-cards .cc-cover.coll { aspect-ratio: 4 / 5; }
+#couch.ui-x360.x3-cards .cc-cover::before { top: -3.2vh; height: 3.2vh; font-size: 1.5vh; }
+#couch.ui-x360.x3-cards .cc-run, #couch.ui-x360.x3-cards .cc-ni, #couch.ui-x360.x3-cards .cc-count { top: .3em; }
+/* inicio Xbox 360: mosaico de losetas */
+#couch.ui-x360 .cc-home { top: calc(26vh + var(--cc-sy, 0px)); left: calc(6vw + var(--cc-sx, 0px)); overflow: hidden; }
+#couch.ui-x360 .x3-home { display: grid; grid-template-rows: repeat(3, 19vh); grid-auto-columns: 21vh; gap: .4vh; padding: 1.6vh 3vw 3vh .6vw; height: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; align-content: start; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 9vw), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 9vw), transparent); }
+#couch.ui-x360 .x3-home::-webkit-scrollbar { display: none; }
+#couch.ui-x360 .x3t { position: relative; overflow: hidden; background: #0f9d0f; color: #fff; transition: transform .14s, box-shadow .14s; cursor: pointer; }
+#couch.ui-x360 .x3t.fn { display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #0fa50f, #0a920a); }
+#couch.ui-x360 .x3t-ic { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; width: 100%; padding-top: 1.2vh; }
+#couch.ui-x360 .x3t-ic svg { width: 36%; height: auto; max-height: 70%; stroke-width: 1.7; }
+#couch.ui-x360 .x3t-img { position: absolute; inset: 0; background-size: cover; background-position: center; }
+#couch.ui-x360 .x3t-lab { position: relative; align-self: stretch; margin-top: auto; padding: .5em .7em; font-size: .95em; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+#couch.ui-x360 .x3t.art .x3t-lab { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(20,22,22,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-x360 .x3t.big .x3t-lab { font-size: 1.15em; }
+#couch.ui-x360 .x3t-badge { position: absolute; left: 0; top: 0; padding: .2em .6em; font-size: .62em; font-weight: 700; background: #0f9d0f; color: #fff; }
+#couch.ui-x360 .x3t.sel { transform: translate(-.3%, -1%) scale(1.07); z-index: 5; box-shadow: 0 0 0 .1em rgba(255,255,255,.9), 0 1.2vh 2.4vh rgba(0,0,0,.5); }
+#couch.ui-x360 .x3t.fn.sel { background: linear-gradient(180deg, #3cc13c, #0fa50f); }
+/* página del juego Xbox 360 */
+#couch.ui-x360.bl-det .cc-detail { position: absolute !important; inset: 0; padding: calc(15vh + var(--cc-sy, 0px)) calc(6vw + var(--cc-sx, 0px)) 9vh; display: block; z-index: 3; }
+#couch.ui-x360.bl-det .cc-bg { filter: brightness(.6) saturate(1.05); }
+#couch.ui-x360 .x3d-head { position: absolute; top: calc(8vh + var(--cc-sy, 0px)); right: calc(6vw + var(--cc-sx, 0px)); max-width: 56vw; text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+#couch.ui-x360 .x3d-head .cc-title { font-size: 2.3em; font-weight: 400; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.6); height: auto; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56vw; }
+#couch.ui-x360 .x3d-head .cc-title img { max-height: 3em; }
+#couch.ui-x360 .x3d-head .cc-meta { color: #fff; opacity: .85; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+#couch.ui-x360 .x3d-main { display: flex; gap: 2vw; align-items: flex-start; height: 100%; padding-top: 5vh; }
+#couch.ui-x360 .x3d-main .cc-det-btns { display: grid; grid-template-columns: repeat(2, 17.5vh); grid-auto-rows: 17.5vh; gap: .4vh; margin: 0; flex: 0 0 auto; }
+#couch.ui-x360 .x3d-main .cc-btn { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; text-align: left; padding: .6em .7em; border: 0; border-radius: 0; background: linear-gradient(180deg, #0fa50f, #0a920a); color: #fff; font-weight: 500; font-size: 1em; transform: none; box-shadow: none; transition: transform .14s, box-shadow .14s; }
+#couch.ui-x360 .x3d-main .cc-btn.primary { background: linear-gradient(180deg, #19b819, #0c960c); }
+#couch.ui-x360 .x3d-main .cc-btn.sel { transform: translate(-.4%, -1%) scale(1.07); z-index: 4; background: linear-gradient(180deg, #3cc13c, #0fa50f); box-shadow: 0 0 0 .1em rgba(255,255,255,.9), 0 1.2vh 2.4vh rgba(0,0,0,.5); border: 0; }
+#couch.ui-x360 .x3b-ic { position: absolute; top: .45em; right: .6em; font-size: 1.9em; line-height: 1; }
+#couch.ui-x360 .x3d-right { flex: 1 1 auto; min-width: 0; height: 100%; display: flex; flex-direction: column; gap: 1.2vh; padding-right: 1vw; }
+#couch.ui-x360 .x3d-right .cc-d-media { flex: 0 0 auto; width: min(44vh, 100%); }
+#couch.ui-x360 .x3d-right .cc-d-media .cc-m-stage { min-height: 0; aspect-ratio: 16 / 9; border-radius: 0; flex: none; }
+#couch.ui-x360 .x3d-right .cc-m-cap { color: #fff; }
+#couch.ui-x360 .x3d-right .cc-d-body { flex: 1 1 auto; min-height: 0; background: none; padding: 0; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.6); max-width: 54vw; }
+#couch.ui-x360 .x3d-right .cc-desc { font-size: .98em; line-height: 1.45; }
+#couch.ui-x360 .x3d-right .cc-facts { grid-template-columns: 1fr; gap: .5em; }
+#couch.ui-x360 .x3d-right .cc-fact b { display: block; font-weight: 500; }
+#couch.ui-x360.bl-det .x3d-head { top: calc(14vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.bl-det .x3d-main { padding-top: 9vh; }
+/* ajustes Xbox 360: lista clara a la izquierda y panel gris a la derecha */
+#couch.ui-x360 .cc-settings { background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 0; border-radius: 0; overflow: visible; display: flex; width: min(82vw, 1500px); top: calc(26vh + var(--cc-sy, 0px)); bottom: calc(11vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .cc-s-cats { flex: 0 0 31%; padding: 0; gap: 0; border: 0; background: #eef0f0; position: relative; overflow: visible; }
+#couch.ui-x360 .cc-s-title { position: absolute; top: -7vh; left: 0; margin: 0; font-size: 1.7em; font-weight: 500; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); white-space: nowrap; }
+#couch.ui-x360 .cc-s-cat { border: 0; border-bottom: 1px solid #cfd2d2; border-radius: 0; padding: .85em 1em; opacity: 1; color: #222; font-weight: 400; font-size: 1.05em; background: transparent; }
+#couch.ui-x360 .cc-s-cat.on { background: #d6ecd6; }
+#couch.ui-x360 .cc-s-cat.sel { background: #0f9d0f; color: #fff; }
+#couch.ui-x360 .cc-s-wrap { flex: 1 1 auto; background: linear-gradient(180deg, #747d7f, #98a0a2); padding: 0; gap: 0; opacity: 1; color: #fff; }
+#couch.ui-x360 .cc-s-wrap:not(.focus) .cc-s-row { opacity: .8; }
+#couch.ui-x360 .cc-s-row { border: 0; border-bottom: 1px solid rgba(255,255,255,.25); border-radius: 0; background: transparent; color: #fff; padding: .8em 1.1em; font-size: 1em; }
+#couch.ui-x360 .cc-s-row.sel { background: #0f9d0f; }
+#couch.ui-x360 .cc-s-row.act .cc-s-name { color: #d8ffd8; }
+#couch.ui-x360 .cc-s-val { color: #fff; }
+/* menú F2 / opciones: como la Xbox Guide */
+#couch.ui-x360 .cc-menu-ov { background: rgba(0,0,0,.84); -webkit-backdrop-filter: none; backdrop-filter: none; }
+#couch.ui-x360 .cc-menu { width: min(48vw, 920px); max-height: 70vh; padding: 0 0 0 4.4vw; border-radius: 0; border: 0; background: linear-gradient(90deg, #566b7c 0 4.4vw, #f1f2f2 4.4vw); color: #222; box-shadow: none; }
+#couch.ui-x360 .cc-menu-title { margin-left: -4.4vw; padding: .8em 1em .8em calc(4.4vw + 1em); background: #000; color: #fff; font-weight: 500; font-size: 1.35em; }
+#couch.ui-x360 .cc-menu-it { border: 0; border-bottom: 1px solid #cfd2d2; border-radius: 0; background: #f7f8f8; color: #222; font-weight: 400; padding: .85em 1em; font-size: 1.05em; }
+#couch.ui-x360 .cc-menu-it b { font-weight: 400; color: inherit; opacity: .85; }
+#couch.ui-x360 .cc-menu-it.sel { background: #0f9d0f; color: #fff; }
+#couch.ui-x360 .cc-menu-it.danger { color: #b3261e; }
+#couch.ui-x360 .cc-menu-it.danger.sel { color: #fff; }
+#couch.ui-x360 .cc-menu-sep { margin: 0; height: 0; background: none; border-bottom: 3px solid #566b7c; }
+/* logros: lista blanca sobre negro, selección verde */
+#couch.ui-x360.ach-view .cc-listwrap { background: #000; margin: 0 -3vw; padding: 1vh 3vw 6vh; }
+#couch.ui-x360.ach-view .cc-tile { border-radius: 0 !important; background: #f4f5f5 !important; color: #222; box-shadow: none !important; border-bottom: 1px solid #cfd2d2; }
+#couch.ui-x360.ach-view .cc-tile.sel { background: #0f9d0f !important; color: #fff; }
+#couch.ui-x360.ach-view .cc-tile .cc-name, #couch.ui-x360.ach-view .cc-tile .cc-ptxt { color: inherit; }
+#couch.ui-x360.ach-view .cc-tile.done .cc-ptxt { color: inherit; }
+#couch.ui-x360.ach-view .cc-cover, #couch.ui-x360.ach-view .cc-tile.done .cc-cover { border-radius: 0; box-shadow: none; }
+#couch.ui-x360.ach-view .cc-achpane { background: #000; border-radius: 0; border: 0; padding: 0 0 0 .5em; }
+#couch.ui-x360.ach-view .cc-achpane.focus { border: 0; }
+#couch.ui-x360 .cc-ach-head { color: #fff; font-size: 1.1em; padding: .5em 0 .7em; }
+#couch.ui-x360 .cc-ach-list { gap: 0; }
+#couch.ui-x360 .cc-ach { border-radius: 0; background: #f4f5f5; color: #222; opacity: 1; border-bottom: 1px solid #cfd2d2; padding: .5em .8em; }
+#couch.ui-x360 .cc-ach:not(.got) { background: #d9dcdc; color: #555; }
+#couch.ui-x360 .cc-ach.got { background: #f4f5f5; }
+#couch.ui-x360 .cc-ach img { border-radius: 0; }
+#couch.ui-x360 .cc-ach.sel { background: #0f9d0f !important; color: #fff; outline: 0; box-shadow: none; }
+#couch.ui-x360 .cc-ach-meta .rare { color: inherit; }
+/* 1.84.37b: tarjetas más grandes, sin logos, icono de tienda en la cinta, fondo propio, páginas sin choques */
+#couch.ui-x360 { --x3-w: 16.8vw; }
+#couch.ui-x360.x3s { --x3-w: 14vw; }
+#couch.ui-x360.x3l { --x3-w: 19.4vw; }
+#couch.ui-x360.x3-cards .cc-tile { width: var(--x3-w); }
+#couch.ui-x360.x3-cards .cc-strip { gap: 1vw; }
+#couch.ui-x360.x3-cards .cc-listwrap { top: calc(26vh + var(--cc-sy, 0px)); bottom: calc(7vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.x3-cards .cc-hero { top: calc(17.5vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.x3-cards .cc-tile:has(.cc-store) .cc-cover::before { content: ''; }
+#couch.ui-x360.x3-cards .cc-store { top: .6vw; left: calc(.6vw + .55em); right: auto; bottom: auto; width: auto; height: 3.2vh; display: flex; align-items: center; z-index: 3; background: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+#couch.ui-x360.x3-cards .cc-store svg { height: 2.3vh; width: auto; }
+#couch.ui-x360 .cc-title img, #couch.ui-x360 .cc-hc-logo { display: none; }
+/* fondo propio */
+#couch.ui-x360.x3-bg .cc-bg { display: block; inset: 0; width: auto; height: auto; -webkit-mask-image: none; mask-image: none; filter: brightness(.75) saturate(1.05); }
+#couch.ui-x360.x3-bg .cc-shade { display: block; background: linear-gradient(180deg, rgba(20,22,22,.35), rgba(20,22,22,.55)); }
+/* inicio más despejado */
+#couch.ui-x360 .x3-home { grid-template-rows: repeat(3, 20vh); grid-auto-columns: 22vh; gap: 1vh; padding: 1.6vh 3vw 3vh .6vw; }
+#couch.ui-x360 .x3t.art .x3t-lab { padding: .6em .8em; font-size: .85em; }
+#couch.ui-x360 .x3t.big .x3t-lab { font-size: 1.1em; }
+/* página del juego: fichas más pequeñas y cuerpo + vídeo en columnas */
+#couch.ui-x360 .x3d-main .cc-det-btns { grid-template-columns: repeat(2, 14.5vh); grid-auto-rows: 14.5vh; gap: 1vh; }
+#couch.ui-x360 .x3d-right { flex-direction: row; align-items: flex-start; gap: 2vw; }
+#couch.ui-x360 .x3d-right .cc-d-media { position: static !important; order: 2; flex: 0 0 34vw; width: 34vw; max-width: 34vw; height: auto; padding: .6em; background: rgba(20,22,22,.55); border-radius: 0; }
+#couch.ui-x360 .x3d-right .cc-d-body { order: 1; flex: 1 1 0; min-width: 0; max-width: none; height: 100%; }
+#couch.ui-x360 .x3d-head .cc-title { font-size: 2.1em; }
+#couch.ui-x360.bl-det .x3d-head { top: calc(13vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.bl-det .x3d-main { padding-top: 10vh; }
+/* 1.84.38b: logos ajustados al área del título, tienda a la derecha, inicio ordenado, Guía de Xbox */
+#couch.ui-x360 .cc-hc-logo { display: none; }
+#couch.ui-x360 .cc-title img { display: block; margin-left: auto; max-height: 10vh; max-width: 30vw; object-fit: contain; object-position: right center; filter: drop-shadow(0 2px 6px rgba(0,0,0,.55)); }
+#couch.ui-x360.x3-cards .cc-title { height: auto; min-height: 5vh; display: block; }
+#couch.ui-x360 .x3d-head .cc-title { min-height: 5vh; }
+#couch.ui-x360 .x3d-head .cc-title img { max-height: 9vh; max-width: 34vw; }
+#couch.ui-x360.x3-cards .cc-store { left: auto; right: calc(.6vw + .55em); }
+#couch.ui-x360.x3-cards .cc-run, #couch.ui-x360.x3-cards .cc-ni, #couch.ui-x360.x3-cards .cc-count { top: calc(3.2vh + .4em); left: .4em; }
+#couch.ui-x360.x3-cards .cc-count { left: auto; right: .4em; }
+#couch.ui-x360 { --x3r: 19.4vh; }
+#couch.ui-x360 .cc-home { top: calc(25vh + var(--cc-sy, 0px)); bottom: calc(9vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .x3-home { grid-template-rows: repeat(3, var(--x3r)); grid-auto-columns: var(--x3r); gap: 1vh; padding: 1.6vh 3vw 3vh .6vw; height: 100%; box-sizing: border-box; }
+/* Guía de Xbox */
+#couch.ui-x360 .cc-menu-ov { align-items: center; justify-content: center; }
+#couch.ui-x360 .cc-guide { width: min(70vw, 1280px); display: flex; flex-direction: column; gap: 1.2vh; }
+#couch.ui-x360 .gd-top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; color: #fff; padding: 0 .3vw; }
+#couch.ui-x360 .gd-title { font-size: 1.4em; font-weight: 500; }
+#couch.ui-x360 .gd-av { width: 4.4vh; height: 4.4vh; display: flex; align-items: center; justify-content: center; background: #566b7c; font-weight: 700; font-size: 1.1em; }
+#couch.ui-x360 .gd-sys { justify-self: end; text-align: right; font-size: 1.2em; line-height: 1.3; display: flex; flex-direction: column; }
+#couch.ui-x360 .gd-bat { opacity: .85; font-size: .8em; }
+#couch.ui-x360 .gd-panel { display: flex; height: 56vh; background: #000; }
+#couch.ui-x360 .gd-blade { flex: 0 0 4.6vw; display: flex; align-items: flex-start; justify-content: center; padding-top: 1.6em; writing-mode: vertical-rl; background: #566b7c; color: #fff; font-size: 1.25em; border-left: 1px solid #000; cursor: pointer; letter-spacing: .02em; }
+#couch.ui-x360 .gd-blade.l { background: linear-gradient(180deg, #e4e6e6, #b9bebf); color: #3a4650; }
+#couch.ui-x360 .gd-main { flex: 1 1 auto; min-width: 0; background: #f1f2f2; display: flex; }
+#couch.ui-x360 .gd-list { flex: 1 1 auto; overflow-y: auto; scrollbar-width: none; }
+#couch.ui-x360 .gd-list .cc-menu-it { padding: 1em 1.2em; font-size: 1.15em; }
+#couch.ui-x360 .gd-hints { display: flex; gap: 2.2vw; color: #fff; font-size: 1.1em; align-items: center; }
+#couch.ui-x360 .gd-hints span { display: flex; align-items: center; gap: .5em; }
+#couch.ui-x360 .gd-c { font-style: normal; font-weight: 700; min-width: 1.7em; height: 1.7em; padding: 0 .4em; border-radius: 1em; display: inline-flex; align-items: center; justify-content: center; font-size: .8em; color: #fff; }
+#couch.ui-x360 .gd-c.a { background: #1a9a1a; } #couch.ui-x360 .gd-c.b { background: #c92a2a; } #couch.ui-x360 .gd-c.x { background: #2a6fc9; }
+#couch.ui-x360 .cc-home { container-type: size; height: auto; }
+#couch.ui-x360 .x3-home { grid-template-rows: repeat(3, minmax(0, 1fr)); grid-auto-columns: calc((100cqh - 4.6vh - 2vh) / 3); }
+/* página del juego Xbox 360: pestañas resumen / detalles / logros / galería */
+#couch.ui-x360.bl-det .x3d-head { top: calc(10vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .x3v-tabs { position: absolute; left: calc(6vw + var(--cc-sx, 0px)); top: calc(17.5vh + var(--cc-sy, 0px)); display: flex; gap: 1.4em; font-size: 1.5em; font-weight: 300; }
+#couch.ui-x360 .x3v-tab { color: #fff; opacity: .42; cursor: pointer; }
+#couch.ui-x360 .x3v-tab.on { opacity: 1; font-weight: 400; }
+#couch.ui-x360 .x3v-body { position: absolute; left: calc(6vw + var(--cc-sx, 0px)); right: calc(6vw + var(--cc-sx, 0px)); top: calc(26vh + var(--cc-sy, 0px)); bottom: calc(10vh + var(--cc-sy, 0px)); color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+#couch.ui-x360 .x3v-ov { display: flex; gap: 2.4vw; align-items: flex-start; }
+#couch.ui-x360 .x3v-ov .cc-det-btns { display: grid; grid-template-columns: repeat(2, 15vh); grid-auto-rows: 15vh; gap: 1vh; margin: 0; flex: 0 0 auto; }
+#couch.ui-x360 .x3v-ov .cc-btn { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; text-align: left; padding: .7em .8em; border: 0; border-radius: 0; background: #0f9d0f; color: #fff; font-size: 1em; cursor: pointer; text-shadow: none; transition: transform .14s, box-shadow .14s; }
+#couch.ui-x360 .x3v-ov .cc-btn.primary { background: linear-gradient(180deg, #19b819, #0c960c); }
+#couch.ui-x360 .x3v-ov .cc-btn.sel { transform: scale(1.07); z-index: 4; background: linear-gradient(180deg, #3cc13c, #0fa50f); box-shadow: 0 0 0 .1em rgba(255,255,255,.9), 0 1.2vh 2.4vh rgba(0,0,0,.5); }
+#couch.ui-x360 .x3v-mid { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: .5em; font-size: .95em; }
+#couch.ui-x360 .x3v-box { width: min(15vh, 9vw); aspect-ratio: 3 / 4; background: rgba(255,255,255,.12); margin-bottom: .6em; overflow: hidden; }
+#couch.ui-x360 .x3v-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#couch.ui-x360 .x3v-ln { opacity: .92; }
+#couch.ui-x360 .x3v-side { flex: 0 0 20vw; display: flex; flex-direction: column; opacity: .8; }
+#couch.ui-x360 .x3v-k { font-weight: 700; margin-top: .9em; }
+#couch.ui-x360 .x3v-v { opacity: .9; }
+#couch.ui-x360 .x3v-det { display: grid; grid-template-columns: 1fr 1fr 2.2fr; gap: 3vw; overflow-y: auto; scrollbar-width: none; align-content: start; }
+#couch.ui-x360 .x3v-h { font-weight: 700; color: #7fe27f; }
+#couch.ui-x360 .x3v-det .cc-desc { font-size: .98em; line-height: 1.5; margin: 0; }
+#couch.ui-x360 .x3v-ach .cc-d-body, #couch.ui-x360 .x3v-ach { height: 100%; }
+#couch.ui-x360 .x3v-ach .cc-d-body { width: min(64vw, 1180px); background: none; padding: 0; overflow-y: auto; scrollbar-width: none; max-width: none; }
+#couch.ui-x360 .x3v-gal .cc-d-media { position: static !important; width: min(62vw, 1180px); height: 100%; background: rgba(20,22,22,.55); border-radius: 0; }
+#couch .cc-x3n { display: none; }
+#couch.ui-x360.x3-cards .cc-x3n { display: block; color: #fff; opacity: .85; font-size: .95em; text-align: right; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+#couch.ui-x360.bl-det .x3d-head { top: calc(12.5vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .x3v-tabs { top: calc(19vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .x3v-body { top: calc(27.5vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .cc-guide { width: min(56vw, 1020px); }
+#couch.ui-x360 .gd-panel { height: 46vh; }
+#couch.ui-x360 .gd-list .cc-menu-it { padding: .8em 1.1em; font-size: 1.05em; }
+/* 1.84.41: logos dentro de su zona (anulan las alturas forzadas del tema clásico) */
+#couch.ui-x360:not(.grid) .cc-hero .cc-title img { height: auto !important; width: auto !important; max-height: 6.5vh !important; max-width: 26vw !important; object-fit: contain; object-position: right center; margin-left: auto; display: block; }
+#couch.ui-x360 .cc-detail .x3d-head .cc-title img { height: auto !important; width: auto !important; max-height: 8vh !important; max-width: 30vw !important; object-fit: contain; object-position: right center; margin-left: auto; display: block; }
+#couch.ui-x360.x3-cards .cc-hero { z-index: 8; pointer-events: none; }
+#couch.ui-x360.x3-cards .cc-listwrap { top: calc(31.5vh + var(--cc-sy, 0px)); bottom: calc(6vh + var(--cc-sy, 0px)); }
+#couch.ui-x360.x3-cards .cc-title { min-height: 0; }
+#couch.ui-x360 .x3d-head { max-width: 60vw; }
+#couch.ui-x360 .x3v-body { top: calc(29vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .x3v-ov .cc-det-btns { grid-template-columns: repeat(2, 14vh); grid-auto-rows: 14vh; }
+#couch.ui-x360 .x3v-center { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 2vh; max-width: 44vw; }
+#couch.ui-x360 .x3v-ov .cc-d-media { position: static !important; width: 100%; height: auto; padding: .5em; background: rgba(20,22,22,.55); border-radius: 0; flex: 0 0 auto; }
+#couch.ui-x360 .x3v-ov .cc-d-media .cc-m-stage { min-height: 0; aspect-ratio: 16 / 9; flex: none; border-radius: 0; }
+#couch.ui-x360 .x3v-ov .cc-d-media .cc-m-cap { font-size: .8em; }
+#couch.ui-x360 .x3v-info { display: flex; gap: 1.4vw; align-items: flex-start; }
+#couch.ui-x360 .x3v-box { width: min(11vh, 7vw); margin-bottom: 0; flex: 0 0 auto; }
+#couch.ui-x360 .x3v-mid { flex: 1 1 0; }
+#couch.ui-x360 { --x3-w: 15.4vw; }
+#couch.ui-x360.x3s { --x3-w: 13vw; }
+#couch.ui-x360.x3l { --x3-w: 17.6vw; }
+#couch.ui-x360.x3-cards .cc-listwrap { top: calc(29.5vh + var(--cc-sy, 0px)); }
+/* 1.84.42: resumen del juego mejor repartido: fichas | tráiler | portada y datos (nada se sale por abajo) */
+#couch.ui-x360 .x3v-center { flex-direction: row; max-width: none; gap: 2.4vw; align-items: flex-start; }
+#couch.ui-x360 .x3v-ov .cc-d-media { flex: 0 0 31vw; width: 31vw; }
+#couch.ui-x360 .x3v-info { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 1.2vh; }
+#couch.ui-x360 .x3v-box { width: min(17vh, 10vw); }
+#couch.ui-x360 .x3v-mid { flex: none; gap: .4em; }
+/* 1.84.43: solo la hora arriba, logros como en la Xbox, animaciones de la Guía */
+#couch.ui-x360 .cc-music, #couch.ui-x360 .cc-bat { display: none !important; }
+/* página del juego · logros: cabecera gris + rejilla de iconos */
+#couch.ui-x360 .x3v-ach { height: auto; }
+#couch.ui-x360 .x3g { width: min(66vw, 1240px); height: 100%; display: flex; flex-direction: column; background: #eef1f1; color: #222; text-shadow: none; box-shadow: 0 1vh 3vh rgba(0,0,0,.45); }
+#couch.ui-x360 .x3g-head { position: relative; flex: 0 0 auto; min-height: 15vh; padding: 1.1em 1.4em; background: linear-gradient(180deg, #8d9899, #5f6b6d); color: #fff; display: flex; flex-direction: column; gap: .15em; }
+#couch.ui-x360 .x3g-l1 { font-size: 1.15em; font-weight: 500; }
+#couch.ui-x360 .x3g-l2 { font-size: 1.05em; opacity: .9; }
+#couch.ui-x360 .x3g-l3 { font-size: 1em; opacity: .85; padding-right: 14em; }
+#couch.ui-x360 .x3g-rt { position: absolute; right: 1.4em; top: 1.1em; text-align: right; opacity: .9; line-height: 1.5; }
+#couch.ui-x360 .x3g-grid { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-width: none; display: grid; grid-template-columns: repeat(8, 1fr); grid-auto-rows: max-content; gap: 1.2vh .4vw; padding: 2.4vh 1.6vw; background: linear-gradient(180deg, #f3f6f6, #dfe7e7); }
+#couch.ui-x360 .x3g-c { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; padding: 12%; }
+#couch.ui-x360 .x3g-c.sel { background: #0f9d0f; }
+#couch.ui-x360 .x3g-i { width: 100%; height: 100%; border: .12em solid rgba(255,255,255,.9); box-shadow: 0 .15em .5em rgba(0,0,0,.4); background: #333; }
+#couch.ui-x360 .x3g-i img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#couch.ui-x360 .x3g-i.lock img { filter: grayscale(1) brightness(.75); opacity: .75; }
+#couch.ui-x360 .x3g-foot { flex: 0 0 auto; padding: .7em 1.6vw; background: #dfe7e7; color: #333; font-size: .95em; }
+/* pestaña principal Logros: lista de juegos a todo el ancho, filas blancas */
+#couch.ui-x360.ach-view .cc-achpane { display: none !important; }
+#couch.ui-x360.ach-view .cc-listwrap { position: absolute !important; left: calc(6vw + var(--cc-sx, 0px)); right: calc(6vw + var(--cc-sx, 0px)); top: calc(24vh + var(--cc-sy, 0px)); bottom: calc(9vh + var(--cc-sy, 0px)); margin: 0; padding: 0; background: none; display: block !important; }
+#couch.ui-x360.ach-view .cc-strip { flex: 1 1 auto !important; width: 100% !important; height: 100%; padding: 0 !important; gap: 0 !important; background: #f4f5f5; box-shadow: 0 1vh 3vh rgba(0,0,0,.4); }
+#couch.ui-x360.ach-view .cc-tile { grid-template-columns: 4.6em 1fr; padding: .5em .8em !important; width: 100% !important; margin: 0; font-size: 1.05em; }
+#couch.ui-x360.ach-view .cc-cover { width: 4.6em; border-radius: 0; }
+#couch.ui-x360.ach-view .cc-tile .cc-ptxt { font-size: .95em; opacity: .9; }
+/* animaciones de la Guía */
+#couch.ui-x360 .cc-menu-ov { transition: opacity .18s; }
+#couch.ui-x360 .cc-menu-ov:not(.hidden) { animation: gdFade .22s ease-out both; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
+#couch.ui-x360 .cc-guide.an-open { animation: gdPop .34s cubic-bezier(.2,.9,.25,1) both; }
+#couch.ui-x360 .cc-guide.an-open .gd-panel { animation: gdUnfold .42s cubic-bezier(.2,.85,.25,1) both; }
+#couch.ui-x360 .cc-guide.an-open .gd-top, #couch.ui-x360 .cc-guide.an-open .gd-hints { animation: gdFade .4s .12s ease-out both; }
+#couch.ui-x360 .cc-guide.an-l .gd-main, #couch.ui-x360 .cc-guide.an-open .gd-main { animation: gdSlideL .26s cubic-bezier(.2,.85,.25,1) both; }
+#couch.ui-x360 .cc-guide.an-r .gd-main { animation: gdSlideR .26s cubic-bezier(.2,.85,.25,1) both; }
+#couch.ui-x360 .cc-guide.an-open .gd-list .cc-menu-it, #couch.ui-x360 .cc-guide.an-l .gd-list .cc-menu-it, #couch.ui-x360 .cc-guide.an-r .gd-list .cc-menu-it { animation: gdRow .28s calc(var(--i, 0) * 28ms + .06s) ease-out both; }
+#couch.ui-x360 .gd-list .cc-menu-it { transition: background-color .12s, color .12s; }
+#couch.ui-x360 .gd-blade { transition: background .2s, filter .2s; }
+#couch.ui-x360 .gd-blade:hover { filter: brightness(1.12); }
+@keyframes gdFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gdPop { from { opacity: 0; transform: translateY(2.5vh) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes gdUnfold { from { clip-path: inset(0 46% 0 46%); } to { clip-path: inset(0 0 0 0); } }
+@keyframes gdSlideL { from { opacity: 0; transform: translateX(-3vw); } to { opacity: 1; transform: none; } }
+@keyframes gdSlideR { from { opacity: 0; transform: translateX(3vw); } to { opacity: 1; transform: none; } }
+@keyframes gdRow { from { opacity: 0; transform: translateX(-1.4vw); } to { opacity: 1; transform: none; } }
+
+/* 1.84.44: logros centrados sobre fondo oscuro, colecciones como el Inicio y animaciones de la consola */
+#couch.ui-x360.ach-view .cc-listwrap.hidden, #couch.ui-x360 .cc-listwrap.hidden { display: none !important; }
+#couch.ui-x360.x3-dim .cc-bg { display: block; filter: brightness(.16) saturate(.7) !important; transition: filter .5s ease; }
+#couch.ui-x360.x3-dim .cc-shade { display: block; background: rgba(0,0,0,.45); }
+#couch.ui-x360 .x3v-ach { display: flex; justify-content: center; align-items: center; top: calc(24vh + var(--cc-sy, 0px)); bottom: calc(9vh + var(--cc-sy, 0px)); }
+#couch.ui-x360 .x3v-ach .x3g { width: min(62vw, 1180px); height: 100%; margin: 0 auto; }
+#couch.ui-x360 .x3v-tabs { justify-content: flex-start; }
+/* colecciones: mosaico igual que el Inicio */
+#couch.ui-x360.x3-colls .cc-listwrap { container-type: size; }
+#couch.ui-x360.x3-colls .cc-strip { position: relative; display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); grid-auto-flow: column dense; grid-auto-columns: calc((100cqh - 4.6vh - 2vh) / 3); gap: 1vh; align-content: start; align-items: stretch; padding: 1.6vh 3vw 3vh .6vw; height: 100%; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 9vw), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 9vw), transparent); }
+#couch.ui-x360.x3-colls .cc-tile { position: relative; width: auto; margin: 0; padding: 0; overflow: hidden; background: #0f9d0f; display: block; transform-origin: 50% 50%; transition: transform .2s cubic-bezier(.2,.9,.3,1.15), box-shadow .2s; }
+#couch.ui-x360.x3-colls .cc-tile:nth-child(6n+1) { grid-column: span 2; grid-row: span 2; }
+#couch.ui-x360.x3-colls .cc-tile.sel { margin: 0; transform: translate(-.3%, -1%) scale(1.07); z-index: 5; background: #0f9d0f; box-shadow: 0 0 0 .1em rgba(255,255,255,.9), 0 1.2vh 2.4vh rgba(0,0,0,.5); }
+#couch.ui-x360.x3-colls .cc-cover, #couch.ui-x360.x3-colls .cc-cover.coll { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; margin: 0; border-radius: 0 !important; }
+#couch.ui-x360.x3-colls .cc-cover::before { display: none; }
+#couch.ui-x360.x3-colls .cc-coll-over { display: block; position: absolute; left: 0; right: 0; bottom: 0; padding: .6em .8em; font-size: .85em; font-weight: 500; color: #fff; background: rgba(20,22,22,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: none; z-index: 2; }
+#couch.ui-x360.x3-colls .cc-tile:nth-child(6n+1) .cc-coll-over { font-size: 1.1em; }
+#couch.ui-x360.x3-colls .cc-name { display: none; }
+#couch.ui-x360.x3-colls .cc-tile .cc-count { top: 0; right: 0; left: auto; border-radius: 0; z-index: 3; }
+/* animaciones al estilo de la consola */
+@keyframes x3SlideR { from { opacity: 0; transform: translateX(7vw); } to { opacity: 1; transform: none; } }
+@keyframes x3SlideL { from { opacity: 0; transform: translateX(-7vw); } to { opacity: 1; transform: none; } }
+@keyframes x3Tile { from { opacity: 0; transform: translateX(5vw) scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes x3TileL { from { opacity: 0; transform: translateX(-5vw) scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes x3Rise { from { opacity: 0; transform: translateY(2.4vh); } to { opacity: 1; transform: none; } }
+@keyframes x3Zoom { from { opacity: 0; transform: scale(.7); } 60% { opacity: 1; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+@keyframes x3Body { from { opacity: 0; transform: translateX(4vw); } to { opacity: 1; transform: none; } }
+@keyframes x3BodyL { from { opacity: 0; transform: translateX(-4vw); } to { opacity: 1; transform: none; } }
+#couch.ui-x360 .in { animation: none; }
+#couch.ui-x360 .cc-home.in, #couch.ui-x360 .cc-listwrap.in, #couch.ui-x360 .cc-search.in { animation: x3Fade .28s ease-out; }
+@keyframes x3Fade { from { opacity: 0; } to { opacity: 1; } }
+#couch.ui-x360 .in .x3t, #couch.ui-x360 .in .cc-tile { animation: x3Tile .5s cubic-bezier(.2,.85,.25,1) backwards; animation-delay: calc(var(--i, 0) * 38ms); }
+#couch.ui-x360[data-dir="l"] .in .x3t, #couch.ui-x360[data-dir="l"] .in .cc-tile { animation-name: x3TileL; }
+#couch.ui-x360.ach-view .in .cc-tile { animation-name: x3Rise; animation-duration: .35s; animation-delay: calc(var(--i, 0) * 22ms); }
+#couch.ui-x360 .cc-detail.in { animation: none; }
+#couch.ui-x360 .cc-detail.in .x3d-head { animation: x3SlideL .45s cubic-bezier(.2,.85,.25,1) backwards; }
+#couch.ui-x360 .cc-detail.in .x3v-tabs { animation: x3Rise .4s .08s cubic-bezier(.2,.85,.25,1) backwards; }
+#couch.ui-x360 .cc-detail.in .x3v-body { animation: x3Rise .5s .14s cubic-bezier(.2,.85,.25,1) backwards; }
+#couch.ui-x360 .cc-detail.in .x3v-ov .cc-btn { animation: x3Zoom .45s cubic-bezier(.2,.85,.25,1) backwards; animation-delay: calc(.2s + var(--k, 0) * 60ms); }
+#couch.ui-x360 .x3v-body.sl-r { animation: x3Body .38s cubic-bezier(.2,.85,.25,1) backwards; }
+#couch.ui-x360 .x3v-body.sl-l { animation: x3BodyL .38s cubic-bezier(.2,.85,.25,1) backwards; }
+#couch.ui-x360 .x3v-ov.sl-r .cc-btn, #couch.ui-x360 .x3v-ov.sl-l .cc-btn { animation: x3Zoom .4s cubic-bezier(.2,.85,.25,1) backwards; animation-delay: calc(.06s + var(--k, 0) * 50ms); }
+#couch.ui-x360 .x3g-c { animation: x3Zoom .42s cubic-bezier(.2,.85,.25,1) backwards; animation-delay: var(--d, 0ms); }
+#couch.ui-x360 .x3g-head { animation: x3Fade .3s ease-out; }
+#couch.ui-x360 .x3g { animation: x3Zoom .4s cubic-bezier(.2,.85,.25,1) backwards; }
+#couch.ui-x360 .x3t, #couch.ui-x360 .x3v-ov .cc-btn { transition: transform .2s cubic-bezier(.2,.9,.3,1.15), box-shadow .2s, background .2s; }
+#couch.ui-x360.x3-cards .cc-tile { transition: transform .2s cubic-bezier(.2,.9,.3,1.15), margin .2s, background .2s, box-shadow .2s; }
+#couch.ui-x360 .cc-bg.swap { animation: x3BgIn .6s ease-out; }
+@keyframes x3BgIn { from { opacity: .15; transform: scale(1.04); } to { opacity: var(--cc-bgop, 1); transform: none; } }
+#couch.ui-x360 .cc-hero .cc-title, #couch.ui-x360 .cc-hero .cc-meta { animation: x3Fade .3s ease-out; }
+#couch.ui-x360 .cc-tab { transition: color .25s, opacity .25s; }
+#couch.ui-x360 .cc-tab.on { animation: x3Fade .3s ease-out; }
+@media (prefers-reduced-motion: reduce) { #couch.ui-x360 * { animation-duration: .01ms !important; animation-delay: 0ms !important; } }
+
+/* 1.84.44b: sin cortes en la loseta seleccionada, sin "brinco" al entrar y mosaico con margen */
+#couch.ui-x360 { --x3e: none; }
+#couch.ui-x360 .x3t.sel, #couch.ui-x360.x3-colls .cc-tile.sel { --x3e: translate(-.3%, -1%) scale(1.045); transform: translate(-.3%, -1%) scale(1.045); }
+#couch.ui-x360 .x3t:not(.big).sel, #couch.ui-x360.x3-colls .cc-tile:not(:nth-child(6n+1)).sel { --x3e: translate(-.3%, -1%) scale(1.07); transform: translate(-.3%, -1%) scale(1.07); }
+#couch.ui-x360.x3-cards:not(.x3-colls) .cc-tile.sel { --x3e: scale(1.07); }
+#couch.ui-x360 .x3v-ov .cc-btn.sel { --x3e: scale(1.07); }
+@keyframes x3Tile { from { opacity: 0; transform: translateX(5vw) scale(.92); } to { opacity: 1; transform: var(--x3e, none); } }
+@keyframes x3TileL { from { opacity: 0; transform: translateX(-5vw) scale(.92); } to { opacity: 1; transform: var(--x3e, none); } }
+@keyframes x3Zoom { from { opacity: 0; transform: scale(.7); } 60% { opacity: 1; transform: scale(1.06); } to { opacity: 1; transform: var(--x3e, none); } }
+#couch.ui-x360 .x3-home, #couch.ui-x360.x3-colls .cc-strip { padding: 2.6vh 3vw 3.4vh 2.2vw; }
+#couch.ui-x360 .x3-home { grid-auto-columns: calc((100cqh - 6vh - 2vh) / 3); }
+#couch.ui-x360.x3-colls .cc-strip { grid-auto-columns: calc((100cqh - 6vh - 2vh) / 3); -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 9vw), transparent); }
+#couch.ui-x360 .x3t-lab, #couch.ui-x360.x3-colls .cc-coll-over { box-sizing: border-box; min-width: 0; }
+#couch.ui-x360 .x3t.art .x3t-lab { text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+#couch.ui-x360 .x3t.art .x3t-badge { z-index: 2; }
+
+/* 1.84.47: Inicio con la distribución de la consola (estrecha | destacada 2×2 + anchas | estrecha) */
+#couch.ui-x360 .x3-home { --r: calc((100cqh - 6vh - 2vh) / 3); grid-template-rows: repeat(3, var(--r)); gap: 1vh; grid-auto-columns: auto; }
+#couch.ui-x360 .x3t-ic svg { width: 30%; }
+#couch.ui-x360 .x3t.fn .x3t-lab { font-size: .9em; }
+
+/* 1.84.49: oscurecer y desenfocar el fondo (Xbox 360) */
+#couch.ui-x360.x3-bg .cc-bg, #couch.ui-x360.bl-det .cc-bg { filter: brightness(calc(.75 * (1 - var(--x3d, 0)))) saturate(1.05) blur(var(--x3b, 0px)); transform: scale(calc(1 + var(--x3bn, 0) * .004)); }
+#couch.ui-x360.x3-dim .cc-bg { filter: brightness(.16) saturate(.7) blur(var(--x3b, 0px)) !important; }
+
+/* 1.84.51: el fondo ya no «se ajusta» al cargar: solo un fundido suave */
+@keyframes x3BgIn { from { opacity: .35; } to { opacity: var(--cc-bgop, 1); } }
+#couch.ui-x360 .cc-bg.swap { animation: x3BgIn .45s ease-out; }
+
+/* 1.84.52: Xbox 360 · al pulsar Jugar la pantalla se difumina a negro (sin pantalla de «en ejecución») */
+#couch .cc-nowdim.x3 { z-index: 60 !important; background: #000; backdrop-filter: blur(0px); opacity: 0; transition: opacity .9s ease-in, backdrop-filter .9s ease-in; }
+#couch .cc-nowdim.x3.on { opacity: 1; backdrop-filter: blur(22px); }
+#couch .cc-nowdim.x3:not(.on) { transition: opacity .7s ease-out, backdrop-filter .7s ease-out; }
+
+/* 1.84.55 · Tipografía más cercana a la del Xbox 360 (Segoe, trazos finos) */
+#couch.ui-x360 { font-family: "Segoe UI Semilight", "Segoe UI", system-ui, sans-serif; font-weight: 300; }
+#couch.ui-x360 .x3v-tab, #couch.ui-x360 .cc-tab, #couch.ui-x360 .cc-meta, #couch.ui-x360 .x3t-lab, #couch.ui-x360 .x3g-l3 { font-family: "Segoe UI Semilight", "Segoe UI", system-ui, sans-serif; font-weight: 300; }
+#couch.ui-x360 .cc-title, #couch.ui-x360 .x3d-head .cc-title, #couch.ui-x360 .x3g-l1, #couch.ui-x360 .x3g-l2 { font-family: "Segoe UI Light", "Segoe UI Semilight", "Segoe UI", system-ui, sans-serif; font-weight: 300; letter-spacing: .005em; }
+#couch.ui-x360 .x3t-lab { font-weight: 400; }
+
+/* 1.84.56 · Globo de «Logro desbloqueado» estilo Xbox 360 */
+#couch .x3-notes { position: absolute !important; height: 0; justify-content: flex-end; left: 0; right: 0; bottom: 11vh; display: flex; flex-direction: column; align-items: center; gap: 1vh; pointer-events: none; z-index: 80 !important; }
+#couch .x3-note { display: flex; align-items: center; gap: 1.1vh; padding: .9vh 2.4vh .9vh .9vh; min-width: 24vw; max-width: 44vw; border-radius: 10vh; color: #fff; background: linear-gradient(#7ac13a, #3f8b13 55%, #2f7410); box-shadow: 0 .4vh 2vh rgba(0,0,0,.55), inset 0 .15vh 0 rgba(255,255,255,.55); transform: translateY(8vh) scale(.92); opacity: 0; transition: transform .55s cubic-bezier(.2,1.25,.4,1), opacity .35s ease; }
+#couch .x3-note.in { transform: none; opacity: 1; }
+#couch .x3-note.out { transform: translateY(6vh) scale(.96); opacity: 0; transition: transform .5s ease-in, opacity .5s ease-in; }
+#couch .x3-note-ic { flex: none; width: 6.4vh; height: 6.4vh; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: #1f4d0a; border: .3vh solid rgba(255,255,255,.85); font-size: 3vh; }
+#couch .x3-note-ic img { width: 100%; height: 100%; object-fit: cover; }
+#couch .x3-note-tx { min-width: 0; }
+#couch .x3-note-l1 { font-size: 1em; font-weight: 600; text-shadow: 0 .1vh .3vh rgba(0,0,0,.5); }
+#couch .x3-note-l2 { font-size: .9em; opacity: .95; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 1.84.58 · Cambio de sección tipo cinta del Xbox 360: las dos secciones se mueven a la vez, sin recargar los mosaicos */
+@keyframes x3SwInR { from { transform: translateX(100vw); } to { transform: none; } }
+@keyframes x3SwInL { from { transform: translateX(-100vw); } to { transform: none; } }
+@keyframes x3SwOutL { from { transform: none; } to { transform: translateX(-100vw); } }
+@keyframes x3SwOutR { from { transform: none; } to { transform: translateX(100vw); } }
+#couch.ui-x360.x3-sw[data-dir="r"] .cc-home.in, #couch.ui-x360.x3-sw[data-dir="r"] .cc-listwrap.in, #couch.ui-x360.x3-sw[data-dir="r"] .cc-search.in { animation: x3SwInR .36s cubic-bezier(.22,.8,.2,1) both; }
+#couch.ui-x360.x3-sw[data-dir="l"] .cc-home.in, #couch.ui-x360.x3-sw[data-dir="l"] .cc-listwrap.in, #couch.ui-x360.x3-sw[data-dir="l"] .cc-search.in { animation: x3SwInL .36s cubic-bezier(.22,.8,.2,1) both; }
+#couch.ui-x360.x3-sw .in .x3t, #couch.ui-x360.x3-sw .in .cc-tile, #couch.ui-x360.x3-sw .in .cc-search * { animation: none !important; }
+#couch.x3-gh-host[data-dir="r"] .x3-gh { animation: x3SwOutL .36s cubic-bezier(.22,.8,.2,1) both !important; }
+#couch.x3-gh-host[data-dir="l"] .x3-gh { animation: x3SwOutR .36s cubic-bezier(.22,.8,.2,1) both !important; }
+#couch.x3-gh-host .x3-gh, #couch.x3-gh-host .x3-gh * { animation-delay: 0s; }
+
+/* 1.84.64 · Guía: puntaje de logros (gamerscore) y blade de logros recientes */
+#couch.ui-x360 .gd-title { display: flex; flex-direction: column; line-height: 1.15; }
+#couch.ui-x360 .gd-score { font-size: .55em; font-weight: 400; opacity: .85; margin-top: .25em; }
+#couch.ui-x360 .gd-score::first-letter { color: #9bd84a; font-weight: 700; }
+
+/* 1.84.65 · Guía más visual: iconos en las filas y panel de vista previa a la derecha */
+#couch.ui-x360 .gd-main.vis .gd-list { flex: 0 0 56%; }
+#couch.ui-x360 .gd-main.vis .gd-list .cc-menu-it { display: flex; align-items: center; gap: 1em; }
+#couch.ui-x360 .gd-ic { flex: none; width: 4.6vh; height: 4.6vh; display: grid; place-items: center; background: #6b7f8e; color: #fff; }
+#couch.ui-x360 .gd-ic svg { width: 62%; height: 62%; }
+#couch.ui-x360 .gd-ic.img { background: #1d2a1d; border: .25vh solid #6aa82a; padding: 0; overflow: hidden; }
+#couch.ui-x360 .gd-ic.img img { width: 100%; height: 100%; object-fit: cover; }
+#couch.ui-x360 .gd-list .cc-menu-it.sel .gd-ic { background: #0b6e0b; }
+#couch.ui-x360 .gd-list .cc-menu-it.sel .gd-ic.img { background: #1d2a1d; border-color: #fff; }
+#couch.ui-x360 .gd-tx { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+#couch.ui-x360 .gd-l1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-x360 .gd-l2 { font-size: .72em; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-x360 .gd-prev { flex: 1 1 auto; min-width: 0; background: linear-gradient(180deg, #dfe3e3, #c4cacb); color: #2c3840; padding: 2.2vh 1.6vw; display: flex; flex-direction: column; align-items: center; gap: 1vh; overflow: hidden; border-left: 1px solid rgba(0,0,0,.25); }
+#couch.ui-x360 .gd-cov { width: 100%; aspect-ratio: 1.5; display: grid; gap: .5vh; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+#couch.ui-x360 .gd-cov.n1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+#couch.ui-x360 .gd-cov.n1 .gd-cv { background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #aab2b4; }
+#couch.ui-x360 .gd-cv { background: #aab2b4 center top / cover no-repeat; box-shadow: 0 .3vh 1vh rgba(0,0,0,.35); }
+#couch.ui-x360 .gd-big { width: 15vh; height: 15vh; display: grid; place-items: center; background: #6b7f8e; color: #fff; border: .35vh solid #6aa82a; box-shadow: 0 .4vh 1.4vh rgba(0,0,0,.4); overflow: hidden; }
+#couch.ui-x360 .gd-big img { width: 100%; height: 100%; object-fit: cover; }
+#couch.ui-x360 .gd-big.ic { border-color: #fff; }
+#couch.ui-x360 .gd-big svg { width: 60%; height: 60%; }
+#couch.ui-x360 .gd-pt { font-size: 1.15em; font-weight: 600; text-align: center; line-height: 1.2; }
+#couch.ui-x360 .gd-ps { font-size: .78em; opacity: .75; text-align: center; }
+#couch.ui-x360 .gd-pd { font-size: .8em; text-align: center; opacity: .9; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* 1.84.66 · Arranque estilo Xbox 360: esfera de 4 cuadrantes, destello verde y nombre */
+.cc-splash.x3sp { flex-direction: column; gap: 2.2vh; background: #000; transition: opacity .6s ease; }
+.x3sp-orb { position: relative; width: 24vh; height: 24vh; animation: x3spOrb 3s ease-in-out both; }
+.x3sp-orb svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 1.4vh rgba(120,230,50,.85)); }
+.x3sp-orb .bd { fill: url(#x3spg); fill-opacity: 0; stroke: #9be04a; stroke-width: .5; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: x3spDraw 1.1s .2s ease-in-out forwards, x3spFill .6s 1.3s ease-out forwards; }
+.x3sp-orb .bt { stroke: #eaffc8; stroke-width: 1; stroke-linecap: round; fill: #eaffc8; opacity: 0; animation: x3spQ .4s 1.05s ease-out forwards; }
+.x3sp-orb g.bt { fill: none; }
+.x3sp-orb .b1 { animation-delay: 1.15s; } .x3sp-orb .b2 { animation-delay: 1.25s; }
+.x3sp-orb b { position: absolute; inset: -30%; border-radius: 50%; background: radial-gradient(circle, rgba(200,255,140,.95), rgba(90,200,30,.55) 40%, transparent 70%); opacity: 0; animation: x3spFlash .9s 1.35s ease-out both; pointer-events: none; }
+@keyframes x3spDraw { to { stroke-dashoffset: 0; } }
+@keyframes x3spFill { to { fill-opacity: .95; } }
+.x3sp-name { font-size: 6.2vh; font-weight: 200; letter-spacing: .32em; color: #fff; text-indent: .32em; opacity: 0; animation: x3spTx .8s 1.7s ease-out both; font-family: "Segoe UI Light", "Segoe UI", system-ui, sans-serif; }
+.x3sp-sub { font-size: 2.2vh; letter-spacing: .2em; color: #8fd44a; opacity: 0; text-transform: uppercase; animation: x3spTx .8s 2.1s ease-out both; }
+@keyframes x3spQ { from { opacity: 0; transform: scale(.55); } to { opacity: 1; transform: none; } }
+@keyframes x3spFlash { 0% { opacity: 0; transform: scale(.4); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes x3spTx { from { opacity: 0; transform: translateY(1.2vh); } to { opacity: 1; transform: none; } }
+@keyframes x3spOrb { 0% { transform: scale(.92); } 100% { transform: scale(1.04); } }
+
+/* 1.84.68 · Perfil en la Guía: inicial + nombre de usuario de Windows */
+#couch.ui-x360 .gd-pf { display: flex; align-items: flex-end; gap: .7em; justify-self: center; }
+#couch.ui-x360 .gd-nm { font-size: 1.05em; font-weight: 400; padding-bottom: .1em; max-width: 14vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-x360 .gd-av { background: linear-gradient(135deg, #7ac13a, #2f7410); }
+
+/* 1.84.69 · Nombre del perfil: cuadro con teclado en pantalla */
+#couch .cc-namebox { position: absolute !important; inset: 0; z-index: 70 !important; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); }
+#couch .cc-namebox.hidden { display: none !important; }
+#couch .nm-card { width: min(56vw, 900px); background: #f1f2f2; color: #2c3840; padding: 3vh 3vw; box-shadow: 0 1vh 4vh rgba(0,0,0,.6); display: flex; flex-direction: column; gap: 1.6vh; animation: x3Zoom .3s cubic-bezier(.2,.85,.25,1) both; }
+#couch .nm-title { font-size: 1.4em; font-weight: 500; }
+#couch .nm-q { position: relative; min-height: 6vh; padding: 1.2vh 1.2vw; background: #fff; border: .25vh solid #6aa82a; font-size: 1.5em; display: flex; align-items: center; }
+#couch .nm-q.empty::before { content: attr(data-ph); position: absolute; left: 1.2vw; opacity: .4; }
+#couch .nm-kb { display: flex; flex-direction: column; gap: .8vh; }
+#couch .nm-row { display: grid; grid-template-columns: repeat(10, 1fr); gap: .8vh; }
+#couch .nm-row.r4 { grid-template-columns: 1.4fr 1fr 1fr 2fr 2fr; }
+#couch .nm-key { padding: 1.3vh 0; font-size: 1.15em; font-weight: 600; border: 0; background: #3b4750; color: #fff; cursor: pointer; font-family: inherit; }
+#couch .nm-key.sp { font-size: .95em; background: #566b7c; }
+#couch .nm-key.sel { background: #129d12; transform: scale(1.06); box-shadow: 0 .4vh 1.2vh rgba(0,0,0,.4); }
+#couch .nm-hint { font-size: .75em; opacity: .7; }
+
+/* 1.84.71 · Foto de perfil */
+#couch.ui-x360 .gd-av.pic { background-size: cover; background-position: center; width: 6vh; height: 6vh; box-shadow: 0 0 0 .25vh #fff; }
+
+/* 1.84.74 selector de foto de perfil (Xbox 360) */
+#couch .cc-picbox { position: absolute !important; inset: 0; z-index: 70 !important; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.72); backdrop-filter: blur(8px); }
+#couch .cc-picbox.hidden { display: none !important; }
+#couch .pp-card { width: min(72vw, 1180px); background: linear-gradient(#f4f7f7, #dde4e4); color: #2c3840; box-shadow: 0 1vh 4vh rgba(0,0,0,.6); animation: x3Zoom .3s cubic-bezier(.2,.85,.25,1) both; display: flex; flex-direction: column; }
+#couch .pp-head { padding: 2.4vh 2.4vw; background: linear-gradient(#8b9a9a, #5b6868); color: #fff; min-height: 12vh; }
+#couch .pp-nm { font-size: 1.7em; font-weight: 300; }
+#couch .pp-sub { font-size: 1.15em; margin-top: .6vh; font-weight: 300; }
+#couch .pp-ds { font-size: 1em; margin-top: .6vh; font-weight: 300; opacity: .9; }
+#couch .pp-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2.4vh 1.4vw; padding: 3vh 2.4vw; justify-items: center; }
+#couch .pp-t { position: relative; width: 8.6vh; height: 8.6vh; background: #566b7c center/cover no-repeat; border: .3vh solid #fff; box-shadow: 0 .4vh 1vh rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.6em; font-weight: 600; cursor: pointer; image-rendering: auto; }
+#couch .pp-t.none { background: linear-gradient(135deg, #7ac13a, #2f7410); }
+#couch .pp-t.own { background: #8a9696; font-weight: 300; }
+#couch .pp-t.sel { outline: 1.1vh solid #129d12; outline-offset: .2vh; z-index: 2; }
+#couch .pp-t.cur::after { content: "✓"; position: absolute; right: -.5vh; bottom: -.5vh; width: 2.6vh; height: 2.6vh; background: #129d12; color: #fff; font-size: .42em; display: flex; align-items: center; justify-content: center; }
+#couch .pp-foot { padding: 1.4vh 2.4vw; font-size: 1em; font-weight: 300; opacity: .8; }
+
+/* 1.84.75 la cuadrícula no debe salirse de la tarjeta en ventanas pequeñas */
+#couch .pp-card { width: min(78vw, 1180px); box-sizing: border-box; overflow: visible; }
+#couch .pp-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2.4vh 1vw; padding: 3vh 2vw; box-sizing: border-box; width: 100%; }
+#couch .pp-t { width: 100%; max-width: 8.6vh; height: auto; aspect-ratio: 1 / 1; box-sizing: border-box; font-size: clamp(1.2em, 2.6vh, 2.6em); }
+
+/* 1.84.76 foto y nombre del perfil junto al reloj (Xbox 360) */
+#couch .cc-me { display: none; }
+#couch.ui-x360 .cc-me { display: flex; align-items: center; gap: .8vh; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+#couch.ui-x360.portrait .cc-me { display: none; }
+#couch.ui-x360 .me-nm { font-size: 1.05em; font-weight: 400; max-width: 14vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#couch.ui-x360 .me-av { width: 4vh; height: 4vh; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #7ac13a, #2f7410); border: .2vh solid #fff; box-shadow: 0 .3vh .8vh rgba(0,0,0,.4); font-weight: 700; font-size: 1.1em; box-sizing: border-box; }
+#couch.ui-x360 .me-av.pic { background-size: cover; background-position: center; }
+#couch.ui-x360 .cc-sys { gap: 1.6vw; }
+
+/* 1.84.77 fondo en movimiento lento (opcional) */
+#couch.ui-x360.x3-move::after { content: ""; position: absolute; inset: -20%; z-index: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: radial-gradient(38% 30% at 20% 30%, rgba(255,255,255,.55), transparent 70%), radial-gradient(34% 28% at 78% 62%, rgba(255,255,255,.45), transparent 70%), radial-gradient(30% 24% at 52% 88%, rgba(255,255,255,.4), transparent 70%);
+  animation: x3Drift 46s ease-in-out infinite alternate; will-change: transform; }
+@keyframes x3Drift { 0% { transform: translate3d(-5%, -2%, 0) rotate(0deg) scale(1); } 50% { transform: translate3d(4%, 3%, 0) rotate(4deg) scale(1.08); } 100% { transform: translate3d(-2%, 5%, 0) rotate(-3deg) scale(1.02); } }
+#couch.ui-x360.x3-move .cc-bg { animation: x3BgPan 60s ease-in-out infinite alternate; }
+@keyframes x3BgPan { from { translate: -1.2% -.8%; scale: 1.02; } to { translate: 1.2% .8%; scale: 1.06; } }
+@media (prefers-reduced-motion: reduce) { #couch.ui-x360.x3-move::after, #couch.ui-x360.x3-move .cc-bg { animation: none; } }
+
+/* 1.84.78 fondo en movimiento más visible: cintas de luz que cruzan la pantalla + imagen que se desplaza */
+#couch.ui-x360.x3-move::before, #couch.ui-x360.x3-move::after { content: ""; position: absolute; left: -30%; width: 160%; z-index: 0; pointer-events: none; mix-blend-mode: screen; will-change: transform; background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.30), rgba(255,255,255,0) 70%); }
+#couch.ui-x360.x3-move::before { top: 8%; height: 42%; transform: rotate(-9deg); animation: x3Rib1 24s ease-in-out infinite alternate; }
+#couch.ui-x360.x3-move::after { inset: auto; left: -30%; top: 48%; height: 46%; background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.24), rgba(255,255,255,0) 70%); transform: rotate(7deg); animation: x3Rib2 31s ease-in-out infinite alternate; }
+@keyframes x3Rib1 { 0% { transform: translate3d(-14%, -6%, 0) rotate(-9deg) scaleY(.8); opacity: .55; } 50% { opacity: 1; } 100% { transform: translate3d(14%, 9%, 0) rotate(-3deg) scaleY(1.15); opacity: .6; } }
+@keyframes x3Rib2 { 0% { transform: translate3d(12%, 6%, 0) rotate(7deg) scaleY(1.1); opacity: .6; } 50% { opacity: 1; } 100% { transform: translate3d(-14%, -8%, 0) rotate(2deg) scaleY(.85); opacity: .55; } }
+#couch.ui-x360.x3-move .cc-bg { animation: x3BgPan 26s ease-in-out infinite alternate; }
+@keyframes x3BgPan { from { translate: -2.2% -1.4%; scale: 1.03; } to { translate: 2.2% 1.4%; scale: 1.1; } }
+@media (prefers-reduced-motion: reduce) { #couch.ui-x360.x3-move::before, #couch.ui-x360.x3-move::after, #couch.ui-x360.x3-move .cc-bg { animation: none; } }
+
+/* 1.84.79 el fantasma de la transición de sección no debe dibujar las cintas de luz (provocaban un destello) */
+#couch.x3-gh-host::before, #couch.x3-gh-host::after, .x3-gh-host::before, .x3-gh-host::after { display: none !important; content: none !important; animation: none !important; }
+#couch.ui-x360.x3-move .cc-bg.swap { animation: x3BgIn .45s ease-out, x3BgPan 26s ease-in-out infinite alternate; }
+
+/* 1.84.83 Guía: bloque «Mi perfil» */
+#couch.ui-x360 .gd-bigav { width: 17vh; height: 17vh; margin: 0 auto 2vh; background: linear-gradient(135deg, #7ac13a, #2f7410); border: .5vh solid #fff; box-shadow: 0 .8vh 2.4vh rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; font-size: 6em; font-weight: 700; color: #fff; box-sizing: border-box; }
+#couch.ui-x360 .gd-bigav.pic { background-size: cover; background-position: center; }
+
+/* 1.84.84 la Guía no se corta en ventanas estrechas */
+#couch.ui-x360 .cc-guide { width: min(max(66vw, 1060px), 94vw, 1360px); }
+#couch.ui-x360 .gd-panel { height: max(46vh, 440px); max-height: 74vh; }
+#couch.ui-x360 .gd-blade { flex: 0 0 clamp(52px, 4.6vw, 80px); }
+#couch.ui-x360 .gd-main.vis .gd-list { flex: 0 0 54%; }
+#couch.ui-x360 .gd-list .cc-menu-it { padding: .8em 1.1em; }
+#couch.ui-x360 .gd-bigav { width: min(17vh, 22vw, 190px); height: min(17vh, 22vw, 190px); font-size: 4.5em; }
+#couch.ui-x360 .gd-big { width: min(15vh, 18vw, 160px); height: min(15vh, 18vw, 160px); }
