@@ -2163,3 +2163,927 @@ body:has(.toolbar.hidden) #sizeQuick.size-corner, body.couch-on #sizeQuick.size-
 #couch.ui-x360 .gd-list .cc-menu-it { padding: .8em 1.1em; }
 #couch.ui-x360 .gd-bigav { width: min(17vh, 22vw, 190px); height: min(17vh, 22vw, 190px); font-size: 4.5em; }
 #couch.ui-x360 .gd-big { width: min(15vh, 18vw, 160px); height: min(15vh, 18vw, 160px); }
+
+
+/* ===== 1.84.90 · Estilo «Steam Big Picture (oscuro)» (cfg.ui === 'deck'), medido sobre el video de referencia a 1600×900 ===== */
+#couch .cc-dsearch, #couch .cc-dfield, #couch .cc-dic { display: none; }
+#couch.ui-deck { background: #05080c !important; --cc-on-accent: #fff; }
+#couch.ui-deck .cc-ribbon { display: none; }
+#couch.ui-deck .cc-bg { inset: -4%; filter: blur(9px) brightness(.5) saturate(1.1) !important; }
+#couch.ui-deck .cc-shade { background: linear-gradient(180deg, rgba(5,8,12,.30) 0%, rgba(5,8,12,.50) 38%, rgba(5,8,12,.86) 62%, #05080c 100%) !important; }
+#couch.ui-deck.grid { background: linear-gradient(180deg, #0b121c 0%, #070b11 100%) !important; }
+#couch.ui-deck.grid:not(.dk-home):not(.dk-det) .cc-bg, #couch.ui-deck.grid:not(.dk-home):not(.dk-det) .cc-shade { opacity: 0; }
+/* barra superior: iconos, hora y perfil a la derecha */
+#couch.ui-deck .cc-top { display: block; position: relative; height: 5.4vh; padding: 0 !important; margin: 0 !important; flex: 0 0 auto; }
+#couch.ui-deck.dk-lib .cc-top { height: 12.8vh; background: #05080c; box-shadow: 0 .8vh 2.4vh rgba(0,0,0,.55); z-index: 3; }
+#couch.ui-deck .cc-sys { position: absolute; top: 0; right: 1.2vw; transform: none; height: 5.4vh; display: flex; align-items: center; gap: 1.45vw; }
+#couch.ui-deck .cc-dsearch, #couch.ui-deck .cc-dic { display: flex; align-items: center; justify-content: center; width: 1.45vw; height: 1.45vw; min-width: 18px; min-height: 18px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; order: 1; }
+#couch.ui-deck .cc-dic { cursor: default; } #couch.ui-deck .cc-dic.bell { order: 2; } #couch.ui-deck .cc-dic.globe { order: 3; }
+#couch.ui-deck .cc-dsearch svg, #couch.ui-deck .cc-dic svg { width: 100%; height: 100%; }
+#couch.ui-deck .cc-music { order: 4; } #couch.ui-deck .cc-bat { order: 4; font-size: .8em; opacity: .85; }
+#couch.ui-deck .cc-clock { order: 5; font-size: .88em !important; font-weight: 600; letter-spacing: .01em; }
+#couch.ui-deck .cc-me { order: 6; }
+#couch.ui-deck .cc-me .me-nm { display: none; }
+#couch.ui-deck .cc-me .me-av { width: 2.4vw; height: 2.4vw; min-width: 32px; min-height: 32px; border-radius: 3px; box-shadow: .22vw 0 0 #1a9fff; }
+#couch.ui-deck.dk-lib .cc-dsearch { display: none; }
+#couch.ui-deck.dk-lib .cc-dfield { display: flex; position: absolute; left: 1.1vw; top: 0; height: 5.4vh; align-items: center; gap: .9vw; padding: 0; border: 0; background: none; color: #fff; font: inherit; font-size: .85em; cursor: pointer; }
+#couch.ui-deck .cc-dfield svg { width: 1.35vw; height: 1.35vw; min-width: 17px; min-height: 17px; }
+#couch.ui-deck .cc-dfield span { font-style: italic; color: #8e98a6; }
+/* pestañas de la biblioteca: píldoras con contador, más las teclas de sección a los lados */
+#couch.ui-deck .cc-tabs { display: none; position: absolute; left: 0; right: 0; top: 5.4vh; height: 7.4vh; align-items: center; justify-content: center; gap: .3vw; overflow: visible; font-size: .7em; max-width: none; padding: 0; }
+#couch.ui-deck.dk-lib .cc-tabs { display: flex; }
+#couch.ui-deck .cc-tab.dk-off { display: none; }
+#couch.ui-deck .cc-tab { display: flex; align-items: center; gap: .55em; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: .78em 1.5em; opacity: 1; color: #fff; background: none; border-radius: 999px; transition: background .15s, color .15s; }
+#couch.ui-deck .cc-tab .dk-n { font-style: normal; font-weight: 600; color: #7d8794; letter-spacing: .02em; }
+#couch.ui-deck .cc-tab.on { background: #2c333d; color: #fff; }
+#couch.ui-deck .cc-tab.on.hot { background: #fff; color: #05080c; } #couch.ui-deck .cc-tab.on.hot .dk-n { color: #5d6672; }
+#couch.ui-deck .cc-lb, #couch.ui-deck .cc-rb { display: none; position: absolute; top: 8.1vh; z-index: 4; }
+#couch.ui-deck.dk-lib .cc-lb { display: block; left: 2.8vw; } #couch.ui-deck.dk-lib .cc-rb { display: block; right: 2.8vw; }
+#couch.ui-deck .dk-kb { display: inline-block; background: #fff; color: #05080c; border-radius: 4px; padding: .22em .7em; font-size: .62em; font-weight: 800; }
+#couch.ui-deck .dk-pd { display: none; } #couch.ui-deck.padmode .dk-pd { display: inline; } #couch.ui-deck.padmode .dk-kb { display: none; }
+/* barra inferior */
+#couch.ui-deck .cc-hints { left: 0 !important; right: 0 !important; bottom: 0 !important; transform: none !important; width: auto !important; max-width: none !important; height: 5.4vh; box-sizing: border-box; border-radius: 0 !important; border: 0 !important; box-shadow: 0 -.6vh 2vh rgba(0,0,0,.5) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #05080c !important; justify-content: flex-start; align-items: center; flex-wrap: nowrap; gap: 1.6vw; padding: 0 2.3vw !important; font-size: .68em; text-transform: uppercase; letter-spacing: .05em; }
+#couch.ui-deck .cc-hints span { opacity: 1; gap: .7em; font-weight: 700; white-space: nowrap; }
+#couch.ui-deck .cc-hints .dk-sp { flex: 1; }
+#couch.ui-deck .cc-hints b { background: #fff; color: #05080c; border-radius: 4px; padding: .3em .75em; font-weight: 800; text-transform: none; letter-spacing: 0; }
+/* Inicio: portadas verticales y tarjetas de novedades */
+#couch.ui-deck .cc-home { padding: 0 !important; }
+#couch.ui-deck .cc-h-scroll { padding: 1.6vh 0 24vh; -webkit-mask-image: none; mask-image: none; }
+#couch.ui-deck .cc-h-row { margin: 0; }
+#couch.ui-deck .cc-h-row.dk-games { margin-bottom: 7.5vh; }
+#couch.ui-deck .cc-h-title { margin: 0; padding: 0 2.8vw; font-size: 1.07em; font-weight: 700; color: #dfe5ec; text-shadow: 0 2px 12px rgba(0,0,0,.7); }
+#couch.ui-deck .cc-h-strip { gap: .62vw; padding: 2.2vh 2.8vw 6.5vh; align-items: flex-start; scroll-padding: 0 2.8vw; }
+#couch.ui-deck .cc-hc { background: none; border: 0; border-radius: 0; box-shadow: none; transform: none; outline: .17vw solid transparent; outline-offset: 0; transition: outline-color .12s; }
+#couch.ui-deck .cc-hc.sel { transform: none; outline-color: #f1ead8; box-shadow: 0 .8vh 3vh rgba(0,0,0,.6); }
+#couch.ui-deck .cc-hc.dk-cov { width: 12.8vw; overflow: visible; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-img { aspect-ratio: 2 / 3; border-radius: 0; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-logo { display: none; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-body { position: absolute; left: 0; right: 0; top: 100%; padding: .5vh 0 0; opacity: 0; transition: opacity .15s; pointer-events: none; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { opacity: 1; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-name { font-size: .64em; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.9); }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-sub { font-size: .5em; letter-spacing: .05em; text-transform: uppercase; color: #aab3bf; opacity: 1; margin-top: .25em; }
+#couch.ui-deck .cc-hc-badge { border-radius: 0; background: #1a9fff; color: #fff; font-size: .55em; letter-spacing: .06em; left: 50%; transform: translateX(-50%); top: 0; padding: .45em 1.3em; }
+#couch.ui-deck .cc-hc-badge.hot { background: #5ba32b; }
+#couch.ui-deck .cc-hc-tag { display: none; }
+#couch.ui-deck .cc-h-row.dk-news .dk-pill { width: max-content; margin: 0 auto 1.2vh; padding: .6em 1.5em; border-radius: 999px; background: #2c333d; color: #fff; font-size: .68em; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+#couch.ui-deck .cc-h-row.dk-news { margin-bottom: 4vh; }
+#couch.ui-deck .cc-h-row.dk-news .cc-h-strip { padding: .6vh 2.8vw 1vh; gap: .8vw; }
+#couch.ui-deck .cc-hc.dk-new { width: 22.3vw; }
+#couch.ui-deck .cc-hc.dk-new .dk-when { font-size: .72em; color: #b5bdc8; padding: 0 0 .5vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-img { aspect-ratio: 16 / 9; border-radius: 0; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-body { background: #343b46; padding: .8em .8em .9em; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-name { font-size: .95em; font-weight: 500; color: #e8edf3; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-sub { font-size: .72em; color: #aab3bf; opacity: 1; }
+/* Biblioteca: cuadrícula de 6 columnas con portadas de 2:3 y panel gris detrás de la marcada */
+#couch.ui-deck .cc-hero { display: none !important; }
+#couch.ui-deck .cc-listwrap { padding: 0 !important; }
+#couch.ui-deck.grid .cc-strip { display: grid !important; grid-template-columns: repeat(6, 16.06vw) !important; gap: 5.5vh 0 !important; align-content: start; padding: 3.2vh 0 12vh 3.4vw !important; -webkit-mask-image: none !important; mask-image: none !important; scrollbar-width: none; }
+#couch.ui-deck.grid .cc-tile { width: 12.8vw !important; min-width: 0; transform: none !important; isolation: isolate; }
+#couch.ui-deck.grid .cc-cover { border-radius: 0 !important; box-shadow: none !important; }
+#couch.ui-deck.grid .cc-name, #couch.ui-deck.grid .cc-sub, #couch.ui-deck.grid .cc-store, #couch.ui-deck.grid .cc-ptxt, #couch.ui-deck.grid .cc-prog { display: none !important; }
+#couch.ui-deck.grid .cc-tile::before { content: ''; position: absolute; inset: -2.1vh -1.2vw; background: #262e39; border-radius: 3px; z-index: -1; opacity: 0; transition: opacity .12s; }
+#couch.ui-deck.grid .cc-tile.sel::before { opacity: 1; }
+#couch.ui-deck.grid .cc-tile.sel { z-index: 3; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { transform: scale(1.035); box-shadow: 0 1vh 2.6vh rgba(0,0,0,.55) !important; }
+
+#couch.ui-deck.grid:not(.dk-home):not(.dk-det) .cc-bg, #couch.ui-deck.grid:not(.dk-home):not(.dk-det) .cc-shade { display: none; }
+#couch.ui-deck .cc-me { display: flex; }
+#couch.ui-deck .cc-hc.dk-cov { position: relative; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-badge:not(.hot) { display: none; }
+#couch.ui-deck .cc-h-scroll { padding-top: .2vh; }
+#couch.ui-deck .cc-h-strip { padding-top: 1.6vh; }
+#couch.ui-deck .cc-h-row.dk-games { margin-bottom: 5.5vh; }
+#couch.ui-deck .cc-me .me-av { display: flex; align-items: center; justify-content: center; background-color: #2c333d; background-size: cover; background-position: center; color: #fff; font-weight: 700; font-size: .8em; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-name { font-size: .78em; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-sub { font-size: .6em; }
+#couch.ui-deck .cc-hc.dk-new { position: relative; outline: 0 !important; box-shadow: none !important; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-badge { display: none; }
+#couch.ui-deck .cc-hc.dk-new .dk-when { height: 2.2vh; line-height: 2.2vh; padding: 0; box-sizing: border-box; }
+#couch.ui-deck .cc-hc.dk-new::after { content: ''; position: absolute; left: 0; right: 0; top: 2.2vh; bottom: 0; outline: .17vw solid transparent; pointer-events: none; }
+#couch.ui-deck .cc-hc.dk-new.sel::after { outline-color: #f1ead8; }
+
+/* --- Big Picture: menús (lateral de F1 y emergentes centrados) --- */
+#couch.ui-deck .cc-menu-ov { background: rgba(5,8,12,.62); backdrop-filter: blur(16px) brightness(.8); -webkit-backdrop-filter: blur(16px) brightness(.8); }
+#couch.ui-deck .cc-menu-ov.dk-side { inset: 5.4vh 0 5.4vh 0; align-items: stretch; justify-content: flex-start; }
+#couch.ui-deck .cc-menu { width: 20.8vw; max-height: 84vh; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; display: flex; flex-direction: column; gap: 1px; }
+#couch.ui-deck .cc-menu-title { text-align: center; font-weight: 500; font-size: .95em; padding: 0 0 2.4vh; }
+#couch.ui-deck .cc-menu-it { position: relative; display: flex; align-items: center; justify-content: flex-start; gap: .9em; min-height: 6.3vh; padding: 0 1.1em; border: 0; border-radius: 0; background: #1b222c; color: #e8edf3; font-weight: 500; font-size: .86em; }
+#couch.ui-deck .cc-menu-it b { margin-left: auto; font-weight: 500; opacity: .7; }
+#couch.ui-deck .cc-menu-it.sel { background: #fff; color: #0b1017; border: 0; }
+#couch.ui-deck .cc-menu-it.danger { color: #e8edf3; }
+#couch.ui-deck .cc-menu-it.danger.sel { background: #d83a1b; color: #fff; }
+#couch.ui-deck .cc-menu-sep { height: 2px; margin: 0; background: #0a0f16; }
+#couch.ui-deck .cc-menu.dk-side { width: 17.8vw; max-height: none; height: 100%; justify-content: flex-start; gap: 0; padding-top: 19vh; background: #0e151e; }
+#couch.ui-deck .cc-menu.dk-side .cc-menu-it { background: none; color: #dfe5ec; min-height: 6.3vh; padding: 0 1.2vw; font-size: .98em; }
+#couch.ui-deck .cc-menu.dk-side .cc-menu-it.sel { background: #3a4350; color: #fff; }
+#couch.ui-deck .cc-menu.dk-side .cc-menu-it.sel::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: .32vw; background: #1a9fff; }
+#couch.ui-deck .cc-menu-ic { display: flex; width: 1.3em; height: 1.3em; color: #dfe5ec; opacity: .9; }
+#couch.ui-deck .cc-menu-ic svg { width: 100%; height: 100%; }
+
+/* ===== 1.84.91 · Big Picture: ficha del juego ===== */
+#couch.ui-deck .dk-det::-webkit-scrollbar { display: none; }
+
+/* ===== 1.84.91 · Big Picture: cuadrícula fluida, logros propios, ajustes ===== */
+#couch.ui-deck.grid .cc-strip { grid-template-columns: repeat(6, 1fr) !important; padding: 3.2vh 3.4vw 12vh !important; gap: 5.5vh 3.2vw !important; box-sizing: border-box; }
+#couch.ui-deck.grid .cc-tile { width: 100% !important; }
+#couch.ui-deck.grid .cc-tile .cc-cover { width: 100% !important; height: auto !important; aspect-ratio: 2 / 3; }
+/* Ajustes (Big Picture): lista de categorías a la izquierda y filas a la derecha */
+#couch.ui-deck.setmode .cc-listwrap, #couch.ui-deck.setmode .cc-hero { display: none !important; }
+#couch.ui-deck .cc-settings { position: absolute !important; left: 0 !important; right: 0; top: 5.4vh !important; bottom: 5.6vh !important; width: auto !important; z-index: 5; display: flex; justify-content: flex-start; padding: 0; border-radius: 0; background: #0e141b; backdrop-filter: none; box-shadow: none; }
+#couch.ui-deck .cc-s-cats { flex: 0 0 19vw; padding: 3vh 0 2vh; gap: 0; background: #1b222c; border: 0; overflow-y: auto; scrollbar-width: none; }
+#couch.ui-deck .cc-s-title { margin: 0 0 3.4vh 1.6vw; font-size: 1.5em; font-weight: 700; line-height: 1.15; }
+#couch.ui-deck .cc-s-cat { padding: .8em 1.6vw; border-radius: 0; border: 0; font-weight: 400; opacity: .8; font-size: .92em; }
+#couch.ui-deck .cc-s-cat.on { opacity: 1; font-weight: 600; background: linear-gradient(90deg, #1a5a96, rgba(26,90,150,.15)); }
+#couch.ui-deck .cc-s-cat.sel { background: linear-gradient(90deg, #1a9fff, rgba(26,159,255,.25)); border: 0; }
+#couch.ui-deck .cc-s-wrap { flex: 1; padding: 3vh 2vw 4vh; opacity: 1; gap: .55vh; }
+#couch.ui-deck .cc-s-row { padding: .85em 1.1em; border-radius: .25em; border: 0; background: #232a35; font-size: .92em; box-sizing: border-box; }
+#couch.ui-deck .cc-s-row.sel { background: #3d4450; box-shadow: inset 0 0 0 .18em #fff; }
+#couch.ui-deck .cc-s-wrap:not(.focus) .cc-s-row.sel { box-shadow: none; background: #232a35; }
+#couch.ui-deck .cc-s-name { font-weight: 400; }
+#couch.ui-deck .cc-s-val { padding: .35em .9em; border-radius: .25em; background: #3d4450; font-weight: 400; min-width: 8em; justify-content: center; }
+#couch.ui-deck .cc-s-row.act .cc-s-name { color: #fff; }
+#couch.ui-deck .cc-s-row.act { background: #2f3744; }
+#couch.ui-deck .dk-sw { width: 2.8em; height: 1.5em; border-radius: 1em; background: #4b5360; position: relative; flex: 0 0 auto; transition: background .15s; }
+#couch.ui-deck .dk-sw i { position: absolute; left: .18em; top: .18em; width: 1.14em; height: 1.14em; border-radius: 50%; background: #fff; transition: left .15s; }
+#couch.ui-deck .dk-sw.on { background: #1a9fff; }
+#couch.ui-deck .dk-sw.on i { left: 1.46em; }
+
+/* ===== 1.84.93 · Big Picture: revisión completa (fondos, cabecera, ficha, animaciones) ===== */
+#couch.ui-deck { --cc-sx: 0px !important; --cc-sy: 0px !important; background: linear-gradient(180deg, #0e141c 0%, #0a0f15 55%, #07090d 100%) !important; }
+#couch.ui-deck .cc-tabs { width: auto !important; max-width: none !important; margin: 0 !important; }
+#couch.ui-deck .cc-top, #couch.ui-deck .cc-hints { margin: 0 !important; }
+/* fondo: el arte del juego enfocado, arriba y difuminado hacia abajo */
+#couch.ui-deck .cc-bg { inset: 0 0 auto 0 !important; height: 68vh; background-size: cover; background-position: center top; filter: brightness(.66) saturate(1.05) !important; -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 100%); mask-image: linear-gradient(180deg, #000 30%, transparent 100%); }
+#couch.ui-deck .cc-shade { display: none; }
+#couch.ui-deck.setmode .cc-bg, #couch.ui-deck.dk-lib .cc-bg { display: none; }
+#couch.ui-deck.dk-det .cc-bg { inset: -6% !important; height: auto; filter: blur(30px) brightness(.5) saturate(1.2) !important; -webkit-mask-image: none; mask-image: none; }
+#couch.ui-deck.dk-det .cc-shade { display: block; background: linear-gradient(180deg, rgba(10,15,22,.55), rgba(10,15,22,.78)) !important; }
+/* cabecera de la biblioteca: franja oscura de lado a lado, sin marco */
+#couch.ui-deck.dk-lib .cc-top { background: #05070b; box-shadow: none; }
+#couch.ui-deck .cc-hints { background: linear-gradient(0deg, rgba(4,6,9,.94), rgba(4,6,9,.72)) !important; box-shadow: none !important; }
+/* inicio: tarjeta final «Ver más en la biblioteca» y pie gris de las novedades */
+#couch.ui-deck .cc-hc.dk-more { width: 12.8vw; aspect-ratio: 2 / 3; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; text-align: center; color: #d3dae2; font-size: .72em; padding: 0 1em; box-sizing: border-box; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-body { background: #32363a; }
+#couch.ui-deck .cc-h-row.dk-news .dk-pill { background: #2f3337; }
+#couch.ui-deck .cc-hc.dk-cov { transition: transform .14s ease-out, outline-color .1s; }
+#couch.ui-deck .cc-hc.dk-cov.sel { transform: scale(1.045); z-index: 2; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkIt .22s ease-out both; }
+#couch.ui-deck.grid .cc-tile { transition: none; }
+#couch.ui-deck.grid .cc-tile .cc-cover { transition: transform .12s ease-out, box-shadow .12s; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { outline: .1vw solid rgba(236,240,244,.92); outline-offset: 0; }
+/* ficha del juego */
+#couch.ui-deck.dk-det .cc-top { position: absolute; left: 0; right: 0; top: 0; z-index: 7; background: linear-gradient(180deg, rgba(3,5,8,.55), transparent); }
+#couch.ui-deck.dk-det .cc-page { padding: 0; }
+#couch.ui-deck .cc-detail { margin: 0 !important; padding: 0 !important; width: 100%; font-size: 1em; position: relative; display: block; overflow: hidden; }
+#couch.ui-deck .dk-det { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; color: #e6eaef; text-shadow: none; }
+#couch.ui-deck .dk-det::-webkit-scrollbar { display: none; }
+#couch.ui-deck .dk-det.dk-in { animation: dkIn .6s cubic-bezier(.2,.7,.2,1) .12s both; }
+#couch.ui-deck .dk-hero { position: relative; height: 47vh; background-color: #1a2330; }
+#couch.ui-deck .dk-hero::after { content: ''; position: absolute; inset: auto 0 0 0; height: 30%; background: linear-gradient(180deg, transparent, rgba(10,15,22,.62)); }
+#couch.ui-deck .dk-logo { position: absolute; z-index: 2; left: 2.8vw; bottom: 5vh; max-height: 24vh; max-width: 36vw; object-fit: contain; filter: drop-shadow(0 .3vh 1vh rgba(0,0,0,.7)); }
+#couch.ui-deck .dk-logo-t { position: absolute; z-index: 2; left: 2.8vw; bottom: 5vh; margin: 0; font-size: 3em; font-weight: 800; color: #fff; text-shadow: 0 .2vh 1.2vh rgba(0,0,0,.8); max-width: 60vw; }
+#couch.ui-deck .dk-bar { position: relative; display: flex; align-items: center; gap: 2.2vw; padding: 1.5vh 2.8vw; background: rgba(34,42,54,.78); backdrop-filter: blur(12px); }
+#couch.ui-deck .dk-play { display: flex; align-items: center; justify-content: center; gap: .7em; min-width: 15vw; padding: .8em 1.6em; border: 0; border-radius: 3px; background: rgba(255,255,255,.14); color: #fff; font: inherit; font-size: .85em; font-weight: 500; transition: background .12s; }
+#couch.ui-deck .dk-play svg { width: 1.25em; height: 1.25em; }
+#couch.ui-deck .dk-play.sel { background: #5ba32b; transform: scale(1.03); }
+#couch.ui-deck .dk-play.inst.sel { background: #1a9fff; }
+#couch.ui-deck .dk-play.run.sel { background: #c0392b; }
+#couch.ui-deck .dk-stat { display: flex; flex-direction: column; gap: .2em; }
+#couch.ui-deck .dk-k { font-size: .56em; letter-spacing: .07em; text-transform: uppercase; color: #aab3bd; }
+#couch.ui-deck .dk-v { font-size: .78em; font-weight: 600; color: #fff; }
+#couch.ui-deck .dk-bar .dk-sp { flex: 1; }
+#couch.ui-deck .dk-ib { width: 2.6em; height: 2.6em; padding: .55em; border: 0; border-radius: 3px; background: rgba(255,255,255,.14); color: #fff; }
+#couch.ui-deck .dk-ib svg { width: 100%; height: 100%; }
+#couch.ui-deck .dk-ib.sel { background: #fff; color: #0a0f15; transform: scale(1.06); }
+#couch.ui-deck .dk-instline { padding: .8vh 2.8vw; background: rgba(26,159,255,.14); color: #66c0f4; font-size: .8em; }
+#couch.ui-deck .dk-tabs { position: sticky; top: 0; z-index: 5; height: 12.4vh; box-sizing: border-box; padding-top: 5.4vh; display: flex; align-items: center; justify-content: center; transition: background .2s; }
+#couch.ui-deck .dk-tabs.stuck { background: linear-gradient(180deg, rgba(5,8,12,.94) 0%, rgba(5,8,12,.8) 72%, rgba(5,8,12,0) 100%); }
+#couch.ui-deck .dk-trow { display: flex; gap: .3vw; }
+#couch.ui-deck .dk-tab { padding: .8em 1.6em; border: 0; border-radius: 999px; background: none; color: #e6eaef; font: inherit; font-size: .66em; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+#couch.ui-deck .dk-tab.on { background: rgba(255,255,255,.17); color: #fff; }
+#couch.ui-deck .dk-tabs.focus .dk-tab.on { background: #fff; color: #0a0f15; }
+#couch.ui-deck .dk-chip { position: absolute; top: 5.4vh; height: 4.4vh; display: flex; align-items: center; }
+#couch.ui-deck .dk-chip.l { left: 2.8vw; } #couch.ui-deck .dk-chip.r { right: 2.8vw; }
+#couch.ui-deck .dk-body { padding: 1vh 2.8vw 16vh; min-height: 94vh; box-sizing: border-box; }
+#couch.ui-deck .dk-h { margin: 3vh 0 1.2vh; font-size: .95em; font-weight: 700; color: #fff; }
+#couch.ui-deck .dk-card { background: rgba(214,226,240,.075); border-radius: 3px; }
+#couch.ui-deck .dk-rows { padding: .4em 1.2em; max-width: 52vw; }
+#couch.ui-deck .dk-row { display: flex; justify-content: space-between; gap: 2em; padding: .55em 0; border-bottom: 1px solid rgba(255,255,255,.07); font-size: .85em; }
+#couch.ui-deck .dk-row:last-child { border: 0; }
+#couch.ui-deck .dk-row span { color: #9fa9b4; }
+#couch.ui-deck .dk-text { padding: 1.1em 1.4em; max-width: 62vw; line-height: 1.55; font-size: .88em; color: #d3d9e0; }
+#couch.ui-deck .dk-text p { margin: 0; } #couch.ui-deck .dk-text p.dim { color: #8d97a2; }
+#couch.ui-deck .dk-store { display: flex; align-items: center; gap: 1.4vw; padding: 1.2vh 1.4vw; margin-bottom: 1.5vh; }
+#couch.ui-deck .dk-sthumb { flex: 0 0 11vw; aspect-ratio: 16 / 9; background: #1a2330; }
+#couch.ui-deck .dk-sk { font-size: .62em; color: #aab3bd; } #couch.ui-deck .dk-sn { font-size: 1.1em; margin: .1em 0 .5em; }
+#couch.ui-deck .dk-btn { padding: .55em 1.5em; border: 0; border-radius: 3px; background: rgba(255,255,255,.14); color: #fff; font: inherit; font-size: .72em; }
+#couch.ui-deck .dk-btns { display: flex; gap: .8vw; margin-top: 3vh; }
+#couch.ui-deck .dk-info { display: flex; gap: 2vw; align-items: flex-start; }
+#couch.ui-deck .dk-cover { width: 11vw; flex: 0 0 auto; box-shadow: 0 .6vh 2vh rgba(0,0,0,.5); }
+#couch.ui-deck .dk-mid { flex: 1; min-width: 0; }
+#couch.ui-deck .dk-desc { margin: 0; font-size: .86em; line-height: 1.5; color: #e1e6ec; max-width: 56vw; }
+#couch.ui-deck .dk-desc.dim { color: #8d97a2; }
+#couch.ui-deck .dk-kv { margin-top: 2.4vh; display: grid; gap: .25em; font-size: .6em; color: #cdd4dc; }
+#couch.ui-deck .dk-kv span { color: #8f99a4; }
+#couch.ui-deck .dk-feat { width: 16vw; display: grid; gap: .6vh; font-size: .62em; color: #9aa4b0; }
+#couch.ui-deck .dk-colls { display: flex; gap: .8vw; }
+#couch.ui-deck .dk-coll { position: relative; width: 9vw; aspect-ratio: 1; background: linear-gradient(135deg, hsl(var(--h) 52% 46%), hsl(calc(var(--h) + 28) 48% 26%)); display: flex; align-items: flex-end; padding: .7em; box-sizing: border-box; font-size: .56em; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+/* logros: resumen, logro destacado y fila de iconos */
+#couch.ui-deck .dk-ach .dk-h { margin-top: 1vh; }
+#couch.ui-deck .dk-asum { display: flex; align-items: center; gap: .9vw; margin-bottom: 1.8vh; font-size: .86em; }
+#couch.ui-deck .dk-amedal { display: flex; width: 1.6em; height: 1.6em; color: #1a9fff; } #couch.ui-deck .dk-amedal svg { width: 100%; height: 100%; }
+#couch.ui-deck .dk-asum .dk-prog { flex: 1; height: .5em; border-radius: 1em; background: rgba(255,255,255,.14); }
+#couch.ui-deck .dk-prog i { display: block; height: 100%; border-radius: inherit; background: #1a9fff; }
+#couch.ui-deck .dk-apanel { display: flex; align-items: stretch; height: 15.5vh; overflow: hidden; }
+#couch.ui-deck .dk-afeat { flex: 0 0 40%; display: flex; align-items: center; gap: 1.2vw; padding: 0 1.4vw; background: rgba(255,255,255,.05); min-width: 0; }
+#couch.ui-deck .dk-aic { flex: 0 0 8.4vh; width: 8.4vh; height: 8.4vh; border-radius: 50%; overflow: hidden; background: #2a313c; }
+#couch.ui-deck .dk-aic img, #couch.ui-deck .dk-ai img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#couch.ui-deck .dk-aic.lock img, #couch.ui-deck .dk-ai.lock img { filter: grayscale(1) brightness(.72); }
+#couch.ui-deck .dk-atx { min-width: 0; } #couch.ui-deck .dk-an { font-size: .9em; font-weight: 700; color: #fff; } #couch.ui-deck .dk-ad { margin-top: .2em; font-size: .68em; color: #b3bcc6; } #couch.ui-deck .dk-ap { margin-top: .5em; font-size: .58em; color: #8f99a4; }
+#couch.ui-deck .dk-astrip { flex: 1; display: flex; align-items: center; gap: .9vw; padding: 0 1.4vw; overflow-x: auto; scrollbar-width: none; }
+#couch.ui-deck .dk-astrip::-webkit-scrollbar { display: none; }
+#couch.ui-deck .dk-ai { flex: 0 0 9vh; width: 9vh; height: 9vh; border-radius: 50%; overflow: hidden; background: #2a313c; box-sizing: border-box; border: .2em solid transparent; transition: transform .12s; }
+#couch.ui-deck .dk-ai.sel { border-color: #fff; transform: scale(1.12); }
+#couch.ui-deck .dk-body .cc-d-media { margin-top: 1vh; }
+/* panel lateral derecho (campana) */
+#couch.ui-deck .cc-menu-ov.dk-right { justify-content: flex-end; }
+#couch.ui-deck .cc-menu.dk-side.dk-right { width: 24vw; padding-top: 2vh; background: rgba(10,15,22,.96); animation: dkSlideR .16s ease-out; }
+#couch.ui-deck .cc-menu.dk-right .dk-ptitle { padding: 1.4vh 1.4vw 1.6vh; font-size: 1.15em; font-weight: 700; }
+#couch.ui-deck .cc-menu.dk-right .cc-menu-it { font-size: .78em; }
+#couch.ui-deck .cc-menu.dk-right .cc-menu-it b { font-size: .85em; }
+/* animaciones */
+@keyframes dkIn { from { opacity: 0; transform: translateY(2vh); } to { opacity: 1; transform: none; } }
+@keyframes dkIt { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dkSlide { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes dkSlideR { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes dkDim { from { background-color: rgba(2,4,7,0); } to { background-color: rgba(2,4,7,.72); } }
+#couch.ui-deck .cc-menu.dk-side:not(.dk-right) { animation: dkSlide .14s ease-out; }
+#couch.ui-deck .cc-menu-ov { animation: dkDim .22s ease-out both; background-color: rgba(2,4,7,.72); }
+#couch.ui-deck .cc-menu-ov:not(.dk-side) .cc-menu-it { animation: dkIt .24s ease-out both; }
+#couch.ui-deck .cc-home .cc-h-scroll { animation: dkIt .3s ease-out both; }
+#couch.ui-deck .cc-bg.swap { animation: dkIt .4s ease both; }
+/* colecciones: mosaicos cuadrados con degradado, nombre en mayúsculas y recuento */
+#couch.ui-deck.grid .cc-tile.group .cc-cover { aspect-ratio: 1 !important; background: linear-gradient(135deg, hsl(var(--h, 210) 52% 46%), hsl(calc(var(--h, 210) + 30) 46% 24%)) !important; position: relative; overflow: hidden; }
+#couch.ui-deck.grid .cc-tile.group .coll-art { opacity: .32; transform: rotate(-16deg) scale(1.5); background: none; filter: saturate(.7); }
+#couch.ui-deck.grid .cc-tile.group .cc-coll-over { position: absolute; left: 0; right: 0; top: 0; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 .6em; box-sizing: border-box; background: none !important; font-size: .64em; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.7); line-height: 1.35; }
+#couch.ui-deck.grid .cc-tile.group .cc-count { position: absolute; left: 0; right: 0; top: calc(50% + 1.8em); width: auto; height: auto; background: none !important; text-align: center; font-size: .6em; letter-spacing: .2em; color: rgba(255,255,255,.7); }
+#couch.ui-deck.grid .cc-tile.group .cc-count::before { content: '( '; } #couch.ui-deck.grid .cc-tile.group .cc-count::after { content: ' )'; }
+#couch.ui-deck.grid .cc-tile .cc-badge, #couch.ui-deck.grid .cc-tile .cc-new, #couch.ui-deck.grid .cc-cover .cc-nb { display: none !important; }
+#couch.ui-deck.grid .cc-tile .cc-ni { display: none !important; }
+
+/* ===== 1.84.94 · Big Picture: inicio al estilo del video, fondo completo, ficha y barra ===== */
+/* fondo: el arte ocupa TODA la pantalla (inicio) con un degradado oscuro hacia abajo */
+#couch.ui-deck.dk-home .cc-bg { inset: 0 !important; height: 100% !important; -webkit-mask-image: none !important; mask-image: none !important; filter: brightness(.72) saturate(1.1) !important; background-size: cover; background-position: center; opacity: 1 !important; display: block !important; }
+#couch.ui-deck.dk-home .cc-shade { display: block !important; opacity: 1 !important; background: linear-gradient(180deg, rgba(6,9,14,.28) 0%, rgba(6,9,14,.38) 38%, rgba(6,9,14,.82) 72%, rgba(5,7,10,.96) 100%) !important; }
+#couch.ui-deck.dk-det .cc-bg { inset: 0 !important; height: 100% !important; }
+/* primera tarjeta: formato ancho del último juego */
+#couch.ui-deck .cc-hc.dk-cov.dk-hero { width: 27.4vw; }
+#couch.ui-deck .cc-hc.dk-cov.dk-hero .cc-hc-img { aspect-ratio: auto; height: 100%; }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { align-items: stretch; }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov { align-self: flex-start; }
+#couch.ui-deck .cc-hc.dk-cov.dk-hero { height: calc(12.8vw * 1.5); }
+#couch.ui-deck .cc-hc.dk-cov.dk-hero .cc-hc-img { background-size: cover; background-position: center; }
+/* selección: borde claro + elevación suave */
+#couch.ui-deck .cc-hc.dk-cov.sel { outline: .16vw solid rgba(240,244,248,.95); outline-offset: .12vw; box-shadow: 0 1.2vh 3.2vh rgba(0,0,0,.6); transform: scale(1.06); }
+/* pestañas Novedades / Amigos / Recomendados */
+#couch.ui-deck .dk-hpills { display: flex; justify-content: center; gap: .5vw; margin: -2.4vh 0 2.4vh; position: relative; z-index: 1; }
+#couch.ui-deck .dk-hp { border: 0; background: rgba(8,11,16,.55); color: #fff; font: inherit; font-size: .62em; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: .7em 1.7em; border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px); }
+#couch.ui-deck .dk-hp.on { background: rgba(60,67,78,.92); }
+#couch.ui-deck .cc-h-row.dk-news .dk-pill { display: none; }
+#couch.ui-deck .cc-h-row.dk-news .cc-h-strip { padding-top: 0; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-body { background: rgba(38,43,48,.94); }
+/* barra superior: iconos más grandes y con animación */
+#couch.ui-deck .cc-dsearch, #couch.ui-deck .cc-dic { width: 1.7vw; height: 1.7vw; border-radius: 50%; transition: transform .14s ease-out, background .14s; }
+#couch.ui-deck .cc-dic { cursor: pointer; }
+#couch.ui-deck .cc-dsearch:hover, #couch.ui-deck .cc-dic:hover { transform: scale(1.18); background: rgba(255,255,255,.14); }
+#couch.ui-deck .cc-dsearch:active, #couch.ui-deck .cc-dic:active { transform: scale(.88); }
+#couch.ui-deck .cc-dic.bell:hover svg { animation: dkBell .5s ease-in-out; transform-origin: 50% 12%; }
+#couch.ui-deck .cc-dic.globe:hover svg { animation: dkSpin .7s ease-in-out; }
+@keyframes dkBell { 0%,100% { transform: rotate(0); } 20% { transform: rotate(16deg); } 45% { transform: rotate(-14deg); } 70% { transform: rotate(8deg); } }
+@keyframes dkSpin { to { transform: rotate(360deg); } }
+#couch.ui-deck .cc-top .cc-sys > * { animation: dkIt .45s ease-out both; }
+#couch.ui-deck .cc-clock { font-size: 1em !important; }
+/* ficha: el panel multimedia ya no flota sobre las pestañas */
+#couch.ui-deck .dk-body .cc-d-media { position: static !important; width: min(58vw, 1100px); left: auto; right: auto; top: auto; bottom: auto; margin: 1.2vh 0 0; padding: .6vw; background: rgba(8,11,16,.45); border-radius: .5vw; flex: none; }
+#couch.ui-deck .dk-body .cc-d-media .cc-m-stage { flex: none; aspect-ratio: 16 / 9; width: 100%; min-height: 0; border-radius: .3vw; }
+#couch.ui-deck .dk-body .cc-d-media .cc-m-cap { font-size: .8em; font-weight: 700; color: #dfe5ec; }
+#couch.ui-deck .dk-body .cc-d-media.focus { border-color: #fff; }
+#couch.ui-deck.dk-det .cc-tabs, #couch.ui-deck.dk-det .cc-lb, #couch.ui-deck.dk-det .cc-rb, #couch.ui-deck.dk-det .cc-dfield { display: none !important; }
+#couch.ui-deck.dk-det .cc-dsearch { display: flex !important; }
+/* 1.84.94 · el menú ya no se vuelve a animar (parpadeo) al cambiar de opción */
+#couch.ui-deck .cc-menu.dk-side:not(.dk-right) { animation: none; }
+#couch.ui-deck .cc-menu.dk-side.dk-right { animation: none; }
+#couch.ui-deck .cc-menu.dk-fresh.dk-side:not(.dk-right) { animation: dkSlide .16s ease-out; }
+#couch.ui-deck .cc-menu.dk-fresh.dk-side.dk-right { animation: dkSlideR .16s ease-out; }
+#couch.ui-deck .cc-menu-ov:not(.dk-side) .cc-menu-it { animation: none; }
+#couch.ui-deck .cc-menu.dk-fresh .cc-menu-it { animation: dkIt .24s ease-out both; }
+/* 1.84.94 · fondos como el original: inicio = arte solo arriba que se funde a azul oscuro con reflejo de color; ficha = gris oscuro con tinte */
+#couch.ui-deck.dk-home .cc-bg { inset: 0 0 auto 0 !important; height: 57vh !important; -webkit-mask-image: linear-gradient(180deg, #000 52%, transparent 100%) !important; mask-image: linear-gradient(180deg, #000 52%, transparent 100%) !important; filter: brightness(.88) saturate(1.1) !important; background-position: center 18%; }
+#couch.ui-deck.dk-home .cc-shade { display: block !important; position: absolute; inset: 0; background: var(--dk-art, none) center / cover no-repeat !important; filter: blur(70px) saturate(1.6) brightness(.7); transform: scale(1.25); opacity: .38 !important; -webkit-mask-image: linear-gradient(180deg, transparent 28%, #000 62%); mask-image: linear-gradient(180deg, transparent 28%, #000 62%); pointer-events: none; }
+#couch.ui-deck.dk-det .cc-bg { inset: -8% !important; height: auto !important; filter: blur(50px) saturate(1.6) brightness(.9) !important; -webkit-mask-image: none !important; mask-image: none !important; }
+#couch.ui-deck.dk-det .cc-shade { display: block !important; position: absolute; inset: 0; transform: none; filter: none; -webkit-mask-image: none; mask-image: none; opacity: 1 !important; background: linear-gradient(180deg, rgba(36,40,48,.9) 0%, rgba(24,27,33,.86) 55%, rgba(16,18,23,.9) 100%) !important; }
+#couch.ui-deck .dk-bar { background: #2b2f38; backdrop-filter: none; }
+#couch.ui-deck .dk-det .dk-tabs.stuck { background: #0c0e12; }
+/* pestañas del inicio seleccionables */
+#couch.ui-deck .cc-h-row.dk-hpills { margin: -1vh 0 1.4vh; }
+#couch.ui-deck .cc-h-row.dk-hpills .cc-h-strip { justify-content: center; padding: 0; gap: .6vw; overflow: visible; }
+#couch.ui-deck .cc-hc.dk-hp { width: auto; flex: 0 0 auto; background: none; color: #fff; font-size: .66em; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: .85em 1.9em; border-radius: 999px; cursor: pointer; transform: none !important; outline: 0 !important; box-shadow: none !important; transition: background .15s, color .15s; }
+#couch.ui-deck .cc-hc.dk-hp.on { background: rgba(58,64,76,.95); }
+#couch.ui-deck .cc-hc.dk-hp.sel { background: #fff; color: #0b1017; }
+#couch.ui-deck .cc-h-row.dk-hpills + .cc-h-row.dk-news .cc-h-title.dk-nt { display: none; }
+#couch.ui-deck .cc-h-title.dk-nt { padding: 0 2.8vw; font-size: .98em; }
+#couch.ui-deck.dk-home .cc-shade { opacity: .24 !important; filter: blur(70px) saturate(1.6) brightness(.55); }
+#couch.ui-deck .dk-r-dkdisc .cc-hc.dk-more { width: 93vw; aspect-ratio: auto; height: 15vh; font-size: .95em; background: linear-gradient(90deg, #6a4a9c, #2f5d9b); }
+/* 1.84.94 · transiciones del original: la vista anterior se apaga, ~0,2 s de negro, y entra la nueva con fundido */
+@keyframes dkDet { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dkHero { from { transform: scale(1.04); } to { transform: none; } }
+#couch.ui-deck .dk-det.dk-in { animation: dkDet .5s ease-out .2s both; }
+#couch.ui-deck .dk-det.dk-in .dk-hero { animation: dkHero .9s cubic-bezier(.2,.7,.2,1) .2s both; overflow: hidden; }
+#couch.ui-deck .dk-det.dk-in .dk-bar, #couch.ui-deck .dk-det.dk-in .dk-tabs { animation: dkIn .5s ease-out .38s both; }
+#couch.ui-deck .cc-home:not(.hidden) { animation: dkDet .38s ease-out .12s both; }
+#couch.ui-deck .cc-bg.swap { animation: dkBgIn .45s ease both; }
+@keyframes dkBgIn { 0% { opacity: .35; filter: brightness(.5); } 100% { opacity: 1; } }
+#couch.ui-deck .cc-hc.dk-cov.dk-hero { width: 42.5vw; }
+
+/* 1.84.95 · fondos de la ficha: sin herencia del inicio, cubren todo y oscurecen */
+#couch.ui-deck .cc-bg { left: -4% !important; right: -4% !important; width: auto !important; }
+
+/* ===== 1.84.95 · Big Picture: búsqueda como el original (barra blanca arriba, resultados anchos) ===== */
+#couch.ui-deck .cc-search { display: block; padding: 0 !important; }
+#couch.ui-deck .cc-sr-left { position: static; width: auto; padding: 0; }
+#couch.ui-deck .cc-sr-q { position: fixed; left: 0; top: 0; width: 84.6vw; height: 5.4vh; z-index: 9; background: #fff; color: #0b1017; display: flex; align-items: center; padding: 0 0 0 4.4vw; box-sizing: border-box; font-size: 1.05em; border: 0; border-radius: 0; box-shadow: none; }
+#couch.ui-deck .cc-sr-q::before { content: ''; position: absolute; left: 1.2vw; top: 50%; width: 1.5vw; height: 1.5vw; transform: translateY(-50%); background: no-repeat center / contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b1017' stroke-width='2.6' stroke-linecap='round'><circle cx='10.5' cy='10.5' r='6.5'/><path d='M15.5 15.5 21 21'/></svg>"); }
+#couch.ui-deck .cc-sr-q.empty::after { content: attr(data-ph); color: #6b7380; }
+#couch.ui-deck .cc-sr-caret { background: #0b1017; }
+#couch.ui-deck .cc-sr-store { display: none; }
+#couch.ui-deck .cc-sr-kb { position: fixed; left: 50%; transform: translateX(-50%); bottom: 6.2vh; width: 46vw; z-index: 8; padding: 1.2vh; background: rgba(8,11,16,.92); border-radius: .6vw; box-shadow: 0 1vh 4vh rgba(0,0,0,.6); animation: dkKb .22s ease-out both; }
+#couch.ui-deck .cc-search.zone-res .cc-sr-kb { display: none; }
+@keyframes dkKb { from { opacity: 0; transform: translate(-50%, 3vh); } to { opacity: 1; transform: translate(-50%, 0); } }
+#couch.ui-deck .cc-sr-right { width: auto; padding: 1vh 2.8vw 0; }
+#couch.ui-deck .cc-sr-head { width: max-content; margin: 0 auto 2.2vh; padding: .7em 1.7em; border-radius: 999px; background: #2c333d; font-size: .7em; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+#couch.ui-deck .cc-sr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.8vw, 1fr)); gap: 3.6vh .9vw; padding-bottom: 30vh; }
+#couch.ui-deck .cc-sr-t { background: none; padding: 0; }
+#couch.ui-deck .cc-sr-cv { aspect-ratio: 460 / 215; height: auto; border-radius: 0; }
+#couch.ui-deck .cc-sr-n { margin-top: .8vh; font-size: .62em; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #cfd6df; }
+#couch.ui-deck .cc-sr-t.sel { outline: .17vw solid #fff; outline-offset: .2vw; }
+/* texto no seleccionable (evitaba un resaltado azul al arrastrar) */
+#couch.ui-deck, #couch.ui-deck * { user-select: none; -webkit-user-select: none; }
+#couch.ui-deck .cc-sr-q, #couch.ui-deck .cc-sr-q * { user-select: text; }
+/* ficha: línea de origen y cronología de actividad */
+#couch.ui-deck .dk-srcline { display: flex; align-items: center; gap: 1vw; padding: 1.2vh 1.4vw 0; color: #aeb7c3; font-size: .68em; font-weight: 700; letter-spacing: .08em; }
+#couch.ui-deck .dk-srcline i { flex: 1; height: 1px; background: rgba(255,255,255,.14); }
+#couch.ui-deck .dk-tl { padding: 0 .4vw; }
+#couch.ui-deck .dk-day { display: flex; align-items: center; gap: 1vw; margin: 3vh 0 1.2vh; color: #aeb7c3; font-size: .78em; letter-spacing: .14em; }
+#couch.ui-deck .dk-day i { flex: 1; height: 1px; background: rgba(255,255,255,.14); }
+#couch.ui-deck .dk-ev { display: flex; gap: 1.4vw; padding: 1.8vh 1vw; background: rgba(60,66,80,.55); }
+#couch.ui-deck .dk-evt { width: 21vw; aspect-ratio: 460 / 215; flex: 0 0 auto; background: #20242c center / cover; display: flex; align-items: center; justify-content: center; }
+#couch.ui-deck .dk-evt.ic { width: 6.5vw; aspect-ratio: 1; background: rgba(0,0,0,.25); } #couch.ui-deck .dk-evt.ic img { width: 80%; height: 80%; object-fit: contain; border-radius: 50%; }
+#couch.ui-deck .dk-evk { font-size: .7em; letter-spacing: .08em; color: #aeb7c3; }
+#couch.ui-deck .dk-evn { font-size: 1.15em; font-weight: 500; margin: .5vh 0 .8vh; color: #fff; }
+#couch.ui-deck .dk-evd { font-size: .8em; color: #b8c0cb; line-height: 1.45; max-width: 52vw; }
+/* animaciones: selección con rebote, nombre que sube, filas que entran al cambiar de pestaña */
+@keyframes dkPop { 0% { transform: scale(1); } 55% { transform: scale(1.085); } 100% { transform: scale(1.058); } }
+@keyframes dkName { from { opacity: 0; transform: translateY(-1vh); } to { opacity: 1; transform: none; } }
+@keyframes dkRowIn { from { opacity: 0; transform: translateX(4vw); } to { opacity: 1; transform: none; } }
+@keyframes dkRise { from { opacity: 0; transform: translateY(2.4vh); } to { opacity: 1; transform: none; } }
+#couch.ui-deck .cc-hc.dk-cov { transition: outline-color .1s; }
+#couch.ui-deck .cc-hc.dk-cov.sel { transform: scale(1.058); animation: dkPop .32s cubic-bezier(.2,1.2,.4,1) both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkName .26s ease-out .06s both; }
+#couch.ui-deck .cc-h-scroll.dk-rowin .cc-h-row:not(.dk-hpills) { animation: dkRowIn .34s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { animation: dkPop .26s cubic-bezier(.2,1.2,.4,1) both; }
+#couch.ui-deck .dk-body > * { animation: dkRise .4s cubic-bezier(.2,.8,.2,1) both; }
+#couch.ui-deck .dk-body > *:nth-child(2) { animation-delay: .06s; } #couch.ui-deck .dk-body > *:nth-child(3) { animation-delay: .12s; } #couch.ui-deck .dk-body > *:nth-child(n+4) { animation-delay: .18s; }
+#couch.ui-deck .cc-menu.dk-fresh .cc-menu-it { animation: dkRowIn .28s cubic-bezier(.2,.8,.2,1) both; }
+#couch.ui-deck .cc-menu.dk-fresh .cc-menu-it:nth-child(2) { animation-delay: .03s; } #couch.ui-deck .cc-menu.dk-fresh .cc-menu-it:nth-child(3) { animation-delay: .06s; } #couch.ui-deck .cc-menu.dk-fresh .cc-menu-it:nth-child(4) { animation-delay: .09s; } #couch.ui-deck .cc-menu.dk-fresh .cc-menu-it:nth-child(n+5) { animation-delay: .12s; }
+#couch.ui-deck .cc-menu.dk-fresh.dk-side.dk-right .cc-menu-it, #couch.ui-deck .cc-menu.dk-fresh.dk-side:not(.dk-right) .cc-menu-it { animation-name: dkIt; }
+#couch.ui-deck .cc-sr-q { width: 76vw; }
+#couch.ui-deck .cc-sr-cv { width: 100% !important; background-size: cover !important; background-position: center !important; }
+#couch.ui-deck .cc-sr-t { width: auto !important; }
+
+/* ===== 1.84.96 · animaciones tipo cinta (tarjetas del Inicio y pestañas de la ficha) ===== */
+/* tarjetas: la seleccionada empuja a sus vecinas (efecto de acordeón), con rebote, insignia de mando y nombre en negrita con subtítulo verde */
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov { transition: margin .24s cubic-bezier(.2,.8,.2,1), outline-color .1s; }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { margin: 0 1vw; transform: scale(1.04); animation: dkPop .34s cubic-bezier(.2,1.25,.4,1) both; outline: .14vw solid #e9edf2; outline-offset: .16vw; z-index: 3; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::after { content: ''; position: absolute; right: .5vw; bottom: .5vw; width: 2.3vw; height: 2.3vw; border-radius: .35vw; background: rgba(8,11,16,.82) center / 62% no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M6.5 8h11a4.5 4.5 0 0 1 4.4 5.4l-.9 4.2a2.6 2.6 0 0 1-4.4 1.2L14.3 16h-4.6l-2.3 2.8a2.6 2.6 0 0 1-4.4-1.2l-.9-4.2A4.5 4.5 0 0 1 6.5 8zm.2 2.2v1.2H5.5v1.6h1.2v1.2h1.6V13h1.2v-1.6H8.3v-1.2z'/></svg>"); animation: dkIt .3s ease .1s both; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-img { position: relative; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-name { font-size: .72em; font-weight: 800; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-sub { color: #6fb23a; font-weight: 700; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-sub::before { content: '▶ '; color: #6fb23a; font-size: .8em; }
+/* pestañas de la ficha: el contenido sale (fundido) y el nuevo entra deslizándose desde el lado del movimiento */
+@keyframes dkSlIn { from { opacity: 0; transform: translateX(var(--dx, 7vw)); } to { opacity: 1; transform: none; } }
+#couch.ui-deck .dk-body.dk-out { opacity: 0; transform: translateX(var(--dx, -5vw)); transition: opacity .09s ease-in, transform .09s ease-in; }
+#couch.ui-deck .dk-body.dk-slin { animation: dkSlIn .34s cubic-bezier(.16,.84,.3,1) both; }
+#couch.ui-deck .dk-body.dk-slin > * { animation: none; }
+#couch.ui-deck .dk-tab.on { animation: dkPill .28s ease-out both; }
+@keyframes dkPill { from { transform: scale(.88); opacity: .6; } to { transform: none; opacity: 1; } }
+
+/* ===== 1.84.98 · tiempos como el original (medidos cuadro a cuadro: ~0,2 s, arranque brusco y frenado fuerte) ===== */
+@keyframes dkPop { 0% { transform: scale(1); } 60% { transform: scale(1.07); } 100% { transform: scale(1.045); } }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov { transition: margin .15s cubic-bezier(.1,.9,.2,1), outline-color .06s; }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { transform: scale(1.045); animation: dkPop .17s cubic-bezier(.1,.9,.2,1) both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkName .15s ease-out both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::after { animation: dkIt .15s ease both; }
+#couch.ui-deck .dk-body.dk-slin { animation: dkSlIn .22s cubic-bezier(.1,.9,.2,1) both; }
+#couch.ui-deck .dk-body.dk-out { transition: opacity .06s linear, transform .06s linear; }
+#couch.ui-deck .dk-tab.on { animation: dkPill .18s ease-out both; }
+#couch.ui-deck .cc-bg.swap { animation: dkBgIn2 .28s ease-out both; }
+@keyframes dkBgIn2 { from { opacity: .55; } to { opacity: 1; } }
+#couch.ui-deck .dk-det.dk-in { animation: dkDet .32s ease-out .12s both; }
+#couch.ui-deck .dk-det.dk-in .dk-hero { animation: dkHero .5s cubic-bezier(.1,.9,.2,1) .12s both; }
+#couch.ui-deck .dk-det.dk-in .dk-bar, #couch.ui-deck .dk-det.dk-in .dk-tabs { animation: dkIn .3s ease-out .22s both; }
+#couch.ui-deck .cc-home:not(.hidden) { animation: dkDet .24s ease-out .06s both; }
+#couch.ui-deck .cc-menu.dk-fresh.dk-side:not(.dk-right) { animation: dkSlide .12s cubic-bezier(.1,.9,.2,1); }
+#couch.ui-deck .cc-menu.dk-fresh.dk-side.dk-right { animation: dkSlideR .12s cubic-bezier(.1,.9,.2,1); }
+#couch.ui-deck .cc-h-scroll.dk-rowin .cc-h-row:not(.dk-hpills) { animation: dkRowIn .2s cubic-bezier(.1,.9,.2,1) both; animation-delay: calc(var(--i, 0) * 25ms); }
+/* 1.84.99 · fondo del Inicio más oscuro y suave, como en Steam */
+#couch.ui-deck.dk-home .cc-bg { inset: -1% -1% auto -1% !important; height: 74vh !important; filter: brightness(.4) saturate(.95) blur(2.5px) !important; -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%) !important; mask-image: linear-gradient(180deg, #000 45%, transparent 100%) !important; }
+
+/* 1.84.100 — grid de biblioteca: la ficha crece ~13% y se asienta en ~9% con borde claro (medido en el video de Steam) */
+@keyframes dkLibPop { 0% { transform: scale(1); } 45% { transform: scale(1.13); } 100% { transform: scale(1.09); } }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { transform: scale(1.09); animation: dkLibPop .2s cubic-bezier(.1,.9,.2,1) both; outline: .14vw solid rgba(236,240,244,.95); }
+
+/* 1.84.100 — inicio Steam: proporciones medidas del video (tarjeta 15.9vw x 23.9vw, hero 51vw, hueco .6vw, nombre grande, fondo nítido arriba) */
+#couch.ui-deck .cc-hc.dk-cov { width: 15.9vw; }
+#couch.ui-deck .cc-hc.dk-cov.dk-hero { width: 51vw; height: calc(15.9vw * 1.5); }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { gap: .6vw; }
+#couch.ui-deck .cc-h-row.dk-games { margin-bottom: 9vh; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-body { padding: 1.1vh 0 0; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-name { font-size: 1.55vw; font-weight: 800; line-height: 1.15; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-name { font-size: 1.55vw; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-sub, #couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-sub { font-size: .95vw; font-weight: 700; color: #8d96a3; letter-spacing: .04em; margin-top: .3vh; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-sub::before { color: #5fb830; }
+#couch.ui-deck .cc-hc.dk-cov.sel { transform: scale(1.04); }
+#couch.ui-deck.dk-home .cc-bg { height: 64vh !important; filter: brightness(.55) saturate(.75) !important; -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 100%) !important; mask-image: linear-gradient(180deg, #000 40%, transparent 100%) !important; }
+#couch.ui-deck.dk-home .cc-shade { filter: none !important; transform: none !important; opacity: 1 !important; background: linear-gradient(180deg, rgba(10,16,24,.25) 0%, rgba(10,16,24,.45) 35%, rgba(10,16,24,.9) 62%, #0a1018 80%) !important; -webkit-mask-image: none !important; mask-image: none !important; }
+/* punto azul de "Novedades" (como el original; el contador de amigos no se muestra: no hay datos reales) */
+#couch.ui-deck .cc-h-row.dk-hpills .cc-hc.dk-hp:first-child::after { content: ''; display: inline-block; width: .55vw; height: .55vw; margin-left: .7vw; border-radius: 50%; background: #1a9fff; vertical-align: middle; }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { padding-bottom: 8vh; }
+#couch.ui-deck .cc-h-row.dk-games { margin-bottom: 0; }
+#couch.ui-deck .cc-h-row.dk-hpills { margin: 2.5vh 0 1.4vh; }
+
+/* 1.84.100 — tiempos del video lento (10 fps): el deslizamiento dura ~0,45 s (80% del recorrido en los primeros 0,2 s, cola larga) */
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov { transition: margin .34s cubic-bezier(.12,.85,.2,1), outline-color .1s; }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { animation: dkPop .34s cubic-bezier(.12,.85,.2,1) both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkName .32s ease-out both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::after { animation: dkIt .3s ease both; }
+#couch.ui-deck .dk-body.dk-slin { animation: dkSlIn .4s cubic-bezier(.12,.85,.2,1) both; }
+#couch.ui-deck .dk-body.dk-out { transition: opacity .12s linear, transform .12s linear; }
+#couch.ui-deck .cc-bg.swap { animation: dkBgIn2 .45s ease-out both; }
+@keyframes dkBgIn2 { from { opacity: .25; } to { opacity: 1; } }
+#couch.ui-deck .cc-h-scroll.dk-rowin .cc-h-row:not(.dk-hpills) { animation: dkRowIn .4s cubic-bezier(.12,.85,.2,1) both; animation-delay: calc(var(--i, 0) * 40ms); }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { animation: dkLibPop .38s cubic-bezier(.12,.85,.2,1) both; }
+
+/* 1.84.100 — efectos de la ficha enfocada (descritos por el usuario): resplandor del color de la portada, barrido diagonal de brillo y borde blanco que "respira" */
+@keyframes dkBreath { 0%, 100% { outline-color: rgba(255,255,255,.4); } 50% { outline-color: rgba(255,255,255,1); } }
+@keyframes dkShine { 0% { background-position: 170% 0; } 100% { background-position: -70% 0; } }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { box-shadow: 0 1.5vh 5vw 1.2vw var(--glow, rgba(255,255,255,.18)); animation: dkPop .34s cubic-bezier(.12,.85,.2,1) both, dkBreath 2.4s ease-in-out .34s infinite; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { box-shadow: 0 1.4vh 4vw .3vw var(--glow, rgba(255,255,255,.16)) !important; animation: dkLibPop .38s cubic-bezier(.12,.85,.2,1) both, dkBreath 2.4s ease-in-out .38s infinite; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::before, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.5) 50%, transparent 62%) 170% 0 / 260% 100% no-repeat; animation: dkShine .85s cubic-bezier(.45,0,.55,1) .08s 1 both; }
+#couch.ui-deck.grid .cc-tile:not(.group) .cc-cover { position: relative; }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { padding-bottom: 14vh; margin-bottom: -6vh; }
+
+/* 1.84.100b — ajustes: brillo de cristal (suave, translúcido), resplandor menos fuerte, fondo con paneo lento + transición entre juegos, tarjetas que no son juegos */
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::before, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::before {
+  content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 56%, rgba(255,255,255,.10) 59%, transparent 62%) 170% 0 / 260% 100% no-repeat,
+    linear-gradient(115deg, transparent 26%, rgba(255,255,255,.05) 38%, rgba(255,255,255,.16) 49%, rgba(255,255,255,.05) 58%, transparent 70%) 170% 0 / 260% 100% no-repeat;
+  animation: dkShine .95s cubic-bezier(.45,0,.55,1) .08s 1 both;
+}
+@keyframes dkShine { 0% { background-position: 170% 0, 170% 0; } 100% { background-position: -70% 0, -70% 0; } }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { box-shadow: 0 1.5vh 5vw .8vw var(--glow, rgba(255,255,255,.14)); }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { box-shadow: 0 1.4vh 4vw 0 var(--glow, rgba(255,255,255,.12)) !important; }
+/* fondo: paneo lento (como en el tema Xbox 360) y fundido desde el arte anterior */
+@keyframes dkPan { from { translate: -1.2% -.8%; scale: 1.02; } to { translate: 1.2% .8%; scale: 1.06; } }
+@keyframes dkPrevOut { from { opacity: 1; } to { opacity: 0; } }
+#couch.ui-deck .cc-bg { animation: dkPan 60s ease-in-out var(--pan, 0s) infinite alternate; }
+#couch.ui-deck .cc-bg.swap { animation: dkPan 60s ease-in-out var(--pan, 0s) infinite alternate; }
+#couch.ui-deck .cc-bg.swap::before { content: ''; position: absolute; inset: 0; background: var(--prev, none) center / cover no-repeat; animation: dkPrevOut .55s ease-out both; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { #couch.ui-deck .cc-bg, #couch.ui-deck .cc-bg.swap { animation: none; } }
+/* tarjetas del inicio que no son juegos: mismo pop, borde que respira y brillo, sin resplandor de portada */
+#couch.ui-deck .cc-hc.dk-new { transition: none; }
+#couch.ui-deck .cc-hc.dk-new.sel { z-index: 3; animation: dkPop .34s cubic-bezier(.12,.85,.2,1) both; }
+#couch.ui-deck .cc-hc.dk-new.sel::after { animation: dkBreath 2.4s ease-in-out .34s infinite; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-img { position: relative; overflow: hidden; }
+
+/* 1.84.100c — tamaños según la captura de Steam (tarjeta 12.8vw, hero 41vw) y fondo animado igual que Xbox 360 (paneo 26 s + cintas de luz) */
+#couch.ui-deck .cc-hc.dk-cov { width: 12.8vw; }
+#couch.ui-deck .cc-hc.dk-cov.dk-hero { width: 41vw; height: calc(12.8vw * 1.5); }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { gap: .9vw; padding-bottom: 11vh; margin-bottom: -3vh; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-name, #couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-name { font-size: 1.25vw; }
+#couch.ui-deck .cc-hc.dk-cov .cc-hc-sub, #couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-sub { font-size: .78vw; }
+@keyframes dkPan { from { translate: -2.2% -1.4%; scale: 1.03; } to { translate: 2.2% 1.4%; scale: 1.1; } }
+#couch.ui-deck .cc-bg, #couch.ui-deck .cc-bg.swap { animation-duration: 26s; }
+#couch.ui-deck.dk-home::before, #couch.ui-deck.dk-home::after, #couch.ui-deck.dk-det::before, #couch.ui-deck.dk-det::after { content: ""; position: absolute; left: -30%; width: 160%; z-index: 0; pointer-events: none; mix-blend-mode: screen; will-change: transform; background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.2), rgba(255,255,255,0) 70%); }
+#couch.ui-deck.dk-home::before, #couch.ui-deck.dk-det::before { top: 0; height: 42%; transform: rotate(-9deg); animation: x3Rib1 24s ease-in-out infinite alternate; }
+#couch.ui-deck.dk-home::after, #couch.ui-deck.dk-det::after { top: 30%; height: 40%; transform: rotate(7deg); animation: x3Rib2 31s ease-in-out infinite alternate; background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,.14), rgba(255,255,255,0) 70%); }
+@media (prefers-reduced-motion: reduce) { #couch.ui-deck::before, #couch.ui-deck::after { animation: none; } }
+/* tarjetas que no son juegos: movimiento sin efectos; solo conservan el borde blanco */
+#couch.ui-deck .cc-hc.dk-new.sel .cc-hc-img::before { content: none; }
+
+/* 1.84.100d — tarjetas que no son juegos (noticias, gratis, eventos): marco completo, vista previa de texto al enfocar y borde que crece un poco y vuelve a su lugar (video de Steam) */
+#couch.ui-deck .cc-hc.dk-new:not(.dk-more) { width: 22.3vw; }
+#couch.ui-deck .cc-hc.dk-new .cc-hc-img { aspect-ratio: 16 / 9; position: relative; overflow: hidden; }
+#couch.ui-deck .cc-hc.dk-new::after { content: ''; position: absolute; left: 0; right: 0; top: 2.2vh; bottom: 0; outline: 0; box-shadow: inset 0 0 0 .18vw rgba(255,255,255,.95); opacity: 0; z-index: 4; pointer-events: none; }
+#couch.ui-deck .cc-hc.dk-new.sel::after { opacity: 1; animation: dkRing .45s cubic-bezier(.12,.85,.2,1) both, dkBreathO 2.4s ease-in-out .45s infinite; }
+@keyframes dkRing { 0% { transform: scale(1.16); opacity: 0; } 22% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes dkBreathO { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+#couch.ui-deck .cc-hc.dk-new.sel { animation: none; transform: none; }
+#couch.ui-deck .cc-hc.dk-new .dk-prev { position: absolute; inset: 0; z-index: 2; padding: 1.1vw 1.2vw; background: rgba(13,21,36,.94); color: #e6ebf2; opacity: 0; transition: opacity .22s ease-out; overflow: hidden; pointer-events: none; }
+#couch.ui-deck .cc-hc.dk-new.sel .dk-prev { opacity: 1; }
+#couch.ui-deck .cc-hc.dk-new .dk-pv-k { display: block; font-size: .72vw; font-weight: 800; letter-spacing: .08em; color: #aeb8c6; margin-bottom: .6vw; }
+#couch.ui-deck .cc-hc.dk-new .dk-pv-t { margin: 0; font-size: .95vw; line-height: 1.45; font-weight: 500; }
+
+/* 1.84.100e — arranque del modo Big Picture (secuencia del video de Steam, con marca propia): trazo de luz dibuja el mando, se transforma en anillo con puntos y aparece el emblema */
+.cc-splash.dksp { flex-direction: column; gap: 3vh; background: radial-gradient(ellipse at 50% 0%, #1a2433 0%, #0b1119 68%); transition: opacity .5s ease; overflow: hidden; }
+.dksp svg { width: 21vh; height: 21vh; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; position: relative; z-index: 2; }
+.dksp .pw, .dksp .pc { transform-box: fill-box; transform-origin: 50% 50%; }
+.dksp .pw { stroke: #fff; stroke-width: .5; stroke-dasharray: 1 2; stroke-dashoffset: 1.06; opacity: 0; animation: dkspDraw 1.7s cubic-bezier(.2,.65,.3,1) .12s forwards, dkspPadOut .5s ease-in 3.05s forwards; }
+.dksp .pc { stroke: url(#dkg); stroke-width: .75; stroke-dasharray: .1 2; stroke-dashoffset: .12; opacity: 0; animation: dkspComet 1.7s cubic-bezier(.2,.65,.3,1) 0s forwards; }
+.dksp .rg { stroke: #fff; stroke-width: .5; stroke-dasharray: 1 2; stroke-dashoffset: 1.06; opacity: 0; transform: rotate(-90deg); transform-origin: 12px 12px; animation: dkspRing .8s cubic-bezier(.3,.6,.2,1) 3.2s forwards; }
+.dksp .cc { stroke: #fff; stroke-width: .9; stroke-dasharray: 1 2; stroke-dashoffset: 1.06; opacity: 0; animation: dkspDraw .6s ease-out 3.8s forwards; }
+.dksp .ar { stroke: url(#dkg); stroke-width: .6; stroke-dasharray: .28 2; opacity: 0; transform-origin: 12px 12px; animation: dkspArc 1.3s ease-in-out 3.9s forwards; }
+.dksp .dksp-n { font-size: 2.6vh; font-weight: 700; letter-spacing: .5em; text-indent: .5em; color: #e8edf5; opacity: 0; animation: dkspName .7s ease-out 4.3s forwards; position: relative; z-index: 2; }
+.dksp .dksp-dots { position: absolute; inset: 0; opacity: 0; background-image: radial-gradient(circle, rgba(111,125,255,.85) 0 .12vh, transparent .2vh); background-size: 3.4vh 3.4vh; -webkit-mask-image: radial-gradient(circle at 50% 46%, #000 0%, transparent 62%); mask-image: radial-gradient(circle at 50% 46%, #000 0%, transparent 62%); animation: dkspDots 2.2s ease-out 3.0s forwards; }
+.dksp .dksp-flash { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 45%, rgba(110,150,230,.55), transparent 62%); animation: dkspFlash .8s ease-out 2.95s; }
+@keyframes dkspDraw { 0% { opacity: 1; stroke-dashoffset: 1.06; stroke-dasharray: 1 2; } 99% { opacity: 1; stroke-dashoffset: 0; stroke-dasharray: 1 2; } 100% { opacity: 1; stroke-dashoffset: 0; stroke-dasharray: 2 0; } }
+@keyframes dkspComet { 0% { stroke-dashoffset: .12; opacity: 1; } 90% { opacity: 1; } 100% { stroke-dashoffset: -1.02; opacity: 0; } }
+@keyframes dkspPadOut { to { opacity: 0; transform: scale(1.45); } }
+@keyframes dkspRing { 0% { opacity: 1; stroke-dashoffset: 1.06; stroke-dasharray: 1 2; } 99% { opacity: 1; stroke-dashoffset: 0; stroke-dasharray: 1 2; } 100% { opacity: 1; stroke-dashoffset: 0; stroke-dasharray: 2 0; } }
+@keyframes dkspArc { 0% { opacity: 0; transform: rotate(-90deg); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: rotate(270deg); } }
+@keyframes dkspName { to { opacity: 1; } }
+@keyframes dkspDots { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: .35; } }
+@keyframes dkspFlash { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .dksp *, .dksp svg * { animation-duration: .01s !important; animation-delay: 0s !important; } }
+
+/* 1.84.100f — borde de las tarjetas de noticias como en Steam: marco grueso y translúcido por fuera de la tarjeta que se cierra sobre el borde y queda como línea blanca fina */
+@keyframes dkRing2 {
+  0% { margin: 0; box-shadow: inset 0 0 0 .14vw rgba(255,255,255,1), 0 0 0 rgba(255,255,255,0); opacity: 1; }
+  35% { margin: -1.2vw; box-shadow: inset 0 0 0 .38vw rgba(235,240,248,.7), 0 0 1.8vw rgba(255,255,255,.35); opacity: 1; }
+  100% { margin: 0; box-shadow: inset 0 0 0 .14vw rgba(255,255,255,1), 0 0 0 rgba(255,255,255,0); opacity: 1; }
+}
+#couch.ui-deck .cc-hc.dk-new.sel::after { opacity: 1; box-shadow: inset 0 0 0 .14vw #fff; animation: dkRing2 .6s cubic-bezier(.2,.7,.3,1) both, dkBreathO 2.6s ease-in-out .65s infinite; }
+#couch.ui-deck .cc-h-row.dk-news .cc-h-strip { padding: 1.6vw 2.8vw 1.8vw; margin-top: -1vw; }
+
+/* 1.84.100g — brillo de cristal: banda translúcida por mezcla (soft-light + screen tenue) y destello breve de la propia imagen que vuelve a la normalidad */
+@keyframes dkGlint { 0% { filter: brightness(1) saturate(1); } 30% { filter: brightness(1.2) saturate(1.1); } 100% { filter: brightness(1) saturate(1); } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::before, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::before {
+  mix-blend-mode: soft-light;
+  background:
+    linear-gradient(115deg, transparent 57%, rgba(255,255,255,.9) 59.5%, transparent 62%) 170% 0 / 260% 100% no-repeat,
+    linear-gradient(115deg, transparent 24%, rgba(255,255,255,.45) 36%, rgba(255,255,255,1) 48%, rgba(255,255,255,.45) 60%, transparent 72%) 170% 0 / 260% 100% no-repeat;
+}
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img { animation: dkGlint .75s ease-out .05s 1 both; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { animation: dkLibPop .38s cubic-bezier(.12,.85,.2,1) both, dkBreath 2.4s ease-in-out .38s infinite, dkGlint .75s ease-out .05s 1; }
+
+/* mismo pulso del borde en las portadas del inicio */
+#couch.ui-deck .cc-hc.dk-cov.sel::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 5; box-shadow: inset 0 0 0 .14vw #fff; animation: dkRing2 .6s cubic-bezier(.2,.7,.3,1) both; }
+
+/* 1.84.100h — UN solo borde por tarjeta (el ::after) que hace todo: aparece, pulsa muy sutil hacia afuera, vuelve y respira. Igual en portadas, noticias, "ver más" y biblioteca */
+@keyframes dkRing3 {
+  0% { margin: 0; box-shadow: inset 0 0 0 .14vw #fff, 0 0 0 rgba(255,255,255,0); }
+  40% { margin: -.4vw; box-shadow: inset 0 0 0 .2vw rgba(255,255,255,.92), 0 0 .9vw rgba(255,255,255,.26); }
+  100% { margin: 0; box-shadow: inset 0 0 0 .14vw #fff, 0 0 0 rgba(255,255,255,0); }
+}
+#couch.ui-deck .cc-hc.dk-cov.sel, #couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { outline: 0 !important; animation: dkPop .34s cubic-bezier(.12,.85,.2,1) both; }
+#couch.ui-deck .cc-hc.dk-cov.sel::after, #couch.ui-deck .cc-hc.dk-new.sel::after, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; top: 0; pointer-events: none; z-index: 5; opacity: 1;
+  box-shadow: inset 0 0 0 .14vw #fff; animation: dkRing3 .42s cubic-bezier(.2,.7,.3,1) both, dkBreathO 2.6s ease-in-out .5s infinite;
+}
+#couch.ui-deck .cc-hc.dk-new.sel::after { top: 2.2vh; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { outline: 0 !important; animation: dkLibPop .38s cubic-bezier(.12,.85,.2,1) both, dkGlint .75s ease-out .05s 1; }
+
+/* 1.84.100i — arreglos: el degradado del hero de la ficha (.dk-hero::after) deformaba el borde de la tarjeta grande; el recorte (overflow) cortaba el pulso en noticias; fuera la placa gris de la biblioteca */
+#couch.ui-deck .cc-hc.dk-hero:not(.sel)::after { content: none; }
+#couch.ui-deck .cc-hc.dk-cov.sel::after { height: auto; background: none; inset: 0; }
+#couch.ui-deck .cc-hc.dk-new { overflow: visible; }
+#couch.ui-deck.grid .cc-tile::before, #couch.ui-deck.grid .cc-tile.sel::before { opacity: 0 !important; background: none !important; }
+#couch.ui-deck.grid .cc-tile .cc-cover { overflow: visible; }
+
+/* 1.84.100j — la respiración del borde empieza al terminar el barrido (≈1,1 s) y arranca desde el valor pleno, sin saltos */
+@keyframes dkBreath2 { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+#couch.ui-deck .cc-hc.dk-cov.sel::after, #couch.ui-deck .cc-hc.dk-new.sel::after, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::after { animation: dkRing3 .42s cubic-bezier(.2,.7,.3,1) both, dkBreath2 2.6s ease-in-out 1.1s infinite; }
+
+/* 1.84.100k — el barrido y el destello empiezan al instante; el resplandor ya no se corta arriba (la franja de la fila reserva espacio) */
+@keyframes dkShine { 0% { background-position: 170% 0, 170% 0; } 100% { background-position: -70% 0, -70% 0; } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::before, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::before { animation: dkShine .9s cubic-bezier(.25,.55,.35,1) 0s 1 both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img { animation: dkGlint .75s ease-out 0s 1 both; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { animation: dkLibPop .38s cubic-bezier(.12,.85,.2,1) both, dkGlint .75s ease-out 0s 1; }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { padding-top: 6vw; margin-top: -6vw; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { box-shadow: 0 1.6vh 2.6vw 0 var(--glow, rgba(255,255,255,.12)) !important; }
+
+/* 1.84.100l — ajustes finos frente al original: sin empuje de margen (las portadas ya no se separan), enfocada ×1,07, respiración más rápida y borde menos blanco, barrido y destello más lentos, resplandor sin corte */
+@keyframes dkPop { 0% { transform: scale(1); } 55% { transform: scale(1.1); } 100% { transform: scale(1.07); } }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { margin: 0; transform: scale(1.07); animation: dkPop .34s cubic-bezier(.12,.85,.2,1) both; }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov { transition: none; }
+#couch.ui-deck .cc-h-row.dk-games .cc-h-strip { gap: .8vw; }
+@keyframes dkRing3 {
+  0% { margin: 0; box-shadow: inset 0 0 0 .14vw rgba(228,233,241,.88), 0 0 0 rgba(255,255,255,0); }
+  40% { margin: -.4vw; box-shadow: inset 0 0 0 .2vw rgba(236,240,247,.92), 0 0 .9vw rgba(255,255,255,.22); }
+  100% { margin: 0; box-shadow: inset 0 0 0 .14vw rgba(228,233,241,.88), 0 0 0 rgba(255,255,255,0); }
+}
+@keyframes dkBreath2 { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+#couch.ui-deck .cc-hc.dk-cov.sel::after, #couch.ui-deck .cc-hc.dk-new.sel::after, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::after { box-shadow: inset 0 0 0 .14vw rgba(228,233,241,.88); animation: dkRing3 .42s cubic-bezier(.2,.7,.3,1) both, dkBreath2 1.5s ease-in-out .9s infinite; }
+@keyframes dkGlint { 0% { filter: brightness(1) saturate(1); } 35% { filter: brightness(1.2) saturate(1.1); } 100% { filter: brightness(1) saturate(1); } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img::before, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::before { animation: dkShine 1.4s cubic-bezier(.3,.5,.4,1) 0s 1 both; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-img { animation: dkGlint 1.1s ease-out 0s 1 both; }
+#couch.ui-deck.grid .cc-tile.sel .cc-cover { animation: dkLibPop .38s cubic-bezier(.12,.85,.2,1) both, dkGlint 1.1s ease-out 0s 1; }
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { box-shadow: 0 3.2vh 3.2vw -.6vw var(--glow, rgba(255,255,255,.14)), 0 0 1.4vw -.2vw var(--glow, rgba(255,255,255,.1)); }
+
+/* 1.84.100m: borde más gris, siempre pegado a la portada (empieza grande y se achica), sin recorte superior */
+#couch.ui-deck .cc-h-scroll { margin-top: -4.5vh; padding-top: 4.7vh; }
+@keyframes dkRing4 {
+  0% { margin: -.5vw; box-shadow: inset 0 0 0 .64vw rgba(170,178,192,.5); }
+  55% { margin: -.12vw; box-shadow: inset 0 0 0 .26vw rgba(190,198,210,.8); }
+  100% { margin: 0; box-shadow: inset 0 0 0 .14vw rgba(184,192,205,.8); }
+}
+@keyframes dkBreath3 { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+#couch.ui-deck .cc-hc.dk-cov.sel::after, #couch.ui-deck .cc-hc.dk-new.sel::after, #couch.ui-deck.grid .cc-tile:not(.group).sel .cc-cover::after {
+  box-shadow: inset 0 0 0 .14vw rgba(184,192,205,.8);
+  animation: dkRing4 .42s cubic-bezier(.2,.7,.3,1) both, dkBreath3 1.5s ease-in-out .9s infinite;
+}
+#couch.ui-deck .cc-h-row.dk-games .cc-hc.dk-cov.sel { box-shadow: 0 3.2vh 3.2vw -.6vw var(--glow, rgba(255,255,255,.14)), 0 1.2vh 1.4vw -.5vw var(--glow, rgba(255,255,255,.1)); }
+
+/* 1.84.100n: Steam — al bajar, las pestañas quedan fijas arriba (con Q / E a los lados) */
+#couch.ui-deck .cc-h-row.dk-hpills { position: sticky; top: 4.2vh; z-index: 8; padding: 1.6vh 0 2.4vh; background: linear-gradient(180deg, rgba(10,14,22,.96) 60%, rgba(10,14,22,0)); }
+#couch.ui-deck .cc-h-scroll:not(.dk-stuck) .cc-h-row.dk-hpills { background: none; }
+#couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::before, #couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::after { position: absolute; top: 1.8vh; width: 1.9vw; height: 1.9vw; line-height: 1.9vw; text-align: center; border-radius: .35vw; background: #fff; color: #0b1018; font-size: .95vw; font-weight: 800; }
+#couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::before { content: 'Q'; left: 2.6vw; }
+#couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::after { content: 'E'; right: 2.6vw; }
+#couch.ui-deck .cc-h-scroll { -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 4.6vh, #000 8vh); mask-image: linear-gradient(180deg, transparent 0, transparent 4.6vh, #000 8vh); }
+#couch.ui-deck .cc-h-row.dk-hpills { top: 6.2vh; }
+
+/* 1.84.100o: Steam — al pulsar Jugar el arte de la ficha crece, se atenúa y muestra el logo con «Iniciando…»; luego queda «Reanudar» + ✕ */
+#couch.ui-deck .dk-det.dk-launching { overflow: hidden; }
+#couch.ui-deck .dk-det.dk-launching .dk-hero { height: 84vh; overflow: hidden; }
+#couch.ui-deck .dk-det.dk-lin .dk-hero { animation: dkLhIn .55s cubic-bezier(.2,.75,.2,1) both; }
+#couch.ui-deck .dk-det.dk-lout .dk-hero { animation: dkLhOut .55s cubic-bezier(.2,.75,.2,1) both; overflow: hidden; }
+@keyframes dkLhIn { from { height: 47vh; } to { height: 84vh; } }
+@keyframes dkLhOut { from { height: 84vh; } to { height: 47vh; } }
+#couch.ui-deck .dk-det.dk-launching .dk-hero > .dk-logo, #couch.ui-deck .dk-det.dk-launching .dk-hero > .dk-logo-t { opacity: 0; transition: opacity .2s; }
+#couch.ui-deck .dk-hero::after { z-index: 1; }
+#couch.ui-deck .dk-lc { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.6vh; background: rgba(38,42,50,.68); }
+#couch.ui-deck .dk-det.dk-lin .dk-lc { animation: dkLcIn .5s ease-out .3s both; }
+@keyframes dkLcIn { from { opacity: 0; } to { opacity: 1; } }
+#couch.ui-deck .dk-lc img { max-height: 21vh; max-width: 36vw; object-fit: contain; filter: drop-shadow(0 .4vh 1.4vh rgba(0,0,0,.6)); }
+#couch.ui-deck .dk-logo-t2 { margin: 0; font-size: 3.4vw; font-weight: 800; color: #fff; text-align: center; }
+#couch.ui-deck .dk-lt { display: flex; align-items: center; gap: .7vw; font-size: .95vw; color: #e8edf2; }
+#couch.ui-deck .dk-spin { width: 1.1vw; height: 1.1vw; border-radius: 50%; border: .16vw solid rgba(255,255,255,.28); border-top-color: #fff; animation: dkSpin .8s linear infinite; }
+@keyframes dkSpin { to { transform: rotate(360deg); } }
+#couch.ui-deck .dk-play.starting { background: #3a3f49; color: #e4e8ee; }
+#couch.ui-deck .dk-play.starting.sel { background: #565d6b; }
+#couch.ui-deck .dk-play.run { background: #1a9fff; min-width: 11vw; }
+#couch.ui-deck .dk-play.run.sel { background: #3fb1ff; transform: scale(1.03); }
+#couch.ui-deck .dk-play.run.fresh { animation: dkRunBlue .45s ease .9s both; }
+@keyframes dkRunBlue { from { background: #3a3f49; } to { background: #1a9fff; } }
+#couch.ui-deck .dk-ib.dk-x { margin-left: -1.7vw; width: 2.6em; background: rgba(255,255,255,.16); }
+#couch.ui-deck .dk-det.dk-launching .dk-srcline, #couch.ui-deck .dk-det.dk-launching .dk-instline { visibility: hidden; }
+
+/* 1.84.100p: Steam — al cerrarse un juego, pantalla negra con el logo y el aro azul girando (breve) */
+#couch .dk-close { position: absolute !important; inset: 0 0 5.5vh 0 !important; width: auto !important; height: auto !important; z-index: 90; background: #000; display: flex; align-items: center; justify-content: center; transition: opacity .4s ease; }
+#couch .dk-close.out { opacity: 0; }
+@keyframes dkClIn { from { opacity: 0; } to { opacity: 1; } }
+#couch .dk-close svg { width: 17vh; height: 17vh; overflow: visible; fill: none; stroke-linecap: round; will-change: transform; animation: dkClPop .3s cubic-bezier(.2,.8,.3,1) both; }
+@keyframes dkClPop { from { transform: scale(.9); } to { transform: scale(1); } }
+#couch .dk-close .bg { stroke: rgba(255,255,255,.14); stroke-width: .35; }
+#couch .dk-close .rg { stroke: #fff; stroke-width: .9; }
+#couch .dk-close .cc { stroke: #fff; stroke-width: 1.5; }
+#couch .dk-close .ar { stroke: #1a9fff; stroke-width: .6; stroke-dasharray: 34 66; transform-origin: 12px 12px; will-change: transform; animation: dkClSpin .95s linear infinite; }
+@keyframes dkClSpin { to { transform: rotate(360deg); } }
+@keyframes dkClArc { 0%, 100% { stroke-dasharray: 12 88; } 50% { stroke-dasharray: 52 48; } }
+
+#couch .dk-close.park { transition: none; }
+#couch .dk-close.park svg { animation: none; }
+
+/* 1.84.100q: Steam — cursor oculto hasta usar el ratón; el nombre del juego entra deslizándose hacia arriba */
+#couch.nomouse, #couch.nomouse * { cursor: none !important; }
+@keyframes dkName2 { from { opacity: 0; transform: translateY(1.1vh); } to { opacity: 1; transform: none; } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkName2 .36s cubic-bezier(.2,.8,.2,1) .08s both; }
+
+/* 1.84.100r — Steam: el texto sube desde abajo con fundido suave (video 11-38-43) */
+@keyframes dkName3 { 0% { opacity: 0; transform: translateY(3.2vh); } 25% { opacity: 0; } 100% { opacity: 1; transform: none; } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkName3 .42s cubic-bezier(.15,.7,.25,1) .06s both; }
+
+/* 1.84.100s — texto más lento y desvanecido */
+@keyframes dkName4 { 0% { opacity: 0; transform: translateY(2.6vh); } 100% { opacity: 1; transform: none; } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkName4 .75s cubic-bezier(.22,.6,.3,1) .1s both; }
+
+/* 1.84.100t — fundido más largo que el movimiento (aparece poco a poco) */
+@keyframes dkNameUp { from { transform: translateY(2.6vh); } to { transform: none; } }
+@keyframes dkNameFade { 0% { opacity: 0; } 100% { opacity: 1; } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkNameUp .75s cubic-bezier(.22,.6,.3,1) .1s both, dkNameFade 1.3s cubic-bezier(.4,.1,.5,1) .1s both; }
+
+/* 1.84.100u — un poco más rápido (~-25 %) */
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkNameUp .56s cubic-bezier(.22,.6,.3,1) .07s both, dkNameFade .98s cubic-bezier(.4,.1,.5,1) .07s both; }
+
+/* 1.84.100v — otro poco más rápido */
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkNameUp .42s cubic-bezier(.22,.6,.3,1) .05s both, dkNameFade .72s cubic-bezier(.4,.1,.5,1) .05s both; }
+
+/* 1.84.100w — bastante más rápido */
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkNameUp .26s cubic-bezier(.22,.6,.3,1) .02s both, dkNameFade .42s cubic-bezier(.4,.1,.5,1) .02s both; }
+
+/* 1.84.100x — punto medio entre w y v */
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkNameUp .34s cubic-bezier(.22,.6,.3,1) .03s both, dkNameFade .56s cubic-bezier(.4,.1,.5,1) .03s both; }
+
+/* 1.84.100y — el texto NO acompaña el "brinco" de la tarjeta: contra-escala sincronizada con dkPop (tarjeta 12.8vw x 19.2vw); el texto solo sube y aparece */
+@keyframes dkNameCancel { 0% { transform: none; } 55% { transform: translateY(-.96vw) scale(.9091); } 100% { transform: translateY(-.672vw) scale(.9346); } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body { animation: dkNameCancel .34s cubic-bezier(.12,.85,.2,1) both !important; transform-origin: 50% 0; opacity: 1 !important; }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body > * { animation: dkNameUp .34s cubic-bezier(.22,.6,.3,1) .03s both, dkNameFade .56s cubic-bezier(.4,.1,.5,1) .03s both; }
+
+/* 1.84.100z — el texto no se mueve: solo aparece con fundido */
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body > * { animation: dkNameFade .56s cubic-bezier(.4,.1,.5,1) .03s both !important; transform: none; }
+
+/* 1.84.100za — vuelve la subida, pero suave y tras el salto de la tarjeta (sin rebote) */
+@keyframes dkNameRise { from { transform: translateY(1.8vh); } to { transform: none; } }
+#couch.ui-deck .cc-hc.dk-cov.sel .cc-hc-body > * { animation: dkNameRise .5s cubic-bezier(.25,.1,.25,1) .12s both, dkNameFade .5s ease-out .12s both !important; }
+
+/* 1.84.100zb — rendimiento al pasar las primeras tarjetas: el fondo (.cc-bg) ya no lleva filter ni mask (se pintaban de nuevo en cada cuadro con la animación de paneo); el oscurecido y el degradado a fondo se hacen con una capa encima */
+#couch.ui-deck.dk-home .cc-bg { filter: none !important; -webkit-mask-image: none !important; mask-image: none !important; will-change: translate, scale; }
+#couch.ui-deck.dk-home .cc-bg::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(10,16,24,0) 38%, #0a1018 100%), rgba(0,0,0,.44); }
+
+/* 1.84.100zc — Steam: el ratón sobre una tarjeta solo hace zoom (sin anillo, brillo, sonido ni cambio de fondo) */
+#couch.ui-deck .cc-hc.dk-cov, #couch.ui-deck .cc-hc.dk-new { transition: transform .16s cubic-bezier(.2,.8,.2,1) !important; }
+#couch.ui-deck .cc-hc.dk-cov.hov:not(.sel), #couch.ui-deck .cc-hc.dk-new.hov:not(.sel) { transform: scale(1.05); z-index: 3; }
+#couch.ui-deck.grid .cc-tile .cc-cover { transition: transform .16s cubic-bezier(.2,.8,.2,1); }
+#couch.ui-deck.grid .cc-tile.hov:not(.sel) .cc-cover { transform: scale(1.05); z-index: 3; }
+
+/* 1.84.100zd — Inicio: la cinta de tarjetas (que sube bajo la cabecera) tapaba los iconos de buscar/notificaciones/ajustes y no recibían clics */
+#couch.ui-deck .cc-top { position: relative !important; z-index: 40 !important; }
+
+/* 1.84.100ze — las tarjetas bajan un poco para que el título de la fila se vea completo (la tarjeta ancha seleccionada lo tapaba); el degradado superior ya no lo apaga; "Ver más en la biblioteca" con texto más grande */
+#couch.ui-deck .cc-h-row.dk-games > .cc-h-strip { margin-top: calc(-6vw + 2.6vh); }
+#couch.ui-deck .cc-h-scroll { -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 3vh, #000 5.4vh); mask-image: linear-gradient(180deg, transparent 0, transparent 3vh, #000 5.4vh); }
+#couch.ui-deck .cc-hc.dk-more { font-size: .97em; line-height: 1.25; padding: 0 1.1em; }
+
+/* 1.84.100zf — Steam: búsqueda propia (no es una sección): la barra crece desde el icono hacia la izquierda, se escribe de inmediato con el teclado, sin teclado en pantalla; filtros arriba; Esc la cierra con un fundido */
+#couch.ui-deck:not(.padmode) .cc-sr-kb { display: none !important; }
+#couch.ui-deck .cc-search.dk-sropen .cc-sr-q { animation: dkSrBar .62s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes dkSrBar { 0% { clip-path: inset(0 0 0 94%); background: rgba(112,120,131,.5); } 30% { clip-path: inset(0 0 0 0); background: rgba(112,120,131,.55); } 100% { clip-path: inset(0 0 0 0); background: #fff; } }
+#couch.ui-deck .cc-search.dk-sropen .cc-sr-q::before { animation: dkSrFade .62s both; }
+#couch.ui-deck .cc-search.dk-sropen .cc-sr-q.empty::after { animation: dkSrFade .62s both; }
+@keyframes dkSrFade { 0%, 35% { opacity: 0; } 100% { opacity: 1; } }
+#couch.ui-deck .cc-search.dk-sropen .cc-sr-right { animation: dkSrRes .5s ease-out .3s both; }
+@keyframes dkSrRes { from { opacity: 0; } to { opacity: 1; } }
+#couch.ui-deck .cc-search.dk-srclosing .cc-sr-q { animation: dkSrBarOut .23s ease-in both; }
+@keyframes dkSrBarOut { 0% { background: #fff; opacity: 1; } 45% { background: rgba(112,120,131,.55); opacity: 1; } 100% { background: rgba(112,120,131,.2); opacity: 0; } }
+#couch.ui-deck .cc-search.dk-srclosing .cc-sr-right { animation: dkSrResOut .23s ease-in both; }
+@keyframes dkSrResOut { from { opacity: 1; } to { opacity: 0; } }
+#couch.ui-deck .cc-sr-head.dk-sp-row { display: flex; justify-content: center; gap: .6vw; width: auto; padding: 0; background: none; border-radius: 0; margin: 0 auto 2.4vh; }
+#couch.ui-deck .dk-sp-p { border: 0; background: none; color: #cfd6df; font: inherit; font-size: .62em; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; padding: .75em 1.5em; border-radius: 999px; cursor: pointer; }
+#couch.ui-deck .dk-sp-p.on { background: #2c333d; color: #fff; }
+#couch.ui-deck .dk-sp-p sup { margin-left: .5em; font-size: .72em; color: #8e98a6; vertical-align: .35em; }
+#couch.ui-deck .cc-sr-q { width: 77.4vw; }
+#couch.ui-deck:has(.cc-search:not(.hidden)) .cc-dsearch, #couch.ui-deck:has(.cc-search:not(.hidden)) .cc-dic.bell { visibility: hidden; }
+
+/* 1.84.100zg — barra de búsqueda completa al pasar el ratón por la lupa (como Steam); sin texto no aparece nada y Inicio sigue a la vista */
+#couch .dk-sbar { display: none; }
+#couch.ui-deck .dk-sbar { display: flex; position: fixed !important; left: 0; top: 0; height: 5.4vh; width: 77.4vw; z-index: 45 !important; align-items: center; padding-left: 1.2vw; box-sizing: border-box; background: rgba(112,120,131,.52); color: #fff; clip-path: inset(0 0 0 calc(100% - 5vw)); opacity: 0; pointer-events: none; transition: clip-path .2s cubic-bezier(.2,.8,.2,1), opacity .14s; }
+#couch.ui-deck .dk-sbar svg { width: 1.5vw; height: 1.5vw; min-width: 18px; min-height: 18px; }
+#couch.ui-deck.sbar-on .dk-sbar { clip-path: inset(0 0 0 0); opacity: 1; pointer-events: auto; cursor: pointer; }
+#couch.ui-deck.sbar-on .cc-dsearch, #couch.ui-deck.sbar-on .cc-dic.bell { visibility: hidden; }
+#couch.ui-deck:has(.cc-search:not(.hidden)) .dk-sbar { display: none; }
+#couch.ui-deck .cc-search.dk-srempty { background: none; pointer-events: none; }
+#couch.ui-deck .cc-search.dk-srempty .cc-sr-q { pointer-events: auto; }
+#couch.ui-deck .cc-search.dk-srhov .cc-sr-q { animation: dkSrBarH .3s ease-out both !important; }
+#couch.ui-deck .cc-search.dk-srhov .cc-sr-q::before, #couch.ui-deck .cc-search.dk-srhov .cc-sr-q.empty::after { animation: none !important; }
+@keyframes dkSrBarH { from { background: rgba(112,120,131,.52); } to { background: #fff; } }
+#couch.ui-deck .cc-sr-q.empty::after { font-style: italic; font-size: .8em; font-weight: 400; color: #7b8491; }
+#couch.ui-deck .cc-search.dk-srempty { position: absolute !important; inset: 0; z-index: 2; }
+
+/* 1.84.100zh — Steam: sin campana de notificaciones */
+#couch.ui-deck .cc-dic.bell:not(.has) { display: none !important; }
+#couch.ui-deck .dk-sbar { width: var(--sbw, 77.4vw); }
+#couch.ui-deck .cc-sr-q { width: var(--sbw, 77.4vw); }
+
+/* 1.84.100zi — Steam: la barra de pestañas fija es una banda traslucida con desenfoque pegada al borde superior (como Steam), no un bloque oscuro a media pantalla */
+#couch.ui-deck .cc-h-row.dk-hpills { top: -8.4vh; margin-top: -3.8vh; padding: 7.9vh 0 2.4vh; background: none; pointer-events: none; }
+#couch.ui-deck .cc-h-row.dk-hpills .cc-hc { pointer-events: auto; }
+#couch.ui-deck .cc-h-scroll.dk-eng { -webkit-mask-image: none; mask-image: none; }
+#couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::before, #couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::after { top: 9.5vh; }
+#couch.ui-deck .cc-h-scroll { margin-top: -8.2vh; padding-top: 8.4vh; -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 6.7vh, #000 9.1vh); mask-image: linear-gradient(180deg, transparent 0, transparent 6.7vh, #000 9.1vh); }
+#couch.ui-deck .cc-h-scroll.dk-eng { -webkit-mask-image: none; mask-image: none; }
+
+/* 1.84.100zj — Steam: la banda superior baja con animación suave y es traslúcida: difumina lo que pasa por debajo (las portadas se ven desenfocadas a través de ella) */
+#couch.ui-deck .cc-h-scroll.dk-eng .cc-h-row.dk-hpills .cc-h-strip, #couch.ui-deck .cc-h-scroll.dk-eng .cc-h-row.dk-hpills::before, #couch.ui-deck .cc-h-scroll.dk-eng .cc-h-row.dk-hpills::after { animation: dkBandFade .3s ease-out both; }
+@keyframes dkBandDown { from { background-size: 100% 0; } to { background-size: 100% 100%; } }
+@keyframes dkBandFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* 1.84.100zk — Steam: la banda también desenfoca el fondo. El navegador solo desenfoca lo que hay dentro de la lista, así que una banda fija va entre el fondo y la lista (desenfoca el arte) y la de la lista desenfoca las portadas */
+#couch .dk-bandfix, #couch .cc-h-row.dk-hpills .dk-bl { display: none; }
+/* varias capas de desenfoque moderado una sobre otra (Chrome falla con radios grandes): queda totalmente borroso, como el acrílico de Windows */
+#couch.ui-deck.dk-engb .dk-bandfix { display: block; position: fixed !important; z-index: 0 !important; left: 0; right: 0; top: 0; height: calc(var(--dk-bandh, calc(10.3vh + 2.9vw)) + 140px); clip-path: inset(0 0 140px 0); pointer-events: none; -webkit-backdrop-filter: blur(30px) saturate(1.1) brightness(.92); backdrop-filter: blur(30px) saturate(1.1) brightness(.92); }
+#couch.ui-deck.dk-engb .dk-bandfix.t { background: rgba(12,16,28,.3); animation: dkBandDown .34s cubic-bezier(.2,.8,.2,1) both; }
+#couch.ui-deck .cc-h-scroll.dk-eng .cc-h-row.dk-hpills .dk-bl { display: block; position: absolute; inset: 0 0 -140px 0; clip-path: inset(0 0 140px 0); pointer-events: none; -webkit-backdrop-filter: blur(30px) saturate(1.1) brightness(.92); backdrop-filter: blur(30px) saturate(1.1) brightness(.92); }
+#couch.ui-deck .cc-h-scroll.dk-eng .cc-h-row.dk-hpills .dk-bl.t { background: linear-gradient(90deg, rgba(8,12,22,.5) 0, rgba(14,19,34,.38) 30%, rgba(14,19,34,.38) 70%, rgba(8,12,22,.5) 100%); background-repeat: no-repeat; background-position: top; animation: dkBandDown .34s cubic-bezier(.2,.8,.2,1) both; }
+#couch.ui-deck .cc-h-row.dk-hpills .cc-h-strip { position: relative; }
+#couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::before, #couch.ui-deck .cc-h-scroll.dk-stuck .cc-h-row.dk-hpills::after { z-index: 2; }
+#couch.ui-deck .cc-h-row.dk-hpills { z-index: 60; }
+#couch.ui-deck .cc-h-scroll .cc-h-title.dk-tbh { opacity: 0; transition: opacity .12s; }
+
+/* 1.84.100zl — Steam: pestaña Logros bien repartida — izquierda lista de juegos (portada + nombre + progreso), derecha cabecera y logros */
+#couch.ui-deck.ach-view .cc-listwrap { display: flex !important; flex-direction: row !important; gap: 2vw; padding: 1.2vh 2.6vw 7vh 2.6vw; align-items: stretch; }
+#couch.ui-deck.ach-view .cc-strip { display: flex !important; flex-direction: column !important; flex-wrap: nowrap !important; flex: 0 0 29vw !important; width: 29vw; height: auto; gap: .5vh; padding: .6vh .4vw .6vh .2vw; overflow-x: hidden; overflow-y: auto; scrollbar-width: none; align-content: normal; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 2.4vh, #000 calc(100% - 3vh), transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 2.4vh, #000 calc(100% - 3vh), transparent 100%); }
+#couch.ui-deck.ach-view .cc-tile { display: grid !important; grid-template-columns: 3.4vw 1fr; grid-template-rows: auto auto; column-gap: .9vw; align-items: center; flex: 0 0 auto; width: auto !important; height: auto !important; margin: 0 !important; padding: .7vh .7vw; border-radius: .6vw; background: rgba(255,255,255,.04); transform: none !important; opacity: 1; }
+#couch.ui-deck.ach-view .cc-tile.sel { background: rgba(110,160,230,.2); box-shadow: inset 0 0 0 .15vw rgba(160,200,255,.85); }
+#couch.ui-deck.ach-view .cc-tile .cc-cover { grid-row: 1 / 3; width: 3.4vw !important; height: 4.6vw !important; margin: 0 !important; border-radius: .3vw; overflow: hidden; }
+#couch.ui-deck.ach-view .cc-tile .cc-cover img { width: 100%; height: 100%; object-fit: cover; }
+#couch.ui-deck.ach-view .cc-tile .cc-name { display: block !important; position: static !important; opacity: 1 !important; margin: 0 !important; font-size: .95em; font-weight: 700; align-self: end; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: none !important; }
+#couch.ui-deck.ach-view .cc-tile .cc-ptxt { display: block !important; position: static !important; font-size: .78em; opacity: .75; align-self: start; text-align: left; }
+#couch.ui-deck.ach-view .cc-tile.done .cc-ptxt { color: #f5c542; font-weight: 700; opacity: 1; }
+#couch.ui-deck.ach-view .cc-tile .cc-prog, #couch.ui-deck.ach-view .cc-tile .cc-trophy, #couch.ui-deck.ach-view .cc-tile .cc-store, #couch.ui-deck.ach-view .cc-tile .cc-run, #couch.ui-deck.ach-view .cc-tile .cc-ni { display: none !important; }
+#couch.ui-deck.ach-view .cc-tile.done .cc-cover { box-shadow: 0 0 0 .12vw rgba(245,197,66,.9); }
+#couch.ui-deck.ach-view .cc-achpane { display: block; flex: 1 1 auto; min-width: 0; padding: 1.6vh 1.6vw; border-radius: .9vw; background: rgba(255,255,255,.04); border: .12vw solid transparent; }
+#couch.ui-deck.ach-view .cc-achpane.focus { border-color: rgba(160,200,255,.7); }
+#couch.ui-deck.ach-view .cc-ach { background: rgba(255,255,255,.05); border-radius: .5vw; padding: .8vh .9vw; opacity: .62; }
+#couch.ui-deck.ach-view .cc-ach.got { opacity: 1; background: rgba(245,197,66,.1); box-shadow: inset .25vw 0 0 rgba(245,197,66,.85); }
+#couch.ui-deck.ach-view .cc-ach.sel { background: rgba(110,160,230,.22); box-shadow: inset 0 0 0 .14vw rgba(160,200,255,.85); opacity: 1; }
+#couch.ui-deck.ach-view .cc-strip { justify-content: flex-start !important; align-content: flex-start !important; grid-auto-rows: auto; }
+#couch.ui-deck.ach-view .cc-tile { min-height: 0; max-height: none; }
+#couch.ui-deck.ach-view .cc-strip { gap: .6vh !important; row-gap: .6vh !important; column-gap: 0 !important; }
+
+/* 1.84.100zm — Steam: amigos (tarjetas con avatar, contador verde en la pestaña y círculo con amigos jugando en las portadas) */
+#couch.ui-deck .dk-hp .dk-fcnt { display: inline-flex; align-items: center; gap: .35em; margin-left: .8em; padding: .12em .65em .12em .5em; border-radius: 999px; background: #1f7a3a; color: #e7ffe9; font-size: .92em; font-weight: 800; vertical-align: middle; }
+#couch.ui-deck .dk-hp .dk-fcnt svg { width: 1.15em; height: 1.15em; }
+#couch.ui-deck .cc-hc.dk-fr { flex: 0 0 auto; width: 9.6vw; }
+#couch.ui-deck .cc-hc.dk-fr .cc-hc-img { width: 9.6vw; height: 9.6vw; border-radius: .5vw; background-size: cover; position: relative; box-shadow: inset 0 0 0 .18vw rgba(255,255,255,.08); }
+#couch.ui-deck .cc-hc.dk-fr.on .cc-hc-img { box-shadow: inset 0 0 0 .22vw #57cbde; }
+#couch.ui-deck .cc-hc.dk-fr.play .cc-hc-img { box-shadow: inset 0 0 0 .22vw #90ba3c; }
+#couch.ui-deck .cc-hc.dk-fr:not(.on):not(.play) .cc-hc-img { filter: grayscale(.55) brightness(.8); }
+#couch.ui-deck .cc-hc.dk-fr .cc-hc-body { text-align: left; padding-top: .8vh; }
+#couch.ui-deck .cc-hc.dk-fr .cc-hc-name { font-weight: 800; font-size: .95em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-deck .cc-hc.dk-fr .cc-hc-sub { font-size: .75em; opacity: .9; color: #9aa3b0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#couch.ui-deck .cc-hc.dk-fr.on .cc-hc-sub { color: #57cbde; }
+#couch.ui-deck .cc-hc.dk-fr.play .cc-hc-sub { color: #90ba3c; }
+#couch.ui-deck .cc-hc-img .dk-frb { position: absolute; left: .6vw; bottom: .6vw; min-width: 1.7vw; height: 1.7vw; line-height: 1.7vw; padding: 0 .3vw; text-align: center; border-radius: 999px; background: rgba(20,26,34,.82); box-shadow: inset 0 0 0 .13vw rgba(255,255,255,.75); color: #fff; font-size: .8vw; font-weight: 800; z-index: 3; }
+
+/* 1.84.100zn · Steam Big Picture: la barra de pestañas de la ficha del juego usa el mismo efecto translúcido+desenfoque que la del inicio */
+#couch.ui-deck .dk-det .dk-tabs.stuck { background: none !important; }
+#couch .dk-tabs .dk-bl { display: none; }
+#couch.ui-deck .dk-tabs.stuck .dk-bl { display: block; position: absolute; z-index: -1; inset: 0 0 -140px 0; clip-path: inset(0 0 140px 0); pointer-events: none; -webkit-backdrop-filter: blur(30px) saturate(1.1) brightness(.92); backdrop-filter: blur(30px) saturate(1.1) brightness(.92); }
+#couch.ui-deck .dk-tabs.stuck .dk-bl.t { background: linear-gradient(90deg, rgba(8,12,22,.5) 0, rgba(14,19,34,.38) 30%, rgba(14,19,34,.38) 70%, rgba(8,12,22,.5) 100%); background-repeat: no-repeat; background-position: top; animation: dkBandDown .34s cubic-bezier(.2,.8,.2,1) both; }
+
+/* 1.84.100zo · amigos en la ficha del juego */
+#couch.ui-deck .dk-fw { display: flex; flex-wrap: wrap; gap: 2.4vw 4vw; padding: 0 .2vw 1vh; }
+#couch.ui-deck .dk-fwc { min-width: 22vw; }
+#couch.ui-deck .dk-fwl { font-size: .62em; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #8d96a3; margin: 0 0 1.2vh; }
+#couch.ui-deck .dk-fwl.dim { text-transform: none; letter-spacing: 0; font-size: .8em; font-weight: 500; }
+#couch.ui-deck .dk-fwi { display: flex; align-items: center; gap: .9vw; margin-bottom: 1.2vh; }
+#couch.ui-deck .dk-fwa { width: 3.6vw; height: 3.6vw; border-radius: 3px; background: #2a303a center / cover no-repeat; flex: none; }
+#couch.ui-deck .dk-fwt b { display: block; font-size: .85em; color: #e6eaef; }
+#couch.ui-deck .dk-fwt span { display: block; font-size: .68em; color: #8d96a3; margin-top: .2vh; }
+#couch.ui-deck .dk-fwn { flex-basis: 100%; font-size: .68em; color: #6b7480; }
+
+/* 1.84.100zp · logros: iconos más grandes en Actividad y diseño de «Tus cosas» como en Steam (destacado + desbloqueados + bloqueados) */
+#couch.ui-deck .dk-ev .dk-evt.ic { width: 8vw; height: 8vw; aspect-ratio: auto; align-self: flex-start; background: rgba(0,0,0,.3); border-radius: 4px; overflow: hidden; }
+#couch.ui-deck .dk-ev .dk-evt.ic img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+#couch.ui-deck .dk-ev:has(.dk-evt.ic) { align-items: center; min-height: 8vw; box-sizing: border-box; }
+#couch.ui-deck .dk-apanel { display: block; height: auto; overflow: visible; padding: 1.6vh 1.2vw 2vh; }
+#couch.ui-deck .dk-arow { display: flex; align-items: stretch; gap: 1.2vw; }
+#couch.ui-deck .dk-afeat { flex: 0 0 46%; padding: 1.4vh 1.2vw; gap: 1.4vw; align-items: center; min-height: 14.5vh; background: rgba(255,255,255,.08); }
+#couch.ui-deck .dk-aic { flex: 0 0 12.5vh; width: 12.5vh; height: 12.5vh; border-radius: 3px; }
+#couch.ui-deck .dk-an { font-size: 1.15em; } #couch.ui-deck .dk-ad { font-size: .8em; margin-top: .3em; } #couch.ui-deck .dk-ap { font-size: .74em; margin-top: .9em; color: #c3ccd6; }
+#couch.ui-deck .dk-astrip { padding: 0; gap: .8vw; align-items: center; }
+#couch.ui-deck .dk-astrip.dk-aall { flex-wrap: wrap; overflow: visible; }
+#couch.ui-deck .dk-ai { flex: 0 0 12.5vh; width: 12.5vh; height: 12.5vh; border-radius: 3px; border-width: .22em; }
+#couch.ui-deck .dk-alockh { margin: 2.4vh 0 1.2vh; font-size: .66em; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #aab3bf; }
+#couch.ui-deck .dk-alock { display: flex; flex-wrap: wrap; gap: .8vw; }
+#couch.ui-deck .dk-alock .dk-ai { flex: 0 0 8.6vh; width: 8.6vh; height: 8.6vh; }
+
+/* 1.84.100zq · campana: solo aparece cuando hay notificaciones sin leer */
+#couch.ui-deck .cc-dic.bell { position: relative; }
+#couch.ui-deck .cc-dic.bell.has::after { content: attr(data-n); position: absolute; top: -.25vw; right: -.35vw; min-width: .95vw; height: .95vw; padding: 0 .2vw; box-sizing: border-box; border-radius: 1vw; background: #1a9fff; color: #fff; font-size: .55vw; font-weight: 800; line-height: .95vw; text-align: center; }
+#couch.ui-deck .cc-dic.bell.has svg { animation: dkBell .9s ease-in-out 2; transform-origin: 50% 12%; }
+
+/* 1.84.100zr · sin barra de «reproduciendo» en ningún modo consola */
+#couch .cc-music { display: none !important; }
+
+/* 1.84.100zs · pantalla de perfil de Steam */
+#couch.ui-deck .cc-menu-ov:has(.dk-prof) { display: flex; align-items: flex-start; justify-content: center; background: rgba(6,9,14,.82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+#couch.ui-deck .dk-prof { width: 82vw; margin-top: 8vh; display: flex; flex-direction: column; gap: .9vh; color: #e6eaef; }
+#couch.ui-deck .dk-prof > * { background: rgba(32,36,44,.92); box-sizing: border-box; }
+#couch.ui-deck .dk-ph { display: flex; align-items: flex-start; gap: 1.2vw; padding: 1vw; min-height: 15vh; }
+#couch.ui-deck .dk-pav { width: 12vh; height: 12vh; flex: none; background: #2a303a center / cover no-repeat; display: flex; align-items: center; justify-content: center; font-size: 4vh; font-weight: 800; }
+#couch.ui-deck .dk-ptx { flex: 1; min-width: 0; } #couch.ui-deck .dk-pn { font-size: 1.9em; color: #67c1f5; } #couch.ui-deck .dk-pst { font-size: 1.15em; color: #4d9fd6; } #couch.ui-deck .dk-plv { margin-top: .6vh; font-size: .8em; color: #8d96a3; }
+#couch.ui-deck .dk-pi { cursor: pointer; transition: background .12s; }
+#couch.ui-deck .dk-pbtn { padding: 1.5vh 2.4vw; background: #3a404b; text-align: center; font-size: 1em; min-width: 14vw; box-sizing: border-box; }
+#couch.ui-deck .dk-pview { align-self: flex-start; }
+#couch.ui-deck .dk-pbtn.sel, #couch.ui-deck .dk-pview.sel { background: #fff; color: #0a0f15; }
+#couch.ui-deck .dk-prow { display: flex; align-items: center; justify-content: space-between; padding: 1.6vh 1vw; gap: 1vw; }
+#couch.ui-deck .dk-prow.sel { background: #3a404b; outline: 2px solid #fff; outline-offset: -2px; }
+#couch.ui-deck .dk-pt { font-size: 1em; } #couch.ui-deck .dk-ps { font-size: .7em; color: #aab3bf; margin-top: .4vh; }
+#couch.ui-deck .dk-pdd { background: #3a404b; padding: 1.4vh 1.4vw; min-width: 18vw; box-sizing: border-box; }
+#couch.ui-deck .dk-pfc b, #couch.ui-deck .dk-prow b { font-weight: 600; margin-left: .3em; }
+#couch.ui-deck .dk-ptiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9vw; background: none !important; }
+#couch.ui-deck .dk-ptile { background: rgba(32,36,44,.92); text-align: center; padding: 3vh 1vw; display: flex; flex-direction: column; align-items: center; gap: .6vh; }
+#couch.ui-deck .dk-ptile.sel { background: #3a404b; outline: 2px solid #fff; outline-offset: -2px; }
+#couch.ui-deck .dk-ptile i { width: 3.4vh; height: 3.4vh; display: block; margin-bottom: 1vh; } #couch.ui-deck .dk-ptile svg { width: 100%; height: 100%; }
+#couch.ui-deck .dk-pnote { padding: 1.2vh 1vw; font-size: .8em; color: #f0b86a; }
+#couch.ui-deck .dk-prof .dk-ptile.sel, #couch.ui-deck .dk-prof .dk-prow.sel { color: #fff; }
+#couch.ui-deck .dk-prof .dk-ptile.sel .dk-ps, #couch.ui-deck .dk-prof .dk-prow.sel .dk-ps { color: #cdd5de; }
+
+/* 1.84.100zt · menú lateral a pantalla completa (sin recorte arriba ni abajo) */
+#couch.ui-deck .cc-menu-ov.dk-side { inset: 0 !important; }
+#couch.ui-deck:has(.cc-menu-ov.dk-side:not(.hidden)) .cc-top, #couch.ui-deck:has(.cc-menu-ov.dk-side:not(.hidden)) .cc-hints { background: none !important; box-shadow: none !important; }
+#couch.ui-deck:has(.cc-menu-ov.dk-side:not(.hidden)) .cc-hints { z-index: 45 !important; }
+/* 1.84.100zu · paneles laterales derechos: el título y la lista quedan por debajo de los iconos de arriba */
+#couch.ui-deck .cc-menu.dk-side.dk-right { padding-top: 10vh !important; }

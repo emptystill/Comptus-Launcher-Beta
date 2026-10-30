@@ -1,4 +1,4 @@
-# Comptus — estado del proyecto (versión 1.84.84)
+# Comptus — estado del proyecto (versión 1.84.100)
 
 Leyenda: `[x]` hecho y confirmado por ti · `[~]` hecho, falta confirmarlo en tu equipo · `[ ]` pendiente
 
@@ -117,3 +117,7 @@ Leyenda: `[x]` hecho y confirmado por ti · `[~]` hecho, falta confirmarlo en tu
 - Juegos en pantalla completa exclusiva: el overlay puede no mostrarse
 - Guardados en el registro de Windows: no se copian (solo archivos)
 - El progreso de descargas dentro de Comptus se descartó: dependía de lo que escriba cada launcher
+
+
+## Cómo se edita el modo consola (desde 1.84.87)
+- El código está en `renderer/couch/*.js` (se unen en orden alfabético). **Edita las partes, no `renderer/couch.js`**, y ejecuta `npm run couch` (o simplemente `npm start`, que lo hace antes de arrancar). Sube a git tanto las partes como el `couch.js` generado.

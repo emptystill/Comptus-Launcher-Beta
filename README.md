@@ -1282,6 +1282,178 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.100
+- Steam Big Picture: el panel de Notificaciones (y los demás paneles de la derecha) empieza más abajo para no quedar pegado a los iconos de arriba.
+- Steam Big Picture: el menú lateral (F1) y los paneles laterales ocupan toda la altura de la pantalla (antes quedaban cortados arriba y abajo); la entrada del perfil se llama «Mi perfil».
+- Steam Big Picture: la foto de la esquina superior derecha usa tu foto de Steam (si hay clave de API y se pudo leer el perfil); si no, la de Comptus.
+- Steam Big Picture: pantalla de **perfil de Steam** (clic en tu foto o F1 → Mi perfil de Steam): foto, nombre, estado, nivel, código de amigo y cuenta de Steam; accesos a Ver perfil, Añadir fondos, Privacidad, Detalles de la cuenta y Añadir amigos (abren Steam/la web) y cambio de estado (conectado/ausente/ocupado/invisible, solo con Steam abierto).
+- Modos consola (todos los temas): se quita la barra superior de «lo que suena» (♪ título — artista). Los controles de música siguen en el menú del sistema.
+- Steam Big Picture: vuelve la campana de notificaciones, pero solo aparece (con contador) cuando hay avisos sin leer. Avisa de logros desbloqueados, juegos gratis/ofertas/eventos y de amigos de Steam que se conectan o empiezan a jugar (se comprueba cada 2,5 min); cada aviso es funcional (abre la ficha del amigo, los logros del juego o Inicio). Al abrir el panel se marcan como leídas y siguen en el menú Avisos.
+- Steam Big Picture (ficha): los iconos de logros en Actividad son mucho más grandes, y "Tus cosas" se distribuye como en Steam: logro destacado a la izquierda, desbloqueados a su derecha y, debajo, la cuadrícula de "Logros bloqueados" en varias filas.
+- Steam Big Picture: la barra de pestañas de la ficha del juego (Actividad / Tus cosas / Información) usa el mismo efecto translúcido con desenfoque que la barra del inicio.
+- Steam Big Picture: ficha de amigo (panel lateral al seleccionarlo: estado, nivel de Steam, amigos desde, juegos de las últimas 2 semanas, enviar mensaje y ver perfil en Steam) y sección **Amigos** en la ficha de los juegos de Steam (jugando ahora / jugado anteriormente / lo tienen), solo con perfiles públicos.
+- Steam Big Picture: en las tarjetas de "Jugados recientemente" el texto "Jugado hoy" ahora añade las horas jugadas (p. ej. "JUGADO HOY · 12 H").
+
+- Steam Big Picture: **amigos de Steam** (necesita API key y perfil/lista de amigos públicos). Pestaña Amigos con secciones Jugando / En línea / Desconectados (avatar, estado, "Visto hace…"), contador verde junto a la pestaña y, en las tarjetas de juego, insignia con el número de amigos que están jugando a ese título. Se actualiza cada ≥2 min.
+- Inicio Steam: al pasar el cursor se enfoca la tarjeta con todos sus efectos; sin empuje de margen (portadas menos separadas), enfocada ×1,07, respiración más rápida (1,5 s) y borde menos blanco, barrido (1,4 s) y destello (1,1 s) más lentos, resplandor sin corte.
+- Barrido y destello de la portada empiezan al instante; el resplandor de color ya no se corta arriba.
+- La respiración del borde empieza tras el barrido de brillo (1,1 s) y sin salto.
+- Inicio Steam: Q/E ya no abren Ajustes desde Inicio (no dan la vuelta); Ajustes solo con el globo. Q/E solo pasan entre secciones.
+- Inicio Steam: la barra Novedades/Amigos/Recomendados al bajar queda pegada arriba como banda traslucida con desenfoque (ya no un bloque oscuro cortado a media pantalla); la banda llega hasta el borde de la pantalla y es más opaca. Baja con animación suave y es traslúcida: difumina las portadas que pasan por debajo (no toma el color del juego enfocado). Al volver a la fila de pestañas con ↑ la barra se queda pegada arriba (con su banda) en vez de bajar a media pantalla. La banda también desenfoca el arte de fondo (banda fija entre el fondo y la lista). Desenfoque en 3 capas de 30 px apiladas (totalmente borroso, estilo acrílico de Windows); con la banda fija, el título de la fila enfocada queda justo debajo de ella en vez de quedar tapado. Los títulos de fila que quedan bajo la banda se ocultan; la banda es un poco más clara.
+- Logros (Steam): izquierda lista de juegos (portada, nombre y progreso, con la selección marcada); derecha cabecera y logros con los desbloqueados resaltados en dorado y los pendientes atenuados. En Logros ya no se abre la ficha del juego (quedaba detrás): Intro o clic pasa a la lista de logros.
+- Arreglos: borde del hero deformado, pulso cortado en noticias, placa gris detrás de las portadas de la biblioteca eliminada.
+- Un solo borde por tarjeta que aparece, pulsa sutil hacia afuera, vuelve y respira (portadas, noticias, Ver más y biblioteca).
+- Intro Steam corregida: arranca al instante (sin pausa), sin puntos residuales de trazos, contorno cerrado, dura ~5,5 s. Borde de tarjetas: pulso que crece hacia afuera y vuelve (noticias y portadas del inicio).
+- Brillo diagonal tipo cristal (mezcla soft-light, translúcido) y destello breve de la imagen que vuelve a la normalidad al enfocar.
+- Arranque del modo Steam: animación de ~6 s (trazo de luz dibuja el mando, anillo con puntos, emblema Comptus), se salta con cualquier tecla. Borde de las tarjetas de noticias: marco grueso translúcido que se cierra sobre la tarjeta hasta quedar en línea blanca fina (0,5 s, como en el video de Steam).
+- Tarjetas de noticias/gratis/eventos (Steam): marco blanco completo que crece un poco y vuelve a su lugar, vista previa de texto al enfocar, sin brillo ni resplandor.
+- Inicio Steam: tamaños según la captura (tarjeta 12,8vw, hero 41vw); fondo animado como en Xbox 360 (paneo 26 s + cintas de luz); tarjetas que no son juegos sin brillo, solo borde blanco.
+- Ajustes Steam: brillo diagonal tipo cristal (más suave), resplandor de portada más bajo, fondo con paneo lento como el tema Xbox 360 y fundido desde el arte anterior al cambiar de juego, tarjetas que no son juegos con pop + borde que respira + brillo (sin resplandor de portada).
+- Efectos de la ficha enfocada (Steam): resplandor con el color dominante de la portada, barrido diagonal de brillo al seleccionar y borde blanco que "respira" (inicio y biblioteca).
+- Biblioteca (tema Steam): la ficha seleccionada crece ~13% y se asienta ~9% con borde claro, como en el video. Sin destellos animados (no se ven en el video). Inicio: tarjetas 15,9vw, hero 51vw, hueco .6vw, nombre grande, fondo nítido arriba oscureciendo a azul noche, punto azul en Novedades. Tiempos alargados (~0,45 s, medidos en el video lento): deslizamiento de la cinta, pop de la ficha, cambio de pestañas y fondo.
+
+- Deck: borde más gris y siempre pegado a la portada (empieza grande y se achica sin separarse); el recorte superior se evita ampliando el área visible del contenedor y bajando el brillo hacia arriba.
+
+- Deck: al pasar el ratón por el inicio solo se enfoca la tarjeta (con todos sus efectos); la cinta y las filas ya no se desplazan solas, lo que antes hacía que las tarjetas se movieran bajo el cursor y cambiaran el enfoque sin parar.
+
+- Deck: el banner de fondo del inicio solo se muestra con un juego enfocado en la fila de arriba; al bajar a pestañas/novedades/eventos se desvanece.
+
+- Deck (video de Steam): al bajar de las pestañas, estas quedan fijas arriba con Q / E a los lados y el contenido se desvanece bajo la barra superior.
+
+- Deck: la intro ahora suena (sonidos/deck/startup.mp3, sacado del audio de tu grabación de Steam: arranca con el mando, golpe al formarse el destello y cola que se apaga al terminar). Respeta el volumen y el interruptor de sonido; se corta suave si saltas la intro.
+
+- Deck (video de Steam al abrir un juego): al pulsar Jugar el arte de la ficha crece, se atenúa y muestra el logo con «Iniciando…» (luego «Lanzando ejecutable»); el botón pasa a «Cancelar», y con el juego abierto queda «Reanudar» (gris→azul) + ✕ para cerrarlo y «Última sesión: Hoy». En este estilo ya no se funde a negro al jugar (eso es de Xbox 360).
+
+- Deck (video de Steam al cerrar un juego): al cerrarse el juego aparece una pantalla negra con el logo de Comptus y un aro azul que gira (como el de Steam, pero dura ≈1,5 s en vez de quedarse esperando) y se funde de vuelta a la ficha/inicio.
+
+- Deck: la animación de cierre ya no entra con fundido (corte directo a negro, para que no se vea la ficha antes), el aro gira solo con transformaciones (sin repintar) y la pantalla de debajo no se reconstruye hasta que acaba (evita tirones).
+
+- Deck: al minimizar Comptus para jugar (Reanudar / «al iniciar: minimizar») se deja puesta la pantalla negra con el logo; así, cuando Windows devuelve la ventana, el primer fotograma ya es la animación de cierre y no la ficha vieja (antes se veía ≈0,5 s). Si vuelves a mano con el juego abierto, se quita sola.
+
+- Deck: la pantalla negra de cierre se aparca en cuanto Comptus pierde el foco con un juego abierto (no solo al minimizar), para que al volver la ventana el primer fotograma ya sea la animación aunque el juego cierre más rápido de lo que Comptus se entera.
+
+- Deck: el cursor se oculta al abrir el modo y el ratón se ignora (no enfoca tarjetas) hasta que lo mueves de verdad; y el nombre/horas del juego enfocado entra deslizándose hacia arriba con fundido (como Steam), en vez de bajar.
+
+- Deck: el ratón solo se activa con un movimiento real (en coordenadas de pantalla, tras 1,5 s de entrar y pasar a pantalla completa), así el modo consola siempre arranca en su posición inicial; el nombre del juego sube desde abajo (2,6 vh) ~0,34 s con fundido más largo (~0,56 s).
+- Deck: el texto bajo la portada no se mueve ni acompaña el "brinco" de la tarjeta (contra-escala): vuelve a subir desde abajo (1,8 vh) pero suave: sin rebote, empieza tras el salto de la tarjeta (~0,5 s).
+
+- Deck, rendimiento: el fondo del inicio ya no usa `filter`/`mask` (repintaba cada cuadro con el paneo); el oscurecido y el degradado son una capa encima. El arte se decodifica antes de cambiar el fondo y se precargan las 5 tarjetas vecinas. `--dk-art` ya no se cambia en la raíz.
+
+- Deck: el fondo y la ficha usan primero la copia fija (`bannerSm`) en vez del banner original: un banner webp animado enorme como fondo causaba el lag al pasar las primeras tarjetas.
+
+- Deck: el ratón sobre una tarjeta solo hace un zoom (1,05) con la clase `.hov`: no la selecciona, no hay anillo/brillo/fondo ni sonido; el clic sigue abriendo.
+
+- Deck: en Inicio, la cinta de tarjetas (que sube bajo la cabecera) tapaba los iconos de buscar, notificaciones y ajustes; la cabecera ahora queda por encima y reciben el clic.
+
+- Deck: la fila de juegos baja ~2,6 vh y el degradado superior ya no apaga el título, así «Jugados recientemente» se ve completo; el texto de «Ver más en la biblioteca» es ~35 % más grande (.97em).
+
+- Deck, búsqueda nueva (video de Steam): ya no es una sección (Q/E la saltan); al pulsar la lupa la barra crece desde el icono hacia la izquierda (gris → blanca) y se escribe de inmediato con el teclado (sin teclado en pantalla salvo con mando); sin texto muestra toda la biblioteca; filtros arriba (Todos + una por tienda, con cantidad); F4 borra; Esc cierra con un fundido y vuelve a Inicio.
+
+- Deck, búsqueda (2.ª pasada): al pasar el ratón por la lupa aparece la barra completa (gris translúcida, lupa a la izquierda) y al hacer clic pasa a blanca para escribir; sin texto no se muestra ningún resultado y Inicio sigue a la vista (sin saltos); los resultados solo aparecen al escribir; el marcador dice «Buscar juegos o perfiles...».
+
+- Deck, búsqueda: con la barra vacía, un clic en otra parte (que no activa nada) o moverte con las flechas/mando la quita y vuelve a Inicio; sin teclado en pantalla, ↓/→ e Intro pasan a los resultados.
+
+- Deck, búsqueda: quitado el oscurecimiento extra al abrir/cerrar la barra (Inicio se ocultaba y reaparecía reiniciando su animación de entrada); ahora Inicio ni se repinta ni parpadea.
+
+- Deck: quitada la campana de notificaciones; un clic en el globo estando en Ajustes (o con un menú abierto) lo cierra, igual que Esc.
+
+- Deck: la barra de búsqueda del hover ya no se queda pegada: se quita siempre que el cursor sale de ella (también si sale muy rápido o de la ventana).
+
+- Deck: la barra de búsqueda mide hasta el globo (medido en pantalla), así la lupa queda siempre dentro de ella a cualquier resolución; antes, en 2560×1440 la lupa quedaba fuera, la barra parpadeaba y el clic no abría la búsqueda.
+
+## 1.84.99 · Big Picture: fondo del Inicio más oscuro
+
+- El banner del fondo del Inicio se ve oscurecido y ligeramente desenfocado, como en Steam.
+
+## 1.84.98 · Big Picture: tiempos del original y arreglo del salto al cambiar de pestaña
+
+- Corregido: al cambiar de pestaña en la ficha la página subía y bajaba (se redibujaba desde arriba y luego volvía a desplazarse); ahora conserva la posición.
+- Animaciones con la duración del original (medida cuadro a cuadro: ≈ 0,2 s, arranque brusco y frenado fuerte): deslizamiento de la fila, rebote de la tarjeta, entrada del contenido, fundidos de fondo y de la ficha, menús.
+
+## 1.84.97 · Big Picture: animaciones tipo cinta
+
+- Pestañas de la ficha: el contenido sale con fundido y el nuevo entra deslizándose desde el lado del movimiento (efecto cinta); la píldora de la pestaña hace un pequeño rebote; el banner ya no parpadea al cambiar de pestaña.
+- Inicio: la tarjeta seleccionada empuja a sus vecinas, rebota, muestra insignia de mando y el nombre en negrita con subtítulo verde; la fila se desliza con frenado suave.
+
+## 1.84.96 · Big Picture: ficha con cronología, búsqueda, pestañas del Inicio y animaciones
+
+- Arreglado el audio doble al bajar de fila (el sonido tenía dos golpes) y el fondo azul de las fichas (el Inicio dejaba su estilo activo).
+- Ficha: pestaña Actividad como cronología por fecha (sesión de juego y logros), línea de origen bajo la barra y colores oscuros del original.
+- Búsqueda: barra blanca arriba con lupa, resultados en cuadrícula ancha y teclado en pantalla como panel inferior.
+- Inicio: Novedades solo muestra noticias y eventos; las filas de juegos pasaron a Recomendados.
+- Animaciones: selección con rebote, nombre que sube, filas que entran al cambiar de pestaña, contenido de la ficha que sube, menús escalonados.
+- Se evita el resaltado azul de texto al arrastrar.
+
+## 1.84.95 · Big Picture: menú sin parpadeo, pestañas del Inicio funcionales y fondos
+
+- Corregido el parpadeo del menú lateral y del de Iniciar/Apagar: ya no se vuelven a animar al mover la selección.
+- Inicio: Novedades / Amigos / Recomendados se pueden seleccionar (←/→ en la fila de pestañas) y cambian el contenido; primera tarjeta ancha (42 % del ancho); el carrusel se desplaza como en el original.
+- Fondos: Inicio con el arte solo arriba y reflejo de color; ficha con gris oscuro tintado.
+- Transiciones: oscurecimiento breve y fundido al abrir la ficha y al volver al Inicio.
+
+## 1.84.94 · Big Picture: Inicio estilo Steam y arreglos de la ficha
+
+- Inicio: primera tarjeta ancha del último juego, pestañas centradas Novedades / Amigos / Recomendados bajo la primera fila y fondo del juego enfocado a pantalla completa.
+- Ficha: el panel de capturas/tráilers ya no se monta sobre las pestañas; las pestañas de la biblioteca no se cuelan en la ficha.
+- Barra superior: iconos más grandes con animación (campana, globo, pulsación).
+- Sonido propio al cambiar de fila.
+
+## 1.84.93 · Big Picture: revisión completa según el video
+
+- Sonidos propios del estilo, extraídos del video (mover, cuadrícula, pestaña, abrir, atrás, menú, ajustes).
+- Inicio: banner del juego enfocado arriba y tarjeta "Ver más en la biblioteca" al final de la primera fila.
+- Páginas de juego rediseñadas: cabecera con logo, barra Jugar/estadísticas, pestañas fijas (Actividad, Tus cosas, Información) y logros con medalla, progreso y tira de iconos.
+- Pestañas centradas (se ignora el margen de pantalla en este estilo), colecciones en mosaico de color.
+- Campana abre el panel lateral de Notificaciones, el globo abre Ajustes y los chips de la barra inferior son clicables.
+- Animaciones de entrada, paneles laterales y fundido de fondos.
+
+## 1.84.92 · Big Picture: volver atrás, logros propios y ajustes
+
+- **Volver:** Esc / B ya regresa a Inicio desde Biblioteca, Buscar, Logros, Colecciones y Ajustes; en la ficha vuelve a la lista. Las pistas de la barra inferior (Menú, Seleccionar, Atrás) también se pueden pulsar con el ratón.
+- **Logros** de la ficha rediseñados y sin código del estilo Xbox: resumen con barra de progreso, logro destacado con su rareza y fecha, y cuadrícula de iconos redondos. En la sección Logros, Intro abre directamente la pestaña de logros del juego.
+- **Pestañas de la ficha** propias del estilo (Actividad, Logros, Multimedia, Información), fijas arriba al desplazarse.
+- **Ajustes** con categorías a la izquierda, filas a la derecha e interruptores azules.
+- **Cuadrícula de la Biblioteca** fluida: ocupa todo el ancho en cualquier proporción de pantalla (16:9, 16:10, panorámica).
+
+## 1.84.91 · Big Picture (segunda parte): menú lateral y ficha del juego
+
+- **F1** abre el menú lateral de Big Picture (Inicio, Biblioteca, Buscar, Logros, Colecciones, Parámetros, Iniciar/Apagar) con el submenú de energía y salida.
+- **Ficha del juego** rediseñada: banner con el logo, barra Jugar / Última sesión / Tiempo de juego / Logros, botones de favorito y opciones, y pestañas ACTIVIDAD, LOGROS, GALERÍA e INFORMACIÓN SOBRE EL JUEGO (LB/RB cambian de pestaña).
+- Los menús contextuales usan el estilo Big Picture.
+- Pendiente: Ajustes, Colecciones y extras de Inicio.
+
+## 1.84.90 · Nuevo estilo «Steam Big Picture (oscuro)» (primera parte)
+
+- Nuevo estilo en Ajustes → Estilo de interfaz. Se hizo midiendo el video de referencia de Big Picture (a 1600×900).
+- **Barra superior:** búsqueda, campana, red, batería, hora (9:38 a.m.) y foto de perfil con su marca azul. En la biblioteca, campo «Buscar juegos o perfiles…» a la izquierda.
+- **Pestañas de la biblioteca:** Todos los juegos, Instalados, Colecciones, Favoritos, Recientes y Más jugados, con contador y las teclas Q / E a los lados. La activa se ve blanca un momento y luego gris, como en Steam. No aparecen en Inicio ni en Ajustes.
+- **Barra inferior:** «Menú» a la izquierda, el resto a la derecha, con teclas blancas y los nombres de Steam (Seleccionar, Atrás…).
+- **Inicio:** «Jugados recientemente» con portadas de 2:3, marco crema en la marcada y nombre + dato debajo. Gratis, eventos y ofertas como tarjetas con fecha arriba y pie gris, bajo una píldora de título.
+- **Biblioteca:** cuadrícula de 6 columnas con panel gris detrás de la portada marcada, sin nombres encima.
+- Pendiente: menú lateral (F1), ficha del juego, Ajustes con panel a la izquierda, menú de opciones y Colecciones como mosaicos.
+
+## 1.84.89 · Menos carga mientras juegas
+
+- El seguimiento del juego consultaba todos los procesos de Windows (PowerShell + WMI) cada 5 s, lo que causaba pequeños tirones de FPS. Ahora, con el juego ya detectado y sus procesos vivos, lo repite solo cada 30 s (al cerrarse el juego se detecta igual de rápido).
+- Los PowerShell de segundo plano (vigilante de ventana, lectura del mando) corren con prioridad baja.
+
+## 1.84.88 · Arranque: sin destello blanco y sin paso extra en `npm start`
+
+- Al abrir, la ventana esperaba muy poco tras maximizarse y se veía un destello blanco antes de pintar. Ahora espera a que se redibuje.
+- `npm start` ya no ejecuta el generador de `couch.js` (el archivo ya viene generado). Si editas `renderer/couch/*.js`, corre `npm run couch`.
+
+## 1.84.87 · Inicio (Xbox 360): la tarjeta marcada es la que se abre
+- En Inicio, al abrir una tarjeta (Enter, clic, y también Jugar/Menú/Favorito) a veces se abría otro juego distinto del marcado. Ocurría porque las tarjetas se rotan en cada entrada al modo consola pero el índice interno de cada una no se actualizaba. Ahora cada tarjeta guarda su posición real y al abrir se usa exactamente la tarjeta marcada.
+
+## 1.84.86 · Buscar vuelve a ir primero en Xbox 360
+- Si el estilo Xbox 360 se aplicaba con el modo consola ya abierto (cambiando de estilo en Ajustes, o al cargarse los ajustes después de entrar), las secciones se quedaban en el orden del estilo clásico (Inicio, Buscar…). Ahora se reordenan al instante al cambiar de estilo: en Xbox 360 Buscar va primero y después Inicio.
+
+## 1.84.85 · `couch.js` dividido en partes (sin cambios visibles)
+- El código del modo consola, que vivía en un solo archivo de unas 1.750 líneas, ahora está repartido por tema en `renderer/couch/` (base, estructura, sonidos, cabecera, lista, inicio, buscar, acciones, menús, guía, perfil, sistema, ficha, ficha Xbox 360, ajustes, entrada y entrar/salir).
+- `renderer/couch.js` sigue existiendo y es el que carga la app: se **genera** uniendo las partes (`npm run couch`; `npm start` y los `npm run dist…` lo hacen solos antes de arrancar). No se edita a mano. El resultado es idéntico byte a byte al archivo anterior, así que el programa se comporta igual.
+- `node tools/build-couch.js --check` comprueba que `couch.js` esté al día.
+- Los archivos de `renderer/couch/` y `tools/` no se incluyen en el instalador.
+
 ## 1.84.84 · La Guía no se corta
 - La Guía (Xbox 360) es más ancha en ventanas estrechas o cuadradas (mínimo 1060 px, hasta el 94 % de la ventana) y las pestañas laterales son más finas, así que los textos de «Mi perfil» y «Logros» ya no salen cortados con «…» ni la vista previa queda aplastada.
 

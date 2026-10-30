@@ -1,7 +1,11 @@
 // Seguimiento del juego en ejecución (para el overlay): detecta sus procesos por la carpeta del juego
 // y puede cerrarlos. Solo Windows. Nunca toca procesos fuera de la carpeta del juego.
 const path = require('path');
+const os = require('os');
 const { execFile } = require('child_process');
+
+// Los PowerShell de segundo plano van con prioridad baja para no quitarle CPU al juego
+function lowPrio(child) { try { if (child && child.pid) os.setPriority(child.pid, os.constants.priority.PRIORITY_BELOW_NORMAL); } catch {} return child; }
 
 // WMI (en vez de Get-Process) da la ruta también de los procesos protegidos (anti-trampas, administrador)
 const LIST_SCRIPT =
@@ -13,8 +17,8 @@ const LIST_SCRIPT =
 
 function powershell(script) {
   return new Promise((resolve, reject) => {
-    execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script],
-      { windowsHide: true, maxBuffer: 16 * 1024 * 1024, timeout: 20000 }, (err, out) => (err ? reject(err) : resolve(out)));
+    lowPrio(execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script],
+      { windowsHide: true, maxBuffer: 16 * 1024 * 1024, timeout: 20000 }, (err, out) => (err ? reject(err) : resolve(out))));
   });
 }
 
@@ -80,6 +84,10 @@ function createTracker({ list = listProcesses, kill = killPid, onEnd = () => {},
 
   async function tick() {
     if (!active) return;
+    // Consultar todos los procesos (WMI) cuesta CPU y se nota como tirón en el juego: con el juego ya visto y sus procesos vivos, solo se repite cada 30 s
+    const known = [...active.pids, ...active.extra];
+    if (active.seen && known.length && known.some(alive) && now() - (active.lastFull || 0) < 30000) { active.misses = 0; return; }
+    active.lastFull = now();
     let found;
     try { found = await matching(); } catch { return; } // si falla la consulta, no contamos nada
     if (!active) return;
@@ -138,4 +146,4 @@ function createTracker({ list = listProcesses, kill = killPid, onEnd = () => {},
   return { track, addPid, tick, closeGame, stop, get active() { return active; } };
 }
 
-module.exports = { createTracker, safeDir, under, gameDir, listProcesses };
+module.exports = { lowPrio, createTracker, safeDir, under, gameDir, listProcesses };

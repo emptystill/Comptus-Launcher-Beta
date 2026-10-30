@@ -53,6 +53,7 @@ const { createSaves } = require('./saves');
 const disksize = require('./disksize');
 const freegames = require('./freegames');
 const wishlist = require('./wishlist');
+const { fetchFriends, fetchFriendDetail, fetchOwners } = require('./friends');
 const sgdb = require('./steamgriddb');
 const eventsMod = require('./events');
 let diskStoreMem = null;
@@ -584,6 +585,79 @@ async function checkWishNotify() {
   } catch (e) { if (process.env.COMPTUS_DEBUG) console.error('wish check', e); return 0; }
 }
 ipcMain.handle('wish:check', () => checkWishNotify());
+ipcMain.handle('friends:open', async (_e, url) => {
+  if (!/^https:\/\/steamcommunity\.com\/(id|profiles)\/[\w-]+\/?$/.test(String(url))) return { ok: false };
+  try { await shell.openExternal('steam://openurl/' + url); return { ok: true, via: 'app' }; } catch { /* a la web */ }
+  await shell.openExternal(url); return { ok: true, via: 'web' };
+});
+// Amigos de Steam: se consulta como mucho cada 2 min (o al forzar)
+let friendsMem = null, friendsBusy = null;
+ipcMain.handle('friends:get', async (_e, force) => {
+  try {
+    if (!force && friendsMem && Date.now() - friendsMem.at < 2 * 60 * 1000) return friendsMem.res;
+    if (!friendsBusy) friendsBusy = (async () => {
+      const st = loadStore();
+      let sid = null; try { sid = await resolveSteamId(st.settings); } catch { /* sin Steam */ }
+      const res = await fetchFriends({ steamId: sid, key: st.settings.steamKey, getJson });
+      friendsMem = { at: Date.now(), res };
+      return res;
+    })().finally(() => { friendsBusy = null; });
+    return await friendsBusy;
+  } catch (e) { return { ok: false, code: 'net', error: String((e && e.message) || e) }; }
+});
+
+// Perfil de Steam propio (avatar, nombre, estado, nivel, código de amigo y cuenta local)
+let profMem = null;
+ipcMain.handle('profile:get', async (_e, force) => {
+  try {
+    if (!force && profMem && Date.now() - profMem.at < 60 * 1000) return profMem.res;
+    const st = loadStore(); const key = String(st.settings.steamKey || '').trim();
+    let sid = null; try { sid = await resolveSteamId(st.settings); } catch { /* sin Steam */ }
+    if (!sid) return { ok: false, code: 'nosteam' };
+    const out = { ok: true, id: String(sid), friendCode: String(BigInt(sid) - 76561197960265728n), account: '', name: '', avatar: '', state: 0, level: null, url: 'https://steamcommunity.com/profiles/' + sid, hasKey: !!key };
+    try { if (steamPathCache === undefined) steamPathCache = await findSteamPath().catch(() => null); if (steamPathCache) { const t = fs.readFileSync(path.join(steamPathCache, 'config', 'loginusers.vdf'), 'utf8'); const re = /"(\d{17})"\s*\{([^}]*)\}/g; let mm; while ((mm = re.exec(t))) if (mm[1] === String(sid)) { const a = /"AccountName"\s+"([^"]*)"/.exec(mm[2]), p = /"PersonaName"\s+"([^"]*)"/.exec(mm[2]); out.account = a ? a[1] : ''; out.name = p ? p[1] : ''; } } } catch { /* sin loginusers */ }
+    if (key) {
+      try { const r = await getJson(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${encodeURIComponent(key)}&steamids=${sid}`); const p = r && r.response && r.response.players && r.response.players[0]; if (p) { out.name = p.personaname || out.name; out.avatar = p.avatarfull || p.avatarmedium || ''; out.state = Number(p.personastate) || 0; out.url = p.profileurl || out.url; } } catch { /* sin red */ }
+      try { const r = await getJson(`https://api.steampowered.com/IPlayerService/GetSteamLevel/v1/?key=${encodeURIComponent(key)}&steamid=${sid}`); if (r && r.response && r.response.player_level != null) out.level = Number(r.response.player_level); } catch { /* privado */ }
+    }
+    profMem = { at: Date.now(), res: out }; return out;
+  } catch { return { ok: false, code: 'net' }; }
+});
+const PROFILE_ACTIONS = {
+  funds: 'https://store.steampowered.com/steamaccount/addfunds', privacy: 'https://steamcommunity.com/my/edit/settings', account: 'https://store.steampowered.com/account',
+  addfriend: 'steam://friends/add', 'status:online': 'steam://friends/status/online', 'status:away': 'steam://friends/status/away', 'status:busy': 'steam://friends/status/busy', 'status:invisible': 'steam://friends/status/invisible', 'status:offline': 'steam://friends/status/offline',
+};
+ipcMain.handle('profile:action', async (_e, act) => {
+  try {
+    const u = PROFILE_ACTIONS[String(act)]; if (!u) return { ok: false };
+    if (/^steam:\/\//.test(u)) { await shell.openExternal(u); return { ok: true }; }
+    try { await shell.openExternal('steam://openurl/' + u); return { ok: true, via: 'app' }; } catch { await shell.openExternal(u); return { ok: true, via: 'web' }; }
+  } catch { return { ok: false }; }
+});
+const friendDetailMem = new Map(), ownersMem = new Map();
+ipcMain.handle('friends:detail', async (_e, id) => {
+  try {
+    id = String(id || ''); if (!/^\d{5,20}$/.test(id)) return { ok: false };
+    const c = friendDetailMem.get(id); if (c && Date.now() - c.at < 5 * 60 * 1000) return c.res;
+    const key = loadStore().settings.steamKey; if (!String(key || '').trim()) return { ok: false, code: 'nokey' };
+    const res = await fetchFriendDetail({ id, key, getJson }); friendDetailMem.set(id, { at: Date.now(), res }); return res;
+  } catch { return { ok: false }; }
+});
+ipcMain.handle('friends:owners', async (_e, appid) => {
+  try {
+    appid = Number(appid); if (!appid) return { ok: false };
+    const c = ownersMem.get(appid); if (c && Date.now() - c.at < 10 * 60 * 1000) return c.res;
+    const st = loadStore(); const key = st.settings.steamKey; if (!String(key || '').trim()) return { ok: false, code: 'nokey' };
+    let fr = friendsMem && friendsMem.res && friendsMem.res.ok ? friendsMem.res : null;
+    if (!fr) { let sid = null; try { sid = await resolveSteamId(st.settings); } catch { /* sin Steam */ } fr = await fetchFriends({ steamId: sid, key, getJson }); friendsMem = { at: Date.now(), res: fr }; }
+    if (!fr.ok) return fr;
+    const res = await fetchOwners({ appid, friends: fr.friends, key, getJson }); ownersMem.set(appid, { at: Date.now(), res }); return res;
+  } catch { return { ok: false }; }
+});
+ipcMain.handle('friends:chat', async (_e, id) => {
+  if (!/^\d{5,20}$/.test(String(id))) return { ok: false };
+  try { await shell.openExternal('steam://friends/message/' + id); return { ok: true }; } catch { return { ok: false }; }
+});
 
 // ---------- Eventos y rebajas ----------
 const EVENTS_URL = 'https://raw.githubusercontent.com/emptystill/Comptus-Launcher-Beta/main/events.json';
@@ -2038,6 +2112,7 @@ function showPanel() {
 let padWin = null, padWinMode = null;
 const padMode = () => { const m = loadStore().settings.padOverlay; return ['selstart', 'sela', 'l3r3', 'guide', 'custom', 'off'].includes(m) ? m : 'selstart'; };
 const padBtns = () => { const b = loadStore().settings.padOverlayBtns; return Array.isArray(b) ? b.filter((n) => Number.isInteger(n) && n >= 0 && n < 32).slice(0, 3) : []; };
+const lowPrioProc = (c) => { try { if (c && c.pid) require('os').setPriority(c.pid, require('os').constants.priority.PRIORITY_BELOW_NORMAL); } catch {} };
 function stopPadWin() { try { if (padWin && !padWin.isDestroyed()) padWin.destroy(); } catch {} padWin = null; padWinMode = null; }
 function stopPadWatch() { stopXi(); stopPadWin(); stopNav(); }
 function syncPadWatch() {
@@ -2123,7 +2198,7 @@ function syncXi() {
   stopXi();
   try {
     xiKey = key;
-    xiProc = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(xiScript(btns), 'utf16le').toString('base64')], { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    xiProc = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(xiScript(btns), 'utf16le').toString('base64')], { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] }); lowPrioProc(xiProc);
     xiProc.stdout.on('data', (d) => {
       xiBuf += d.toString('utf8'); let i;
       while ((i = xiBuf.indexOf('\n')) >= 0) {
@@ -2394,7 +2469,7 @@ function fgChanged(p, pid) {
 function startFgWatch() {
   if (fgProc || process.platform !== 'win32' || !overlayOn()) return;
   try {
-    fgProc = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(FG_LOOP, 'utf16le').toString('base64')], { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+    fgProc = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(FG_LOOP, 'utf16le').toString('base64')], { windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] }); lowPrioProc(fgProc);
     dlog('vigilante de ventana activa iniciado');
     let errN = 0; fgProc.stderr.on('data', (d) => { if (!String(d).startsWith('#<') && errN++ < 3) dlog('PowerShell: ' + String(d).trim().slice(0, 300)); });
     fgProc.stdout.on('data', (d) => {
@@ -2731,7 +2806,8 @@ function deployMain(done) {
   const pendingMaxHad = pendingMax;
   try { win.setOpacity(0); win.show(); if (pendingMax) { pendingMax = false; win.maximize(); } } catch { try { win.show(); } catch {} return done(); }
   const wasMax = !!pendingMaxHad;
-  setTimeout(startFade, wasMax ? 180 : 40); // tras maximizar, la página necesita un instante para redibujarse antes de verse
+  try { win.webContents.invalidate(); } catch {}
+  setTimeout(startFade, wasMax ? 380 : 40); // tras maximizar, la página necesita un instante para redibujarse (si no, se ve un destello blanco)
   let t0 = 0, closed = false;
   function startFade() { t0 = Date.now(); tickLoop(); }
   function tickLoop() {
