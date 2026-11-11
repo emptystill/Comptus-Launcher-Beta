@@ -55,6 +55,8 @@ Necesita la **clave de la API de Steam** (Ajustes) y que tu lista de amigos y tu
 ## Rendimiento y arranque
 - Menos carga mientras juegas: el seguimiento del juego, que consultaba todos los procesos de Windows cada 5 s y causaba pequeños tirones de FPS, ahora se repite cada 30 s con el juego ya detectado. Los procesos de segundo plano (vigilante de ventana, lectura del mando) corren con prioridad baja.
 - **Menos consumo:** la consulta de instalaciones en curso solo relee los archivos de Steam/Epic que cambiaron y se espacia a 8 s cuando no hay nada instalándose; en modo consola la música de Windows se consulta cada 10 s (antes 2 s); y los vigilantes de mando de PowerShell comprueban cada 1 s, en lugar de 25 veces por segundo, mientras no haya un mando conectado.
+- **Sin foco, menos gráfica:** con Comptus minimizado o sin la ventana activa se congelan las animaciones CSS y, según el ajuste de portadas animadas, estas vuelven a su imagen fija.
+- **Inicio con Windows:** Comptus reconoce y limpia las entradas de arranque duplicadas o antiguas (`electron.app.Comptus`, `com.mateo.gamelauncher`) y deja una sola, `Comptus`. Antes el ajuste podía aparecer apagado y aun así abrirse al encender el PC.
 - El arranque ya no muestra un destello blanco al abrir y `npm start` no ejecuta el generador de `couch.js`.
 - Steam Big Picture: el fondo del Inicio ya no repinta con cada cuadro (sin `filter`/`mask` animados), se precargan las tarjetas vecinas y se usa la copia fija del banner para evitar el lag con banners animados enormes.
 
