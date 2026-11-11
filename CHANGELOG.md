@@ -1138,13 +1138,15 @@ El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derech
 - Se quita la función **Partidas guardadas** (panel en la ficha, copia automática al cerrar el juego, base de datos Ludusavi y su apartado en Configuración): en muchos juegos no estaba claro dónde guardan y confundía más de lo que ayudaba. La **Copia de seguridad** de Comptus (ajustes, colecciones, temas) sigue igual. Ya no hace falta la dependencia `yaml`.
 - Con `npm start`, las notificaciones de Windows ya salen como «Comptus» y no como «electron.app.Electron» (la versión instalada ya lo hacía bien).
 
-## 1.84.100
+## 1.84.101
 - Con «Iniciar con Windows» apagado, al abrir Comptus se borran las entradas de arranque antiguas (`electron.app.Comptus`, `com.mateo.gamelauncher`) que dejaban versiones anteriores y podían seguir abriéndolo al encender el PC.
 - Menos tirones en otras apps (p. ej. un fondo animado): cuando Comptus no tiene el foco o está minimizado, se congelan las animaciones CSS y, con la animación de portadas en «pocas», las portadas animadas vuelven a su imagen fija.
 - Inicio con Windows: Comptus ya no puede aparecer duplicado en «Aplicaciones de arranque». Al guardar el ajuste (y al abrir, si está activado) se borran las entradas duplicadas (`electron.app.Comptus`, `com.mateo.gamelauncher`, otros nombres/argumentos) y se deja una sola, llamada «Comptus».
 - Menos consumo de recursos: (1) la consulta de instalaciones en curso (Steam/Epic) ya no relee todos los `appmanifest`/`.item` cada vez, solo los que cambiaron, y se hace cada 8 s en lugar de 2,5 s cuando no hay nada instalándose (modo consola y escritorio); (2) con el modo consola abierto, la música de Windows se consulta cada 10 s en lugar de cada 2 s (ya no hay barra de música); (3) los vigilantes de mando (XInput) comprueban cada 1 s, en vez de 25 veces por segundo, cuando no hay ningún mando conectado.
 - Modo escritorio: el cambio de tamaño al cambiar de pantalla ya no es brusco: cada portada viaja de su posición y tamaño anteriores a los nuevos, con un ligero rebote al asentarse y sin parpadeo (respeta «reducir movimiento» de Windows).
 - Modo escritorio: el tamaño de las portadas se recuerda **por pantalla** (resolución + orientación). Si mueves la ventana a otro monitor o lo giras (horizontal/vertical), se aplica solo el tamaño que dejaste en esa pantalla; en una pantalla nueva se conserva el actual y desde ahí queda guardado.
+
+## 1.84.100
 - Steam Big Picture: el panel de Notificaciones (y los demás paneles de la derecha) empieza más abajo para no quedar pegado a los iconos de arriba.
 - Steam Big Picture: el menú lateral (F1) y los paneles laterales ocupan toda la altura de la pantalla (antes quedaban cortados arriba y abajo); la entrada del perfil se llama «Mi perfil».
 - Steam Big Picture: la foto de la esquina superior derecha usa tu foto de Steam (si hay clave de API y se pudo leer el perfil); si no, la de Comptus.

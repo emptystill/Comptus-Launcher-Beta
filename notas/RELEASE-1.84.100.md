@@ -49,14 +49,8 @@ Necesita la **clave de la API de Steam** (Ajustes) y que tu lista de amigos y tu
 ## Todos los modos consola
 - Se quita la barra superior de «lo que suena» (♪ título — artista) en todos los temas. Los controles de música siguen en el menú del sistema.
 
-## Modo escritorio
-- **Tamaño de las portadas por pantalla:** se recuerda según la pantalla (resolución + orientación). Al mover la ventana a otro monitor o girarlo (horizontal/vertical), el tamaño cambia solo al que dejaste en esa pantalla; en una pantalla nueva se conserva el actual y desde ahí queda guardado. Dos monitores con la misma resolución y orientación comparten tamaño.
-
 ## Rendimiento y arranque
 - Menos carga mientras juegas: el seguimiento del juego, que consultaba todos los procesos de Windows cada 5 s y causaba pequeños tirones de FPS, ahora se repite cada 30 s con el juego ya detectado. Los procesos de segundo plano (vigilante de ventana, lectura del mando) corren con prioridad baja.
-- **Menos consumo:** la consulta de instalaciones en curso solo relee los archivos de Steam/Epic que cambiaron y se espacia a 8 s cuando no hay nada instalándose; en modo consola la música de Windows se consulta cada 10 s (antes 2 s); y los vigilantes de mando de PowerShell comprueban cada 1 s, en lugar de 25 veces por segundo, mientras no haya un mando conectado.
-- **Sin foco, menos gráfica:** con Comptus minimizado o sin la ventana activa se congelan las animaciones CSS y, según el ajuste de portadas animadas, estas vuelven a su imagen fija.
-- **Inicio con Windows:** Comptus reconoce y limpia las entradas de arranque duplicadas o antiguas (`electron.app.Comptus`, `com.mateo.gamelauncher`) y deja una sola, `Comptus`. Antes el ajuste podía aparecer apagado y aun así abrirse al encender el PC.
 - El arranque ya no muestra un destello blanco al abrir y `npm start` no ejecuta el generador de `couch.js`.
 - Steam Big Picture: el fondo del Inicio ya no repinta con cada cuadro (sin `filter`/`mask` animados), se precargan las tarjetas vecinas y se usa la copia fija del banner para evitar el lag con banners animados enormes.
 
@@ -67,7 +61,6 @@ Necesita la **clave de la API de Steam** (Ajustes) y que tu lista de amigos y tu
 ## Interno
 - `renderer/couch.js` ahora se **genera** a partir de las partes de `renderer/couch/` (`node tools/build-couch.js`; `--check` comprueba que esté al día; `npm run couch`). No se edita a mano. Esas partes y `tools/` no van en el instalador.
 - Nuevo `friends.js` (amigos, ficha de amigo y propietarios de un juego) y nuevas llamadas en `main.js` / `preload.js` para amigos y perfil.
-- Se elimina `community.json`, un catálogo de proyectos que ya no se usaba. La sección Comunidad sigue igual.
 
 ## Qué no incluye / límites
 - Steam no da por su API pública: chat dentro de Comptus, feed de actividad, invitaciones, «No molestar», saldo de la cuenta ni listas de deseados de otros usuarios. Tampoco están las pestañas «Comunidad» ni la sección de cromos de Big Picture.
