@@ -609,7 +609,7 @@ function perfReport() {
 }
 
 // ---------- Transiciones suaves ----------
-let couchStart = false, transitions = true, lastViewKey = null, padOn = true, saveAuto = true, saveKeep = 5;
+let couchStart = false, transitions = true, lastViewKey = null, padOn = true;
 function playIn(target) {
   if (!transitions) return;
   const e = typeof target === 'string' ? document.querySelector(target) : target;
@@ -2270,8 +2270,6 @@ function renderDetail() {
   mine.append(mineHead, mineBody);
   fillMyShots(g, mineBody);
 
-  mainCol.append(savesPanel(g));
-
   const notesPanel = el('div', 'panel');
   notesPanel.append(el('h3', null, 'Notas'));
   const ta = el('textarea');
@@ -2335,93 +2333,6 @@ function renderDetail() {
   body.append(mainCol, sideCol);
   box.replaceChildren(hero, bar, body);
 }
-
-// ---------- Partidas guardadas ----------
-const fmtWhen = (ms) => new Date(ms).toLocaleString([], { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-function savesPanel(g) {
-  const panel = el('div', 'panel');
-  const head = el('div', 'panel-head');
-  head.append(el('h3', null, 'Partidas guardadas'));
-  const now = el('button', 'small', '[[download]] Copiar ahora');
-  const open = el('button', 'ghost small', '[[folderOpen]] Carpeta de copias');
-  open.onclick = async () => { const r = await window.api.savesOpenFolder(g.id); if (!r.ok) toast(r.error || 'No se pudo abrir la carpeta'); };
-  head.append(now, open);
-  const body = el('div');
-  panel.append(head, body);
-  let confirmId = null, confirmT;
-  const paint = (r) => {
-    body.replaceChildren();
-    if (!r || !r.ok) { body.append(el('p', 'hint', (r && r.error) || 'No se pudo leer la información de guardados.')); now.disabled = true; return; }
-    const known = r.known && r.paths.length;
-    now.disabled = !known;
-    if (!r.db.ready && !r.known) {
-      body.append(el('p', 'hint', r.db.building ? 'Descargando la base de datos de guardados… vuelve en un minuto.' : 'Aún no tengo la base de datos que dice dónde guarda cada juego su progreso. Se descarga sola, o puedes hacerlo ahora.' + (r.db.error ? ' Último intento fallido: ' + r.db.error : '')));
-      if (!r.db.building) { const b = el('button', 'small', '[[download]] Descargar ahora'); b.onclick = async () => { b.disabled = true; b.textContent = 'Descargando… (puede tardar un minuto)'; const u = await window.api.savesUpdate(true); toast(u.ok ? 'Base de guardados lista' : u.error, 5000); load(); }; body.append(b); }
-    } else if (!r.known) body.append(el('p', 'hint', 'No conozco dónde guarda este juego su progreso. Indícalo tú con «Añadir carpeta» (o «Añadir archivo») y Comptus lo copiará igual que al resto.'));
-    else if (!r.paths.length) body.append(el('p', 'hint', `Conozco el juego (${r.name}) pero aún no hay archivos de guardado en tu equipo. Se copiarán cuando juegues.`));
-    else {
-      body.append(el('p', 'hint', `${r.files} archivo${r.files === 1 ? '' : 's'} de guardado (${fmtBytes(r.bytes)}) en:`));
-      for (const p of r.paths.slice(0, 4)) { const row = el('div', 'dvalue path', p); row.title = 'Abrir esta ubicación'; row.style.cursor = 'pointer'; row.onclick = () => window.api.savesOpenPath(p); body.append(row); }
-      if (r.paths.length > 4) body.append(el('p', 'hint', `…y ${r.paths.length - 4} más.`));
-    }
-    const addRow = el('div', 'row');
-    const addDir = el('button', 'small ghost', '[[plus]] Añadir carpeta'); addDir.title = 'Indica tú dónde guarda este juego su progreso';
-    const addFile = el('button', 'small ghost', '[[plus]] Añadir archivo');
-    addDir.onclick = async () => { const x = await window.api.savesAddPath(g.id, 'dir'); if (x && x.error) toast(x.error); load(); };
-    addFile.onclick = async () => { const x = await window.api.savesAddPath(g.id, 'file'); if (x && x.error) toast(x.error); load(); };
-    const find = el('button', 'small', '[[search]] Buscar guardados');
-    find.title = 'Busca carpetas y archivos que parezcan partidas guardadas de este juego';
-    const sugBox = el('div', 'saves-list');
-    find.onclick = async () => {
-      find.disabled = true; find.textContent = 'Buscando…';
-      const x = await window.api.savesSuggest(g.id);
-      find.disabled = false; rich(find, '[[search]] Buscar guardados');
-      sugBox.replaceChildren();
-      if (!x.ok) { sugBox.append(el('p', 'hint', x.error)); return; }
-      if (!x.list.length) { sugBox.append(el('p', 'hint', 'No encontré nada que parezca una partida guardada. Juega al menos un minuto, guarda la partida y ciérralo: Comptus mirará qué archivos cambiaron y te lo propondrá. Si sabes dónde está, usa «Añadir carpeta».')); return; }
-      sugBox.append(el('p', 'hint', 'Esto es lo que encontré. Lo marcado «cambió mientras jugabas» es lo más fiable. Añade solo lo que sea de verdad el progreso del juego:'));
-      for (const c of x.list) {
-        const row = el('div', 'saves-row'); const t = el('div', 'saves-txt');
-        t.append(el('div', 'saves-when', c.path), el('div', 'hint', `${c.dir ? 'Carpeta' : 'Archivo'} · ${c.files} archivo${c.files === 1 ? '' : 's'} · ${fmtBytes(c.bytes)} · modificado ${fmtWhen(c.mtime)} · ${c.why}`));
-        const add = el('button', 'small', 'Añadir'); add.onclick = async () => { await window.api.savesAddSuggested(g.id, c.path); load(); };
-        const open = el('button', 'small ghost', '[[folderOpen]]'); open.title = 'Ver en el Explorador'; open.onclick = () => window.api.savesOpenPath(c.dir ? c.path : c.path.replace(/[\\/][^\\/]*$/, ''));
-        row.append(t, open, add); sugBox.append(row);
-      }
-    };
-    addRow.append(find, addDir, addFile); body.append(addRow, sugBox);
-    for (const p of r.custom || []) {
-      const row = el('div', 'saves-row'); const t = el('div', 'saves-txt'); t.append(el('div', 'hint', 'Tuya: ' + p)); row.append(t);
-      const del = el('button', 'small ghost', '[[x]]'); del.title = 'Quitar esta ruta'; del.onclick = async () => { await window.api.savesRemovePath(g.id, p); load(); };
-      row.append(del); body.append(row);
-    }
-    if (r.backups.length) {
-      const list = el('div', 'saves-list');
-      for (const b of r.backups) {
-        const row = el('div', 'saves-row');
-        const txt = el('div', 'saves-txt');
-        txt.append(el('div', 'saves-when', fmtWhen(b.date)), el('div', 'hint', `${fmtBytes(b.bytes)} · ${b.files} archivo${b.files === 1 ? '' : 's'}${b.note ? ' · ' + b.note : ''}`));
-        row.append(txt);
-        const rest = el('button', 'small ghost', 'Restaurar');
-        rest.onclick = async () => {
-          if (confirmId !== b.id) { confirmId = b.id; clearTimeout(confirmT); confirmT = setTimeout(() => { confirmId = null; rest.textContent = 'Restaurar'; }, 4000); rest.textContent = '¿Seguro? Pulsa otra vez'; return; }
-          const res = await window.api.savesRestore(g.id, b.id);
-          toast(res.ok ? 'Partida restaurada' + (res.safety ? ' (antes se copió la actual)' : '') : res.error, 4000); load();
-        };
-        const del = el('button', 'small ghost', '[[x]]'); del.title = 'Borrar esta copia';
-        del.onclick = async () => { await window.api.savesRemove(g.id, b.id); load(); };
-        row.append(rest, del); list.append(row);
-      }
-      body.append(list);
-    } else if (known) body.append(el('p', 'hint', 'Aún no hay copias. Se hacen solas al cerrar el juego, o pulsa «Copiar ahora».'));
-  };
-  const load = async () => { try { paint(await window.api.savesInfo(g.id)); } catch { paint(null); } };
-  now.onclick = async () => { now.disabled = true; const r = await window.api.savesBackup(g.id); toast(r.ok ? (r.fresh ? 'Copia hecha' : 'Sin cambios desde la última copia') : r.error, 4000); load(); };
-  body.append(el('p', 'hint', 'Buscando guardados…'));
-  load();
-  return panel;
-}
-window.api.onSavesHint && window.api.onSavesHint((d) => toast(`Detecté dónde guarda «${d.name}» su progreso: míralo en «Partidas guardadas» de su ficha`, 6000));
-window.api.onSavesDone && window.api.onSavesDone((d) => toast(`Partida de «${d.name}» copiada`, 3000));
 
 // ---------- Mis capturas ----------
 // ---------- Tráiler ----------
@@ -3185,7 +3096,6 @@ function syncThemeModal() {
   $('#vidPauseBlur').checked = vidPauseBlur; $('#vidPauseBattery').checked = vidPauseBattery; $('#vidNoBlur').checked = vidNoBlur;
   $('#transitions').checked = transitions;
   $('#sysPad').checked = padOn; $('#couchStart').checked = couchStart;
-  $('#saveAuto').checked = saveAuto; $('#saveKeep').value = saveKeep; showSaveDb();
   $('#autoTrailer').checked = autoTrailer;
   $('#animMode').value = animMode;
   $('#rawgKey').value = rawgKey;
@@ -3800,10 +3710,6 @@ $('#autoTrailer').onchange = (e) => { autoTrailer = e.target.checked; window.api
 $('#couchBtn').onclick = () => Couch.toggle();
 $('#couchStart').onchange = (e) => window.api.setSettings({ couchStart: e.target.checked });
 document.addEventListener('keydown', (e) => { if (e.key === 'F10' && !e.ctrlKey && !e.altKey) { e.preventDefault(); Couch.toggle(); } });
-$('#saveAuto').onchange = (e) => window.api.setSettings({ saveAuto: e.target.checked });
-$('#saveKeep').onchange = (e) => { const v = Math.max(1, Math.min(30, parseInt(e.target.value, 10) || 5)); e.target.value = v; window.api.setSettings({ saveKeep: v }); };
-async function showSaveDb() { try { const d = await window.api.savesDb(); $('#saveDbMsg').textContent = d.ready ? `Base de guardados: ${d.count} juegos · actualizada el ${new Date(d.built).toLocaleDateString()}. Las copias van a «Comptus Media > Partidas guardadas»; es una copia local, no toca la nube de ninguna tienda.` : (d.building ? 'Descargando la base de guardados…' : 'La base de guardados aún no está descargada (se descarga sola, o pulsa el botón).'); } catch {} }
-$('#saveDb').onclick = async () => { const b = $('#saveDb'); b.disabled = true; $('#saveDbMsg').textContent = 'Descargando… puede tardar uno o dos minutos.'; const r = await window.api.savesUpdate(true); b.disabled = false; if (!r.ok) $('#saveDbMsg').textContent = r.error; else showSaveDb(); };
 $('#sysPad').onchange = (e) => { padOn = e.target.checked; window.api.setSettings({ gamepad: e.target.checked }); if (window.Pad) window.Pad.setEnabled(e.target.checked); };
 $('#transitions').onchange = (e) => { transitions = e.target.checked; window.api.setSettings({ transitions }); if (transitions) playIn('#grid'); };
 $('#autoBackground').onchange = (e) => { autoBackground = e.target.checked; window.api.setSettings({ autoBackground }); toast(autoBackground ? 'Se completará en segundo plano al abrir el lanzador' : 'Descarga en segundo plano desactivada'); };
@@ -4122,7 +4028,6 @@ window.api.gameState().then(applyRunState).catch(() => {});
   autoCollBg = !!(s && s.autoCollBg);
   vidPauseBlur = !(s && s.vidPauseBlur === false); vidPauseBattery = !(s && s.vidPauseBattery === false); vidNoBlur = !!(s && s.vidNoBlur);
   boxTransp = Math.max(0, Math.min(70, parseInt(s && s.boxTransp, 10) || 0)); applyBoxTransp();
-  saveAuto = !(s && s.saveAuto === false); saveKeep = (s && parseInt(s.saveKeep, 10)) || 5;
   couchStart = !!(s && s.couchStart);
   window.__couchCfg = (s && s.couch) || null; // couch.js puede cargarse después de esto: lo recoge al iniciar
   if (window.Couch) Couch.configure(window.__couchCfg);

@@ -1134,6 +1134,10 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.102
+- Se quita la función **Partidas guardadas** (panel en la ficha, copia automática al cerrar el juego, base de datos Ludusavi y su apartado en Configuración): en muchos juegos no estaba claro dónde guardan y confundía más de lo que ayudaba. La **Copia de seguridad** de Comptus (ajustes, colecciones, temas) sigue igual. Ya no hace falta la dependencia `yaml`.
+- Con `npm start`, las notificaciones de Windows ya salen como «Comptus» y no como «electron.app.Electron» (la versión instalada ya lo hacía bien).
+
 ## 1.84.100
 - Con «Iniciar con Windows» apagado, al abrir Comptus se borran las entradas de arranque antiguas (`electron.app.Comptus`, `com.mateo.gamelauncher`) que dejaban versiones anteriores y podían seguir abriéndolo al encender el PC.
 - Menos tirones en otras apps (p. ej. un fondo animado): cuando Comptus no tiene el foco o está minimizado, se congelan las animaciones CSS y, con la animación de portadas en «pocas», las portadas animadas vuelven a su imagen fija.

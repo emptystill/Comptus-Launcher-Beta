@@ -884,13 +884,6 @@ main.has-bg .bg-layer.wide {
 /* Ahorro de gráfica: sin desenfoque sobre el vídeo de fondo */
 main.vid-noblur.has-bg .bg-layer { filter: none !important; }
 
-/* Partidas guardadas */
-.saves-list { display: flex; flex-direction: column; margin-top: 8px; }
-.saves-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border, rgba(255,255,255,.1)); }
-.saves-txt { flex: 1; min-width: 0; }
-.saves-txt .hint { margin: 2px 0 0; }
-.saves-when { font-size: 13px; font-weight: 600; }
-.saves-row button { flex: 0 0 auto; width: auto; }
 
 /* ---------- Modo consola (colores propios: no usa el tema del lanzador) ---------- */
 #couch { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; overflow: clip; background: var(--cc-bg); color: var(--cc-text); font-size: calc(clamp(14px, 1.45vw, 28px) * var(--cc-font, 1)); font-family: inherit; }

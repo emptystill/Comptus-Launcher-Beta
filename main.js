@@ -49,7 +49,6 @@ async function stopActiveGame() {
 
 // ---------- Persistencia (juegos locales + favoritos, tiempo de juego, etc.) ----------
 const media = require('./media');
-const { createSaves } = require('./saves');
 const disksize = require('./disksize');
 const freegames = require('./freegames');
 const wishlist = require('./wishlist');
@@ -542,7 +541,7 @@ ipcMain.handle('wish:get', async (_e, force) => { try { return await getWish(!!f
 // así que en las notificaciones enseña el identificador interno («com.mateo.gamelauncher»). Se registra aquí el nombre y el icono
 // para ese identificador (HKCU, sin permisos de administrador); vale para el instalador, el portable y la versión instalada ya existente.
 function registerToastIdentity() {
-  if (process.platform !== 'win32' || !app.isPackaged) return;
+  if (process.platform !== 'win32') return; // también con npm start, para que los avisos no salgan como «electron.app.Electron»
   try {
     const key = 'HKCU\\Software\\Classes\\AppUserModelId\\com.mateo.gamelauncher';
     const add = (name, value) => execFile('reg', ['add', key, '/v', name, '/t', 'REG_SZ', '/d', value, '/f'], { windowsHide: true }, () => {});
@@ -2533,83 +2532,7 @@ function logSession(g) { // historial de sesiones (para las estadísticas): solo
     saveStore(store);
   } catch { /* no es crítico */ }
 }
-const gameById = (id) => cache.find((x) => x.id === id);
-ipcMain.handle('saves:info', (_e, id) => { const g = gameById(id); if (!g) return { ok: false, error: 'Juego no encontrado.' }; try { return { ...getSaves().info(g), opts: saveOpts() }; } catch (e) { return { ok: false, error: e.message }; } });
-ipcMain.handle('saves:backup', (_e, id) => { const g = gameById(id); if (!g) return { ok: false, error: 'Juego no encontrado.' }; try { return getSaves().backup(g, { note: 'Manual', force: true, keep: saveOpts().keep }); } catch (e) { return { ok: false, error: e.message }; } });
-ipcMain.handle('saves:restore', (_e, id, bid) => { const g = gameById(id); if (!g) return { ok: false, error: 'Juego no encontrado.' }; if (gameRunning()) return { ok: false, error: 'Cierra el juego antes de restaurar.' }; try { return getSaves().restore(g, bid, saveOpts().keep); } catch (e) { return { ok: false, error: e.message }; } });
-ipcMain.handle('saves:remove', (_e, id, bid) => { const g = gameById(id); if (!g) return { ok: false }; try { return getSaves().remove(g, bid); } catch (e) { return { ok: false, error: e.message }; } });
-ipcMain.handle('saves:openFolder', async (_e, id) => { const g = gameById(id); if (!g) return { ok: false }; const d = getSaves().gameDir(g); fs.mkdirSync(d, { recursive: true }); const err = await shell.openPath(d); return { ok: !err, error: err }; });
-ipcMain.handle('saves:openSaves', async (_e, p) => { if (typeof p !== 'string') return { ok: false }; const err = await shell.openPath(p); return { ok: !err, error: err }; });
-ipcMain.handle('saves:suggest', (_e, id) => { const g = gameById(id); if (!g) return { ok: false, error: 'Juego no encontrado.' };
-  try {
-    const hint = ((loadStore().saveHints || {})[id] || {});
-    const mine = new Set(((loadStore().savePaths || {})[id] || []).map((p) => p.toLowerCase()));
-    const fromPlay = (hint.list || []).filter((c) => fs.existsSync(c.path) && !mine.has(c.path.toLowerCase()));
-    const rest = getSaves().suggest(g).filter((c) => !fromPlay.some((h) => h.path.toLowerCase() === c.path.toLowerCase()));
-    return { ok: true, list: [...fromPlay, ...rest], playedAt: hint.when || 0 };
-  } catch (e) { return { ok: false, error: e.message }; } });
-ipcMain.handle('saves:addSuggested', (_e, id, p) => {
-  const g = gameById(id); if (!g || typeof p !== 'string' || !path.isAbsolute(p) || !fs.existsSync(p)) return { ok: false };
-  const store = loadStore(); store.savePaths = store.savePaths || {};
-  const cur = store.savePaths[id] || [];
-  if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) store.savePaths[id] = [...cur, p];
-  saveStore(store); return { ok: true };
-});
-ipcMain.handle('saves:addPath', async (_e, id, kind) => {
-  const g = gameById(id); if (!g) return { ok: false };
-  const r = await dialog.showOpenDialog(win, { title: kind === 'file' ? 'Archivo de guardado' : 'Carpeta de guardado', properties: [kind === 'file' ? 'openFile' : 'openDirectory'] });
-  if (r.canceled || !r.filePaths[0]) return { ok: true, canceled: true };
-  const p = r.filePaths[0];
-  if (p.split(/[\\/]/).filter(Boolean).length < 2) return { ok: false, error: 'Elige una carpeta concreta, no la raíz de un disco.' };
-  const store = loadStore(); store.savePaths = store.savePaths || {};
-  const cur = store.savePaths[id] || [];
-  if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) store.savePaths[id] = [...cur, p];
-  saveStore(store); return { ok: true };
-});
-ipcMain.handle('saves:removePath', (_e, id, p) => { const store = loadStore(); store.savePaths = store.savePaths || {}; store.savePaths[id] = (store.savePaths[id] || []).filter((x) => x !== p); saveStore(store); return { ok: true }; });
-ipcMain.handle('saves:db', () => getSaves().status());
-ipcMain.handle('saves:update', (_e, force) => getSaves().update(!!force));
 ipcMain.handle('stats:sessions', () => loadStore().sessions || []);
-let savesInst = null;
-function getSaves() {
-  if (!savesInst) savesInst = createSaves({
-    userData: userDir(), backupsRoot: () => path.join(media.dirOf(userDir()), 'Partidas guardadas'),
-    findSteamPath: () => { try { return require('./scanners/steam').steamPathSync(); } catch { return null; } },
-    extraPaths: (g) => ((loadStore().savePaths || {})[g.id] || []),
-    documentsDir: (() => { try { return app.getPath('documents'); } catch { return null; } })(),
-  });
-  return savesInst;
-}
-const saveOpts = () => { const s = loadStore().settings || {}; return { auto: s.saveAuto !== false, keep: Math.max(1, Math.min(30, parseInt(s.saveKeep, 10) || 5)) }; };
-function detectSavesAfter(g) { // juegos sin guardados conocidos: se miran los archivos que cambiaron durante la sesión
-  try {
-    if (!g || !g.seen || !g.startedAt || Date.now() - g.startedAt < 60000) return;
-    const game = cache.find((x) => x.id === g.id); if (!game) return;
-    const sv = getSaves(); const info = sv.info(game);
-    if (info.known && info.paths.length) return; // ya sabemos dónde guarda
-    setTimeout(async () => {
-      try {
-        const list = await sv.detect(game, g.startedAt);
-        const store = loadStore(); store.saveHints = store.saveHints || {};
-        store.saveHints[game.id] = { when: Date.now(), list };
-        saveStore(store);
-        if (list.length && win && !win.isDestroyed()) win.webContents.send('saves:hint', { id: game.id, name: game.name, n: list.length });
-      } catch { /* no es crítico */ }
-    }, 6000);
-  } catch { /* no es crítico */ }
-}
-function autoBackupSaves(g) { // al cerrar un juego, copia su progreso (si lo conocemos y cambió)
-  try {
-    const o = saveOpts(); if (!o.auto || !g) return;
-    const game = cache.find((x) => x.id === g.id); if (!game) return;
-    setTimeout(() => {
-      try {
-        const r = getSaves().backup(game, { keep: o.keep, maxBytes: 100 * 1024 * 1024 });
-        if (r.ok && r.fresh && win && !win.isDestroyed()) win.webContents.send('saves:done', { id: game.id, name: game.name });
-      } catch { /* no es crítico */ }
-    }, 4000); // un momento, para que el juego termine de soltar sus archivos
-  } catch { /* no es crítico */ }
-}
 // Trae la ventana principal al frente y con el foco del teclado y del mando. Windows a veces no deja robar el foco de un
 // juego que se está cerrando, así que se insiste unas veces (si ya tiene el foco, no hace nada más).
 function bringMainFront() {
@@ -2631,8 +2554,6 @@ function bringMainFront() {
 function onGameEnd(g) {
   stopping = false;
   logSession(g);
-  autoBackupSaves(g);
-  detectSavesAfter(g);
   if (g) { sendGameState(g.id, null); setTimeout(() => detectNewAch(cache.find((x) => x.id === g.id) || g), 6000); }
   if (overlay && !overlay.isDestroyed()) overlay.hide();
   if (win && !win.isDestroyed()) {
@@ -2934,7 +2855,7 @@ function allowSteamVideo() {
 app.whenReady().then(() => { if (!gotLock) return; if (!process.argv.includes('--oculto') && sysSettings().splash !== false) openSplash(); /* lo primero: que se vea cuanto antes */
   // El resto del arranque (copias, bandeja, ventana principal…) bloquea el hilo principal: se hace cuando la pantalla de inicio ya se ve (o a los 700 ms como máximo)
   let started = false;
-  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { if (app.isPackaged) app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
-  updater.start(); setTimeout(() => { try { getSaves().update(false); } catch {} }, 90000); setTimeout(async () => { await autoSyncOwned().catch(() => {}); backgroundInfo().catch(() => {}); setTimeout(() => startDiskScan(false).catch(() => {}), 15000); startFreeNotify(); backgroundSgdb(); }, 4000); };
+  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
+  updater.start(); setTimeout(async () => { await autoSyncOwned().catch(() => {}); backgroundInfo().catch(() => {}); setTimeout(() => startDiskScan(false).catch(() => {}), 15000); startFreeNotify(); backgroundSgdb(); }, 4000); };
   if (splash) { afterSplash = rest; setTimeout(() => { afterSplash = null; rest(); }, 700); } else rest(); });
 app.on('window-all-closed', () => app.quit());
