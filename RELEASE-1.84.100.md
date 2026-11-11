@@ -67,7 +67,7 @@ Necesita la **clave de la API de Steam** (Ajustes) y que tu lista de amigos y tu
 ## Interno
 - `renderer/couch.js` ahora se **genera** a partir de las partes de `renderer/couch/` (`node tools/build-couch.js`; `--check` comprueba que esté al día; `npm run couch`). No se edita a mano. Esas partes y `tools/` no van en el instalador.
 - Nuevo `friends.js` (amigos, ficha de amigo y propietarios de un juego) y nuevas llamadas en `main.js` / `preload.js` para amigos y perfil.
-- Se elimina `community.json` (la sección de proyectos de la comunidad ya no existe).
+- Se elimina `community.json`, un catálogo de proyectos que ya no se usaba. La sección Comunidad sigue igual.
 
 ## Qué no incluye / límites
 - Steam no da por su API pública: chat dentro de Comptus, feed de actividad, invitaciones, «No molestar», saldo de la cuenta ni listas de deseados de otros usuarios. Tampoco están las pestañas «Comunidad» ni la sección de cromos de Big Picture.

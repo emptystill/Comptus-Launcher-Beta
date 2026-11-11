@@ -10,4 +10,4 @@ Mejoras de rendimiento y arranque sobre la 1.84.100.
 - Comptus reconoce y limpia las entradas de arranque duplicadas o antiguas (`electron.app.Comptus`, `com.mateo.gamelauncher`) y deja una sola, `Comptus`. Antes el ajuste podía aparecer apagado y aun así abrirse al encender el PC.
 
 ## Interno
-- Se elimina `community.json` (la sección de proyectos de la comunidad ya no existe).
+- Se elimina `community.json`, un catálogo de proyectos que ya no se usaba. La sección Comunidad sigue igual.
