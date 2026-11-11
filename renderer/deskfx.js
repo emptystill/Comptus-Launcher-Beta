@@ -63,7 +63,7 @@
   let t = null; const later = () => { clearTimeout(t); t = setTimeout(paint, 60); };
   function start() {
     ['#grid', '#detail'].forEach((s) => { const e = document.querySelector(s); if (e) new MutationObserver(later).observe(e, { childList: true }); });
-    D.pt = setInterval(poll, 3000); setTimeout(poll, 1500);
+    const loop = async () => { await poll(); D.pt = setTimeout(loop, Object.keys(D.prog).length ? 3000 : 8000); }; D.pt = setTimeout(loop, 1500); // con instalaciones en curso cada 3 s; si no, cada 8 s
   }
   root.DeskFx = { onRender };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

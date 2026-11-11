@@ -43,7 +43,7 @@
       document.addEventListener('mousemove', mm, true); document.addEventListener('mousedown', md, true);
     } else { S.mouse = true; box.classList.remove('nomouse'); }
     try { if (window.api.mediaGet) window.api.mediaGet().then(paintMusic).catch(() => {}); } catch {}
-    active = true; INST.snap = null; clearInterval(INST.pt); INST.pt = setInterval(instPoll, 2500); setTimeout(instPoll, 300); friendWatchStart(); bellSync(); if (cfg.ui === 'deck' && window.api.profileGet) window.api.profileGet(false).then((r) => { S.prof = r; paintMe(); }).catch(() => {}); hintMode = document.body.classList.contains('pad-mode') ? 'pad' : 'kb'; applyCfg(); box.classList.toggle('padmode', hintMode === 'pad');
+    active = true; INST.snap = null; clearTimeout(INST.pt); const instLoop = async () => { await instPoll(); if (active) INST.pt = setTimeout(instLoop, Object.keys(INST.prog).length ? 2500 : 8000); }; INST.pt = setTimeout(instLoop, 300); // con instalaciones en curso se consulta cada 2,5 s; si no, cada 8 s friendWatchStart(); bellSync(); if (cfg.ui === 'deck' && window.api.profileGet) window.api.profileGet(false).then((r) => { S.prof = r; paintMe(); }).catch(() => {}); hintMode = document.body.classList.contains('pad-mode') ? 'pad' : 'kb'; applyCfg(); box.classList.toggle('padmode', hintMode === 'pad');
     try { const r = await window.api.setFullscreen(true); wasFs = !!(r && r.was); } catch { wasFs = false; }
     document.body.classList.add('couch-on'); box.classList.remove('hidden'); box.classList.add('idle'); if (cfg.ui === 'deck') { S.mp = null; S.mpT = Date.now() + 1500; }
     tick(); clearInterval(clockT); clockT = setInterval(tick, 20000);

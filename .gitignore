@@ -6,3 +6,6 @@ out/
 *.log
 .DS_Store
 Thumbs.db
+
+# Sonidos del estilo Steam Big Picture: solo uso personal, no se suben al repositorio público
+renderer/sonidos/deck/

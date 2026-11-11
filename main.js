@@ -872,6 +872,13 @@ ipcMain.handle('launcher:open', (_e, sourceId) => openLauncher(sourceId));
 // No borramos nada nosotros: abrimos el desinstalador oficial para que confirmes allí
 // Instalaciones en curso (para el modo consola): Steam trae el porcentaje real; Epic solo indica que está instalando
 let instDirs = null, instDirsAt = 0;
+const instCache = new Map(); // archivo → { t: fecha de modificación, rec: resultado ya leído | null }: solo se vuelve a leer lo que cambió
+const cachedRead = (file, parse) => {
+  let st; try { st = fs.statSync(file); } catch { instCache.delete(file); return null; }
+  const c = instCache.get(file); if (c && c.t === st.mtimeMs) return c.rec;
+  let rec = null; try { rec = parse(fs.readFileSync(file, 'utf8')); } catch { rec = null; }
+  instCache.set(file, { t: st.mtimeMs, rec }); return rec;
+};
 ipcMain.handle('installs:get', async () => {
   const out = [];
   try {
@@ -879,22 +886,26 @@ ipcMain.handle('installs:get', async () => {
     for (const d of instDirs) {
       let files = []; try { files = fs.readdirSync(d).filter((f) => /^appmanifest_\d+\.acf$/.test(f)); } catch { continue; }
       for (const f of files) {
-        let t; try { t = fs.readFileSync(path.join(d, f), 'utf8'); } catch { continue; }
-        const num = (k) => parseInt((t.match(new RegExp('"' + k + '"\\s+"(\\d+)"')) || [])[1] || '0', 10);
-        const flags = num('StateFlags');
-        if ((flags & 4) || (flags & 2048) || !(flags & (2 | 256 | 512 | 1024))) continue; // solo instalaciones nuevas en marcha o en pausa
-        const tot = num('BytesToDownload') + num('BytesToStage'), got = num('BytesDownloaded') + num('BytesStaged');
-        out.push({ id: 'steam:' + f.match(/\d+/)[0], pct: tot > 0 ? Math.max(0, Math.min(99, Math.round(got / tot * 100))) : null, paused: !!(flags & 512) });
+        const rec = cachedRead(path.join(d, f), (t) => {
+          const num = (k) => parseInt((t.match(new RegExp('"' + k + '"\\s+"(\\d+)"')) || [])[1] || '0', 10);
+          const flags = num('StateFlags');
+          if ((flags & 4) || (flags & 2048) || !(flags & (2 | 256 | 512 | 1024))) return null; // solo instalaciones nuevas en marcha o en pausa
+          const tot = num('BytesToDownload') + num('BytesToStage'), got = num('BytesDownloaded') + num('BytesStaged');
+          return { id: 'steam:' + f.match(/\d+/)[0], pct: tot > 0 ? Math.max(0, Math.min(99, Math.round(got / tot * 100))) : null, paused: !!(flags & 512) };
+        });
+        if (rec) out.push(rec);
       }
     }
   } catch {}
   try {
     const dir = epicManifestsDir();
     for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.item'))) {
-      let it; try { it = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch { continue; }
-      if (!it.bIsIncompleteInstall) continue;
-      const cats = Array.isArray(it.AppCategories) ? it.AppCategories : []; if (cats.length && !cats.includes('games')) continue;
-      const an = it.MainGameAppName || it.AppName; if (an) out.push({ id: 'epic:' + an, pct: null, paused: false });
+      const rec = cachedRead(path.join(dir, f), (t) => {
+        const it = JSON.parse(t); if (!it.bIsIncompleteInstall) return null;
+        const cats = Array.isArray(it.AppCategories) ? it.AppCategories : []; if (cats.length && !cats.includes('games')) return null;
+        const an = it.MainGameAppName || it.AppName; return an ? { id: 'epic:' + an, pct: null, paused: false } : null;
+      });
+      if (rec) out.push(rec);
     }
   } catch {}
   return out;
@@ -2138,7 +2149,7 @@ function syncPadWatch() {
 let navProc = null, navBuf = '';
 const NAV_SCRIPT = "Add-Type -Namespace P -Name N -MemberDefinition '[DllImport(\"xinput1_4.dll\", EntryPoint=\"XInputGetState\")] public static extern int Get(int i, byte[] s);';" +
   "$pa=$null;$pb=$null;$nu=0;$nd=0;$fu=$true;$fd=$true;$nl=0;$nr=0;$fl=$true;$fr=$true;" +
-  "while($true){ $w=0;$ly=0;$lx=0; for($i=0;$i -lt 4;$i++){ $b=New-Object byte[] 16; if([P.N]::Get($i,$b) -eq 0){ $w=$w -bor [int][BitConverter]::ToUInt16($b,4); $v=[int][BitConverter]::ToInt16($b,10); if([Math]::Abs($v) -gt [Math]::Abs($ly)){$ly=$v}; $vx=[int][BitConverter]::ToInt16($b,8); if([Math]::Abs($vx) -gt [Math]::Abs($lx)){$lx=$vx} } } " +
+  "while($true){ $w=0;$ly=0;$lx=0;$c=0; for($i=0;$i -lt 4;$i++){ $b=New-Object byte[] 16; if([P.N]::Get($i,$b) -eq 0){ $c++; $w=$w -bor [int][BitConverter]::ToUInt16($b,4); $v=[int][BitConverter]::ToInt16($b,10); if([Math]::Abs($v) -gt [Math]::Abs($ly)){$ly=$v}; $vx=[int][BitConverter]::ToInt16($b,8); if([Math]::Abs($vx) -gt [Math]::Abs($lx)){$lx=$vx} } } " +
   "$now=[Environment]::TickCount; $combo=(($w -band 0x30) -ne 0); $a=((($w -band 0x1000) -ne 0) -and -not $combo); $bb=((($w -band 0x2000) -ne 0) -and -not $combo); " +
   "if($pa -eq $null){ $pa=$a;$pb=$bb } " +
   "if($a -and -not $pa){ [Console]::Out.WriteLine('NAV|a'); [Console]::Out.Flush() } if($bb -and -not $pb){ [Console]::Out.WriteLine('NAV|b'); [Console]::Out.Flush() } $pa=$a;$pb=$bb; " +
@@ -2148,7 +2159,7 @@ const NAV_SCRIPT = "Add-Type -Namespace P -Name N -MemberDefinition '[DllImport(
   "$lf=((($w -band 4) -ne 0) -or ($lx -lt -16000)); $rt=((($w -band 8) -ne 0) -or ($lx -gt 16000)); " +
   "if($lf){ if($now -ge $nl){ [Console]::Out.WriteLine('NAV|left'); [Console]::Out.Flush(); if($fl){$nl=$now+380;$fl=$false}else{$nl=$now+110} } } else { $nl=0;$fl=$true } " +
   "if($rt){ if($now -ge $nr){ [Console]::Out.WriteLine('NAV|right'); [Console]::Out.Flush(); if($fr){$nr=$now+380;$fr=$false}else{$nr=$now+110} } } else { $nr=0;$fr=$true } " +
-  "Start-Sleep -Milliseconds 40 }";
+  "if($c -eq 0){ Start-Sleep -Milliseconds 1000 } else { Start-Sleep -Milliseconds 40 } }"; // sin mando conectado basta mirar cada segundo (consultar mandos ausentes a 25 Hz gasta CPU)
 function stopNav() { try { if (navProc) navProc.kill(); } catch {} navProc = null; }
 function startNav() {
   if (navProc || process.platform !== 'win32') return;
@@ -2187,7 +2198,7 @@ function xiScript(btns) {
     `$m=${mask};$lt=${lt};$rt=${rt};$g=${g};$down=$false;$n=-1;` +
     "while($true){ $any=$false;$cnt=0; for($i=0;$i -lt 4;$i++){ $b=New-Object byte[] 16; if($g){$r=[P.X]::GetEx($i,$b)}else{$r=[P.X]::Get($i,$b)}; if($r -eq 0){ $cnt++; $w=[int][BitConverter]::ToUInt16($b,4); if((($w -band $m) -eq $m) -and ((-not $lt) -or $b[6] -gt 100) -and ((-not $rt) -or $b[7] -gt 100)){ $any=$true } } } " +
     "if($cnt -ne $n){ $n=$cnt; [Console]::Out.WriteLine('PAD|'+$cnt); [Console]::Out.Flush() } " +
-    "if($any -and -not $down){ [Console]::Out.WriteLine('COMBO'); [Console]::Out.Flush() } $down=$any; Start-Sleep -Milliseconds 40 }";
+    "if($any -and -not $down){ [Console]::Out.WriteLine('COMBO'); [Console]::Out.Flush() } $down=$any; if($cnt -eq 0){ Start-Sleep -Milliseconds 1000 } else { Start-Sleep -Milliseconds 40 } }"; // sin mando conectado, cada segundo
 }
 function stopXi() { try { if (xiProc) xiProc.kill(); } catch {} xiProc = null; xiKey = null; xiCount = -1; }
 function syncXi() {
@@ -2294,16 +2305,25 @@ const exePath = () => process.env.PORTABLE_EXECUTABLE_FILE || process.execPath; 
 function loginEnabled() { // ¿está en el arranque de Windows? (cuenta también lo que escribió el instalador)
   try {
     if (!app.isPackaged) return sysSettings().startWithWindows;
-    return ['--oculto', null].some((a) => app.getLoginItemSettings({ path: exePath(), args: a ? [a] : [] }).openAtLogin);
+    return ['--oculto', null].some((a) => LOGIN_NAMES.some((n) => app.getLoginItemSettings({ name: n, path: exePath(), args: a ? [a] : [] }).openAtLogin));
   } catch { return sysSettings().startWithWindows; }
 }
+const LOGIN_NAMES = ['Comptus', 'electron.app.Comptus', 'com.mateo.gamelauncher', 'mi-lanzador-de-juegos', 'Mi Lanzador de Juegos']; // 'Comptus' es la entrada única; las otras son nombres antiguos que se limpian
 function applyLoginItem() {
   try {
     if (!app.isPackaged) return; // en desarrollo no se toca el registro de Windows
     const s = sysSettings();
-    if (!s.startWithWindows) { app.setLoginItemSettings({ openAtLogin: false, path: exePath(), args: [] }); app.setLoginItemSettings({ openAtLogin: false, path: exePath(), args: ['--oculto'] }); return; }
-    app.setLoginItemSettings({ openAtLogin: true, path: exePath(), args: s.startHidden ? ['--oculto'] : [] });
+    // se borran todas las variantes (nombres y argumentos) para que quede UNA sola entrada en el arranque de Windows
+    for (const n of LOGIN_NAMES) for (const a of [[], ['--oculto']]) app.setLoginItemSettings({ openAtLogin: false, name: n, path: exePath(), args: a });
+    if (!s.startWithWindows) return;
+    app.setLoginItemSettings({ openAtLogin: true, name: 'Comptus', path: exePath(), args: s.startHidden ? ['--oculto'] : [] });
   } catch { /* sin permiso: se deja como estaba */ }
+}
+function cleanLegacyLogin() { // con «iniciar con Windows» apagado, se borran las entradas antiguas que dejaron versiones anteriores (la de «Comptus» del instalador no se toca)
+  try {
+    if (!app.isPackaged) return;
+    for (const n of LOGIN_NAMES.filter((x) => x !== 'Comptus')) for (const a of [[], ['--oculto']]) app.setLoginItemSettings({ openAtLogin: false, name: n, path: exePath(), args: a });
+  } catch { /* sin permiso */ }
 }
 const systemState = () => ({ ...sysSettings(), startWithWindows: loginEnabled(), packaged: !!app.isPackaged, hasTray: !!tray });
 ipcMain.handle('system:get', () => systemState());
@@ -2668,7 +2688,7 @@ ipcMain.handle('overlay:state', () => {
 });
 // «Sonando ahora»: lo que suena en Windows (Spotify y otros) con pausa / siguiente / anterior; ver nowplaying.js
 const nowPlaying = require('./nowplaying').createNowPlaying();
-let npLastErr = '', npLastThumbErr = '', npState = { has: false }, npThumb = { key: '', data: '' }, npJson = '', npBusy = false;
+let npLastErr = '', npLastThumbErr = '', npState = { has: false }, npThumb = { key: '', data: '' }, npJson = '', npBusy = false, npLastAt = 0;
 const npEnabled = () => process.platform === 'win32' && loadStore().settings.nowPlaying !== false;
 const npWanted = () => npEnabled() && ((win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()) || (overlay && !overlay.isDestroyed() && overlay.isVisible()));
 const npApp = (id) => String(id || '').split('!').pop().replace(/\.exe$/i, '').replace(/_.*$/, '').slice(0, 40);
@@ -2679,6 +2699,8 @@ function npBroadcast() {
 async function npPoll(force) {
   if (!npEnabled()) return { has: false, disabled: true };
   if (npBusy || (!force && !npWanted())) return npState;
+  if (!force && couchOn && Date.now() - npLastAt < 10000) return npState; // en modo consola ya no hay barra de música: basta consultar cada 10 s
+  npLastAt = Date.now();
   npBusy = true;
   try {
     const r = await nowPlaying.get();
@@ -2912,7 +2934,7 @@ function allowSteamVideo() {
 app.whenReady().then(() => { if (!gotLock) return; if (!process.argv.includes('--oculto') && sysSettings().splash !== false) openSplash(); /* lo primero: que se vea cuanto antes */
   // El resto del arranque (copias, bandeja, ventana principal…) bloquea el hilo principal: se hace cuando la pantalla de inicio ya se ve (o a los 700 ms como máximo)
   let started = false;
-  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { if (app.isPackaged) app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem();
+  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { if (app.isPackaged) app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
   updater.start(); setTimeout(() => { try { getSaves().update(false); } catch {} }, 90000); setTimeout(async () => { await autoSyncOwned().catch(() => {}); backgroundInfo().catch(() => {}); setTimeout(() => startDiskScan(false).catch(() => {}), 15000); startFreeNotify(); backgroundSgdb(); }, 4000); };
   if (splash) { afterSplash = rest; setTimeout(() => { afterSplash = null; rest(); }, 700); } else rest(); });
 app.on('window-all-closed', () => app.quit());

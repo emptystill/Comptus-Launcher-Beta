@@ -3087,3 +3087,6 @@ body:has(.toolbar.hidden) #sizeQuick.size-corner, body.couch-on #sizeQuick.size-
 #couch.ui-deck:has(.cc-menu-ov.dk-side:not(.hidden)) .cc-hints { z-index: 45 !important; }
 /* 1.84.100zu · paneles laterales derechos: el título y la lista quedan por debajo de los iconos de arriba */
 #couch.ui-deck .cc-menu.dk-side.dk-right { padding-top: 10vh !important; }
+
+/* 1.84.100zv: sin foco / minimizada → animaciones CSS en pausa (menos gráfica compartida con otras apps) */
+html.app-idle *, html.app-idle *::before, html.app-idle *::after { animation-play-state: paused !important; }

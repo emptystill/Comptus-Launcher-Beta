@@ -170,17 +170,20 @@ const animIO = typeof IntersectionObserver !== 'undefined' ? new IntersectionObs
 function refreshAnim() {
   for (const [c] of animCards) if (!c.isConnected) { if (animIO) animIO.unobserve(c); animCards.delete(c); }
   const playing = new Set();
-  if (animMode === 'few' && !document.hidden) {
+  if (animMode === 'few' && !document.hidden && document.hasFocus()) {
     [...animCards.entries()].filter(([, s]) => s.visible)
       .sort((a, b) => (a[0].compareDocumentPosition(b[0]) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
       .slice(0, ANIM_BUDGET).forEach(([c]) => playing.add(c));
   }
   for (const [c, s] of animCards) {
-    const want = (playing.has(c) || s.hover) && !document.hidden ? s.anim : s.still;
+    const want = (playing.has(c) || s.hover) && !document.hidden && document.hasFocus() ? s.anim : s.still;
     if (s.cur !== want) { s.img.src = want; s.cur = want; }
   }
 }
 document.addEventListener('visibilitychange', refreshAnim);
+// Sin el foco (o minimizada) se congelan las animaciones CSS y las portadas animadas, para no competir por la gráfica con otras apps (p. ej. un fondo animado)
+function syncIdle() { const idle = document.hidden || !document.hasFocus(); document.documentElement.classList.toggle('app-idle', idle); if (animMode !== 'all') refreshAnim(); }
+addEventListener('focus', syncIdle); addEventListener('blur', syncIdle); document.addEventListener('visibilitychange', syncIdle);
 function wireAnim(card, animSrc) {
   const img = card.querySelector('img[data-anim]');
   if (!img || animMode === 'all') return;
@@ -3050,6 +3053,10 @@ const IMG_PRESETS = window.IMG_THEMES || [];
 const THEME_KEYS = { cBg: 'bg', cPanel: 'panel', cText: 'text', cAccent: 'accent', cAccent2: 'accent2' };
 let theme = { ...PRESETS[0], preset: 'midnight' };
 let cardSize = 170;
+// Tamaño de las portadas recordado por pantalla (resolución + orientación): al mover la ventana a otro monitor, o girarlo, se aplica el tamaño que dejaste en esa pantalla
+let cardSizes = {};
+const screenKey = () => `${screen.width}x${screen.height}@${window.devicePixelRatio || 1}`;
+let curScreen = screenKey();
 let cardShape = 'tall', hideNames = false, wideLogos = true; // forma de las portadas (vertical/horizontal) y si se ocultan los nombres
 const CARD_MIN = 90, CARD_MAX = 480;
 
@@ -3122,8 +3129,39 @@ function applyCardSize() {
   $('#grid').classList.toggle('compact', cardSize < 140); // con portadas pequeñas se ocultan los textos largos
 }
 // Un solo lugar para cambiar el tamaño: sincroniza los dos controles y guarda
+// Al cambiar de pantalla (otro monitor o giro): se recupera el tamaño guardado para esa pantalla; si es nueva, se conserva el actual
+let screenT = null;
+function switchCardSize(saved) { // cambio de pantalla: cada portada viaja (posición y tamaño) de donde estaba a donde queda, sin parpadeo
+  const g = $('#grid'), apply = () => { cardSize = saved; applyCardSize(); $('#cardSize').value = cardSize; $('#sizeQuick').value = cardSize; saveTheme(); };
+  if (!g || !g.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return; }
+  const kids = Array.from(g.children), first = new Map(), clamp = (v, m) => Math.max(-m, Math.min(m, v));
+  if (kids.length <= 2500) kids.forEach((el) => { const r = el.getBoundingClientRect(); if (r.width) first.set(el, r); }); // posición de todas, también las que no se veían (en vertical caben muchas más)
+  apply();
+  const vh2 = window.innerHeight; let i = 0;
+  kids.forEach((el) => {
+    const r1 = el.getBoundingClientRect(); if (!r1.width || r1.bottom < -100 || r1.top > vh2 + 100) return; // solo las que se ven ahora
+    const r0 = first.get(el), delay = Math.min(i, 28) * 8; i++;
+    let kf;
+    if (r0) {
+      const dx = clamp(r0.left - r1.left, 500), dy = clamp(r0.top - r1.top, 500), sx = r0.width / r1.width, sy = r0.height / r1.height;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1 && Math.abs(sx - 1) < .01) return;
+      kf = [{ transformOrigin: '0 0', transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` }, { transformOrigin: '0 0', transform: 'none' }];
+    } else kf = [{ opacity: 0, transform: 'translateY(28px) scale(.9)' }, { opacity: 1, transform: 'none' }]; // sin posición anterior: entra desde abajo
+    el.animate(kf, { duration: 460, delay, easing: 'cubic-bezier(.16,1.04,.3,1)', fill: 'backwards' }); // ligero rebote al asentarse
+  });
+}
+window.addEventListener('resize', () => {
+  clearTimeout(screenT);
+  screenT = setTimeout(() => {
+    const k = screenKey(); if (k === curScreen) return; curScreen = k;
+    const saved = cardSizes[k];
+    if (saved && saved !== cardSize) switchCardSize(saved);
+    else if (!saved) { cardSizes[k] = cardSize; saveTheme(); }
+  }, 60);
+});
 function setCardSize(v) {
   cardSize = Math.min(CARD_MAX, Math.max(CARD_MIN, Math.round(v)));
+  cardSizes[screenKey()] = cardSize;
   applyCardSize();
   $('#cardSize').value = cardSize;
   $('#sizeQuick').value = cardSize;
@@ -3133,7 +3171,7 @@ function setCardSize(v) {
 let saveThemeTimer;
 function saveTheme() {
   clearTimeout(saveThemeTimer);
-  saveThemeTimer = setTimeout(() => window.api.setSettings({ theme, cardSize }), 300);
+  saveThemeTimer = setTimeout(() => window.api.setSettings({ theme, cardSize, cardSizes }), 300);
 }
 
 function syncThemeModal() {
@@ -3730,7 +3768,7 @@ $('#saveMyTheme').onclick = saveMyTheme;
 $('#themeName').onkeydown = (e) => { if (e.key === 'Enter') saveMyTheme(); };
 $('#resetTheme').onclick = () => {
   theme = { ...PRESETS[0], preset: 'midnight' };
-  cardSize = 170;
+  cardSize = 170; cardSizes[screenKey()] = 170;
   if (bg.art) { bg.art = null; applyBackground(); saveBackground(); }
   applyTheme(theme);
   applyCardSize();
@@ -4067,6 +4105,7 @@ window.api.gameState().then(applyRunState).catch(() => {});
   if (s && s.theme) theme = { ...PRESETS[0], ...s.theme };
   myThemes = Array.isArray(s && s.myThemes) ? s.myThemes.filter((t) => t && t.id && t.name) : [];
   if (s && s.cardSize) cardSize = s.cardSize;
+  if (s && s.cardSizes && typeof s.cardSizes === 'object') { cardSizes = { ...s.cardSizes }; curScreen = screenKey(); if (cardSizes[curScreen]) cardSize = cardSizes[curScreen]; }
   if (s && s.autoTheme) autoTheme = { ...autoTheme, ...s.autoTheme };
   cardShape = s && s.cardShape === 'wide' ? 'wide' : 'tall'; hideNames = !!(s && s.hideNames); wideLogos = !(s && s.wideLogos === false);
   $('#wideLogos').checked = wideLogos;
