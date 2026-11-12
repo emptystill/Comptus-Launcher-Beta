@@ -1375,6 +1375,7 @@ function render() {
   document.querySelector('.toolbar').classList.toggle('stats-mode', inStats);
   $('#statsBtn').classList.toggle('on', inStats);
   $('#detail').classList.toggle('hidden', !inDetail);
+  document.body.classList.toggle('no-cards', inDetail || inStats || inFree || inEvents || inWish || inCommunity); // sin portadas: se oculta el deslizador de tamaño
   if (inStats) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderStats(); return; }
   if (inCommunity) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderCommunity(); if (!cmLoading && (!cmData || Date.now() - cmData.at > 600000)) loadCommunity(false); return; }
   if (inEvents) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderEvents(); if (!evLoading && (!evData || Date.now() - evData.at > 3600000)) loadEvents(false); return; }

@@ -3083,3 +3083,6 @@ body:has(.toolbar.hidden) #sizeQuick.size-corner, body.couch-on #sizeQuick.size-
 
 /* 1.84.100zv: sin foco / minimizada → animaciones CSS en pausa (menos gráfica compartida con otras apps) */
 html.app-idle *, html.app-idle *::before, html.app-idle *::after { animation-play-state: paused !important; }
+
+/* 1.84.103 · El deslizador de tamaño de portadas solo se ve donde hay portadas (no tapa Estadísticas, Gratis, Eventos, Deseados, Comunidad ni la ficha) */
+body.no-cards #sizeQuick.size-corner { display: none; }

@@ -2301,11 +2301,19 @@ const sysSettings = () => {
   return { startWithWindows: !!s.startWithWindows, startHidden: !!s.startHidden, closeToTray: !!s.closeToTray, quickSearch: s.quickSearch !== false, autoUpdate: s.autoUpdate !== false, freeNotify: s.freeNotify !== false, freeNotifyDlc: !!s.freeNotifyDlc, eventNotify: s.eventNotify !== false, wishNotify: s.wishNotify !== false, splash: s.splash !== false, nowPlaying: s.nowPlaying !== false };
 };
 const exePath = () => process.env.PORTABLE_EXECUTABLE_FILE || process.execPath; // en la versión portable, el .exe original
-function loginEnabled() { // ¿está en el arranque de Windows? (cuenta también lo que escribió el instalador)
+// Nombres de LOGIN_NAMES que hay en el arranque de Windows, leídos del registro directamente:
+// app.getLoginItemSettings() no reconoce la entrada cuando la ruta tiene espacios («Program Files») y decía «apagado» estando encendido
+const RUN_KEY = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run';
+function runEntries() {
   try {
-    if (!app.isPackaged) return sysSettings().startWithWindows;
-    return ['--oculto', null].some((a) => LOGIN_NAMES.some((n) => app.getLoginItemSettings({ name: n, path: exePath(), args: a ? [a] : [] }).openAtLogin));
-  } catch { return sysSettings().startWithWindows; }
+    const out = require('child_process').execFileSync('reg', ['query', RUN_KEY], { encoding: 'utf8', windowsHide: true, timeout: 5000 });
+    return LOGIN_NAMES.filter((n) => new RegExp('^\\s+' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s+REG_', 'mi').test(out));
+  } catch { return null; }
+}
+function loginEnabled() { // ¿está en el arranque de Windows? (cuenta también lo que escribió el instalador)
+  if (!app.isPackaged) return sysSettings().startWithWindows;
+  const found = runEntries();
+  return found ? found.length > 0 : sysSettings().startWithWindows;
 }
 const LOGIN_NAMES = ['Comptus', 'electron.app.Comptus', 'com.mateo.gamelauncher', 'mi-lanzador-de-juegos', 'Mi Lanzador de Juegos']; // 'Comptus' es la entrada única; las otras son nombres antiguos que se limpian
 function applyLoginItem() {
@@ -2315,7 +2323,8 @@ function applyLoginItem() {
     // se borran todas las variantes (nombres y argumentos) para que quede UNA sola entrada en el arranque de Windows
     for (const n of LOGIN_NAMES) for (const a of [[], ['--oculto']]) app.setLoginItemSettings({ openAtLogin: false, name: n, path: exePath(), args: a });
     if (!s.startWithWindows) return;
-    app.setLoginItemSettings({ openAtLogin: true, name: 'Comptus', path: exePath(), args: s.startHidden ? ['--oculto'] : [] });
+    // la ruta entre comillas: Electron la escribe tal cual y sin ellas Windows la parte en «C:\Program» + «Files\…»
+    app.setLoginItemSettings({ openAtLogin: true, name: 'Comptus', path: `"${exePath()}"`, args: s.startHidden ? ['--oculto'] : [] });
   } catch { /* sin permiso: se deja como estaba */ }
 }
 function cleanLegacyLogin() { // con «iniciar con Windows» apagado, se borran las entradas antiguas que dejaron versiones anteriores (la de «Comptus» del instalador no se toca)

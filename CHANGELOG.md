@@ -1134,6 +1134,10 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.103
+- Modo escritorio: el deslizador de tamaño de portadas (abajo a la derecha) solo se ve donde hay portadas. Ya no tapa el porcentaje de la barra de Locales en Estadísticas ni aparece en Gratis, Eventos, Deseados, Comunidad o la ficha de un juego.
+- **Inicio con Windows:** la casilla «Abrir Comptus al iniciar Windows» podía salir desmarcada estando activada, y Comptus seguía abriéndose al encender el PC. Electron no reconoce su propia entrada de arranque cuando la ruta tiene espacios («C:\Program Files\…»), así que ahora Comptus lee el registro directamente y escribe la ruta entre comillas.
+
 ## 1.84.102
 - Se quita la función **Partidas guardadas** (panel en la ficha, copia automática al cerrar el juego, base de datos Ludusavi y su apartado en Configuración): en muchos juegos no estaba claro dónde guardan y confundía más de lo que ayudaba. La **Copia de seguridad** de Comptus (ajustes, colecciones, temas) sigue igual. Ya no hace falta la dependencia `yaml`.
 - Con `npm start`, las notificaciones de Windows ya salen como «Comptus» y no como «electron.app.Electron» (la versión instalada ya lo hacía bien).
