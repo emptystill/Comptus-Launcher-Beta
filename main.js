@@ -1664,7 +1664,13 @@ ipcMain.handle('achievements:get', (_e, id, force) => getAch(id, force));
 ipcMain.handle('app:userName', () => { try { return require('os').userInfo().username || ''; } catch { return ''; } });
 
 // ---------- Logros nuevos: se avisa (sonido + aviso) al desbloquear uno mientras juegas o al cerrar el juego ----------
+const achBusy = new Set(); // una comprobación a la vez por juego (si no, el mismo logro podría avisarse dos veces)
 async function detectNewAch(g) {
+  if (!g || achBusy.has(g.id)) return false;
+  achBusy.add(g.id);
+  try { return await detectNewAchOnce(g); } finally { achBusy.delete(g.id); }
+}
+async function detectNewAchOnce(g) {
   try {
     if (!g || !(g.source === 'steam' || g.source === 'epic' || g.source === 'xbox')) return;
     const before = ((loadStore().meta[g.id] || {}).achievements || {}).list;
@@ -1672,13 +1678,64 @@ async function detectNewAch(g) {
     const had = new Set(before.filter((a) => a.achieved).map((a) => a.id));
     const r = await getAch(g.id, true); const list = r && r.data && Array.isArray(r.data.list) ? r.data.list : null; if (!list) return;
     const fresh = list.filter((a) => a.achieved && !had.has(a.id));
-    if (!fresh.length) return;
+    if (!fresh.length) return false;
     const rare = fresh.some((a) => a.percent != null && a.percent < 10);
     if (win && !win.isDestroyed()) win.webContents.send('ach:unlocked', { id: g.id, game: g.name, rare, list: fresh.map((a) => ({ name: a.name, description: a.description, percent: a.percent, icon: a.icon })) });
     try { showToast('🏆 Logro desbloqueado: ' + fresh[0].name + (fresh.length > 1 ? ` (+${fresh.length - 1})` : ''), 5200); } catch {}
-  } catch (e) { try { dlog('logros nuevos: ' + (e && e.message)); } catch {} }
+    return true;
+  } catch (e) { try { dlog('logros nuevos: ' + (e && e.message)); } catch {} return false; }
 }
-setInterval(() => { try { const a = tracker.active; if (a) { const g = cache.find((x) => x.id === a.id) || a; detectNewAch(g); } } catch {} }, 180000);
+const activeGame = () => { const a = tracker.active; return a ? (cache.find((x) => x.id === a.id) || a) : null; };
+// Consulta periódica mientras juegas: cada minuto en Epic y Xbox; en Steam cada 3 min solo como respaldo del vigilante de abajo
+let achTick = 0;
+setInterval(() => {
+  try {
+    achTick++;
+    const g = activeGame(); if (!g) return;
+    if (g.source === 'steam' ? achTick % 3 === 0 : true) detectNewAch(g);
+  } catch {}
+}, 60000);
+
+// Steam guarda el progreso de cada juego en appcache\stats\UserGameStats_<cuenta>_<appid>.bin y lo reescribe al desbloquear un logro.
+// Mientras juegas a un juego de Steam se vigila ese archivo: si cambia, se consulta enseguida (y a los 15 y 45 s, por si la web de Steam va con retraso).
+let achWatch = null; // { appid, watcher, timers }
+function stopAchWatch() {
+  if (!achWatch) return;
+  try { achWatch.watcher.close(); } catch {}
+  for (const t of achWatch.timers) clearTimeout(t);
+  achWatch = null;
+}
+async function syncAchWatch() {
+  try {
+    const g = activeGame();
+    const appid = g && g.source === 'steam' && g.appid ? String(g.appid) : null;
+    if (achWatch && achWatch.appid === appid) return;
+    stopAchWatch();
+    if (!appid) return;
+    if (steamPathCache === undefined) steamPathCache = await findSteamPath().catch(() => null);
+    if (!steamPathCache) return;
+    const dir = path.join(steamPathCache, 'appcache', 'stats');
+    if (!fs.existsSync(dir)) return;
+    const suffix = `_${appid}.bin`;
+    const w = { appid, timers: [], watcher: null };
+    let last = 0;
+    w.watcher = fs.watch(dir, (_ev, file) => {
+      if (!file || !String(file).startsWith('UserGameStats_') || !String(file).endsWith(suffix)) return;
+      if (Date.now() - last < 3000) return; // Steam escribe el archivo varias veces seguidas
+      last = Date.now();
+      for (const t of w.timers) clearTimeout(t);
+      w.timers = [2000, 15000, 45000].map((ms, i) => setTimeout(async () => {
+        const cur = activeGame();
+        if (!cur || cur.id !== g.id) return;
+        const found = await detectNewAch(cur);
+        if (found) { for (const t of w.timers.slice(i + 1)) clearTimeout(t); } // ya avisado: no hace falta reintentar
+      }, ms));
+    });
+    w.watcher.on('error', () => stopAchWatch());
+    achWatch = w;
+  } catch { stopAchWatch(); }
+}
+setInterval(syncAchWatch, 5000);
 
 // ---------- Juegos que tienes pero no están instalados ----------
 const OWNED_STALE_MS = 12 * 60 * 60 * 1000;

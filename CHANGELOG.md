@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## Próxima versión
+- **Logros más rápidos:** mientras juegas a un juego de Steam, Comptus vigila el archivo donde Steam guarda tus logros (`appcache\stats`) y, en cuanto cambia, comprueba si hay alguno nuevo (con dos reintentos a los 15 y 45 s por si la web de Steam va con retraso). Antes se comprobaba cada 3 minutos. En Epic y Xbox, que no tienen ese archivo, la comprobación pasa de cada 3 minutos a cada minuto. Además, el mismo logro ya no puede avisarse dos veces si dos comprobaciones coinciden.
+
 ## 1.84.103
 - Modo escritorio: el deslizador de tamaño de portadas (abajo a la derecha) solo se ve donde hay portadas. Ya no tapa el porcentaje de la barra de Locales en Estadísticas ni aparece en Gratis, Eventos, Deseados, Comunidad o la ficha de un juego.
 - **Inicio con Windows:** la casilla «Abrir Comptus al iniciar Windows» podía salir desmarcada estando activada, y Comptus seguía abriéndose al encender el PC. Electron no reconoce su propia entrada de arranque cuando la ruta tiene espacios («C:\Program Files\…»), así que ahora Comptus lee el registro directamente y escribe la ruta entre comillas.
