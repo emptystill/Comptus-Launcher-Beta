@@ -170,19 +170,21 @@ const animIO = typeof IntersectionObserver !== 'undefined' ? new IntersectionObs
 function refreshAnim() {
   for (const [c] of animCards) if (!c.isConnected) { if (animIO) animIO.unobserve(c); animCards.delete(c); }
   const playing = new Set();
-  if (animMode === 'few' && !document.hidden && document.hasFocus()) {
+  if (animMode === 'few' && !appIdle()) {
     [...animCards.entries()].filter(([, s]) => s.visible)
       .sort((a, b) => (a[0].compareDocumentPosition(b[0]) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
       .slice(0, ANIM_BUDGET).forEach(([c]) => playing.add(c));
   }
   for (const [c, s] of animCards) {
-    const want = (playing.has(c) || s.hover) && !document.hidden && document.hasFocus() ? s.anim : s.still;
+    const want = (playing.has(c) || s.hover) && !appIdle() ? s.anim : s.still;
     if (s.cur !== want) { s.img.src = want; s.cur = want; }
   }
 }
 document.addEventListener('visibilitychange', refreshAnim);
-// Sin el foco (o minimizada) se congelan las animaciones CSS y las portadas animadas, para no competir por la gráfica con otras apps (p. ej. un fondo animado)
-function syncIdle() { const idle = document.hidden || !document.hasFocus(); document.documentElement.classList.toggle('app-idle', idle); if (animMode !== 'all') refreshAnim(); }
+// Las animaciones CSS y las portadas animadas se congelan cuando Comptus no se ve (minimizada, en la bandeja o tapada del todo)
+// o mientras hay un juego abierto (para no quitarle gráfica). Sin el foco pero a la vista (p. ej. en otro monitor) siguen.
+function appIdle() { return document.hidden || !!(runState && runState.state === 'running'); }
+function syncIdle() { document.documentElement.classList.toggle('app-idle', appIdle()); if (animMode !== 'all') refreshAnim(); }
 addEventListener('focus', syncIdle); addEventListener('blur', syncIdle); document.addEventListener('visibilitychange', syncIdle);
 function wireAnim(card, animSrc) {
   const img = card.querySelector('img[data-anim]');
@@ -1590,6 +1592,7 @@ async function stopGame(g) {
 }
 function applyRunState(s) {
   runState = s && s.state ? s : null;
+  syncIdle(); // con un juego abierto se congelan las animaciones
   try { if (window.Couch) Couch.onRun(); } catch {}
   try { if (window.DeskPlus) DeskPlus.onRun(); } catch {}
   syncBgVideo();

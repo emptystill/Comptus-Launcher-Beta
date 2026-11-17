@@ -108,6 +108,22 @@ function readStoreFile() {
   }
   throw last;
 }
+const shapeStore = (s) => (s ? { local: s.local || [], meta: s.meta || {}, settings: s.settings || {}, owned: s.owned || {}, sessions: Array.isArray(s.sessions) ? s.sessions : [] }
+  : { local: [], meta: {}, settings: {}, owned: {}, sessions: [] });
+// games.json ilegible (p. ej. lleno de bytes nulos tras un apagón a mitad de escritura): se busca la copia buena más reciente,
+// primero games.json.bak y luego las copias diarias de backups/ (de la más nueva a la más antigua)
+function recoverStore() {
+  const file = storePath();
+  const cands = [file + '.bak', ...backup.listAutoBackups(path.dirname(file)).map((f) => path.join(path.dirname(file), 'backups', f))];
+  for (const c of cands) {
+    try {
+      const s = JSON.parse(fs.readFileSync(c, 'utf8'));
+      if (s && typeof s === 'object' && !Array.isArray(s)) return { s, from: c };
+    } catch { /* esta tampoco sirve: la siguiente */ }
+  }
+  return null;
+}
+let storeRecovered = null; // de qué copia se recuperaron los datos en esta sesión (para avisar)
 function loadStore() {
   // Si nadie del programa tiene cambios pendientes y el archivo cambió por fuera (editado a mano), se vuelve a leer
   if (storeMem && (storeDirty || writing || storeBroken || mtimeOf() === storeMtime)) return storeMem;
@@ -115,15 +131,25 @@ function loadStore() {
     const s = readStoreFile();
     storeBroken = false;
     storeMtime = mtimeOf();
-    storeMem = s ? { local: s.local || [], meta: s.meta || {}, settings: s.settings || {}, owned: s.owned || {}, sessions: Array.isArray(s.sessions) ? s.sessions : [] }
-               : { local: [], meta: {}, settings: {}, owned: {}, sessions: [] };
+    storeMem = shapeStore(s);
   } catch (e) {
-    storeBroken = true; // no se sobrescribe el archivo; se guarda una copia por si acaso
+    // se guarda el archivo dañado aparte (solo una vez: si ya hay una copia igual, no se repite en cada arranque)
     try {
-      const keep = path.join(path.dirname(storePath()), 'games.ilegible-' + Date.now() + '.json');
-      fs.copyFileSync(storePath(), keep);
+      const dir = path.dirname(storePath()), size = fs.statSync(storePath()).size;
+      const same = fs.readdirSync(dir).some((f) => f.startsWith('games.ilegible-') && fs.statSync(path.join(dir, f)).size === size);
+      if (!same) fs.copyFileSync(storePath(), path.join(dir, 'games.ilegible-' + Date.now() + '.json'));
     } catch {}
-    storeMem = { local: [], meta: {}, settings: {}, owned: {}, sessions: [] };
+    const rec = recoverStore();
+    if (rec) {
+      // datos recuperados: se vuelven a guardar en games.json; la .bak no se toca (el archivo dañado no debe copiarse encima)
+      storeBroken = false; flushStore.bakDone = true; storeRecovered = rec.from;
+      storeMem = shapeStore(rec.s);
+      storeDirty = true; flushStore(true);
+      try { dlog('games.json ilegible: datos recuperados de ' + rec.from); } catch {}
+    } else {
+      storeBroken = true; // sin copia buena: no se escribe encima del archivo para no perder lo que pudiera quedar
+      storeMem = shapeStore(null);
+    }
   }
   return storeMem;
 }
@@ -143,13 +169,23 @@ function flushStore(sync) {
   const tmp = file + '.tmp';
   try {
     // Una copia del archivo anterior (games.json.bak) por si algo sale mal; solo si el nuevo no es mucho más pequeño
-    if (!flushStore.bakDone) { flushStore.bakDone = true; try { if (fs.existsSync(file)) fs.copyFileSync(file, file + '.bak'); } catch {} }
+    if (!flushStore.bakDone) { flushStore.bakDone = true; try { if (fs.existsSync(file) && backup.looksComplete(file)) fs.copyFileSync(file, file + '.bak'); } catch {} }
     fs.mkdirSync(path.dirname(file), { recursive: true });
     const data = JSON.stringify(storeMem);
-    if (sync) { fs.writeFileSync(tmp, data); fs.renameSync(tmp, file); storeMtime = mtimeOf(); return; }
+    // Los datos se fuerzan al disco (fsync) ANTES de sustituir el archivo: si no, tras un apagón Windows puede
+    // dejar games.json con su tamaño pero lleno de bytes nulos (el cambio de nombre llega al disco y los datos no)
+    if (sync) {
+      const fd = fs.openSync(tmp, 'w');
+      try { fs.writeSync(fd, data); fs.fsyncSync(fd); } finally { fs.closeSync(fd); }
+      fs.renameSync(tmp, file); storeMtime = mtimeOf(); return;
+    }
     writing = true;
-    fs.promises.writeFile(tmp, data).then(() => fs.promises.rename(tmp, file)).then(() => { storeMtime = mtimeOf(); })
-      .catch(() => { storeDirty = true; })
+    (async () => {
+      const fh = await fs.promises.open(tmp, 'w');
+      try { await fh.writeFile(data); await fh.sync(); } finally { await fh.close(); }
+      await fs.promises.rename(tmp, file);
+      storeMtime = mtimeOf();
+    })().catch(() => { storeDirty = true; })
       .finally(() => { writing = false; });
   } catch { storeDirty = true; }
 }
@@ -2921,7 +2957,7 @@ function allowSteamVideo() {
 app.whenReady().then(() => { if (!gotLock) return; if (!process.argv.includes('--oculto') && sysSettings().splash !== false) openSplash(); /* lo primero: que se vea cuanto antes */
   // El resto del arranque (copias, bandeja, ventana principal…) bloquea el hilo principal: se hace cuando la pantalla de inicio ya se ve (o a los 700 ms como máximo)
   let started = false;
-  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
+  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); if (storeRecovered) setTimeout(() => sendNotice('backup', { title: 'Datos recuperados', body: `Tu archivo de datos estaba dañado (posible apagón a mitad de guardar). Se recuperó la copia «${path.basename(storeRecovered)}».` }), 6000); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
   updater.start(); setTimeout(async () => { await autoSyncOwned().catch(() => {}); backgroundInfo().catch(() => {}); setTimeout(() => startDiskScan(false).catch(() => {}), 15000); startFreeNotify(); backgroundSgdb(); }, 4000); };
   if (splash) { afterSplash = rest; setTimeout(() => { afterSplash = null; rest(); }, 700); } else rest(); });
 app.on('window-all-closed', () => app.quit());

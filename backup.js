@@ -72,9 +72,23 @@ const dayStamp = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)
 
 // Copia automática diaria: guarda games.json en <carpeta>/backups/games-AAAA-MM-DD.json (una por día) y
 // conserva solo las últimas `keep`. Devuelve la ruta creada, o null si ya existía la de hoy / no hay archivo.
+// ¿Parece un JSON completo? (empieza por «{» y acaba en «}»). Un apagón a mitad de escritura puede dejar el archivo
+// lleno de bytes nulos o cortado; copiarlo sustituiría poco a poco las copias buenas por otras inservibles.
+function looksComplete(file) {
+  try {
+    const size = fs.statSync(file).size; if (size < 2) return false;
+    const fd = fs.openSync(file, 'r');
+    try {
+      const n = Math.min(256, size), head = Buffer.alloc(n), tail = Buffer.alloc(n);
+      fs.readSync(fd, head, 0, n, 0); fs.readSync(fd, tail, 0, n, size - n);
+      return head.toString('utf8').replace(/^﻿/, '').trimStart().startsWith('{') && tail.toString('utf8').trimEnd().endsWith('}');
+    } finally { fs.closeSync(fd); }
+  } catch { return false; }
+}
+
 function autoBackup(userDir, keep = 7, now = new Date()) {
   const src = path.join(userDir, 'games.json');
-  if (!fs.existsSync(src)) return null;
+  if (!fs.existsSync(src) || !looksComplete(src)) return null;
   const dir = path.join(userDir, 'backups');
   fs.mkdirSync(dir, { recursive: true });
   const dest = path.join(dir, `games-${dayStamp(now)}.json`);
@@ -90,4 +104,4 @@ function listAutoBackups(userDir) {
   try { return fs.readdirSync(dir).filter((f) => /^games-\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort().reverse(); } catch { return []; }
 }
 
-module.exports = { buildBackup, parseBackup, applyBackup, autoBackup, listAutoBackups, dayStamp, FORMAT };
+module.exports = { buildBackup, parseBackup, applyBackup, autoBackup, listAutoBackups, looksComplete, dayStamp, FORMAT };

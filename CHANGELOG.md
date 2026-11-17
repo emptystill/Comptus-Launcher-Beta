@@ -1134,8 +1134,10 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
-## Próxima versión
+## 1.84.104
 - **Logros más rápidos:** mientras juegas a un juego de Steam, Comptus vigila el archivo donde Steam guarda tus logros (`appcache\stats`) y, en cuanto cambia, comprueba si hay alguno nuevo (con dos reintentos a los 15 y 45 s por si la web de Steam va con retraso). Antes se comprobaba cada 3 minutos. En Epic y Xbox, que no tienen ese archivo, la comprobación pasa de cada 3 minutos a cada minuto. Además, el mismo logro ya no puede avisarse dos veces si dos comprobaciones coinciden.
+- **Animaciones con Comptus en otro monitor:** las animaciones (por ejemplo las de los juegos completados) y las portadas animadas ya no se congelan solo porque Comptus pierda el foco. Ahora se pausan cuando no se ve (minimizado, en la bandeja o tapado del todo) y mientras hay un juego abierto. Si lo tienes a la vista en otro monitor, siguen moviéndose.
+- **Tus datos, a salvo de apagones:** si Windows se apagaba o se colgaba justo mientras Comptus guardaba, `games.json` podía quedar lleno de bytes nulos y Comptus arrancaba vacío (sin temas, juegos locales ni colecciones) y sin guardar nada. Ahora: (1) los datos se fuerzan al disco antes de sustituir el archivo, así que un apagón ya no lo deja dañado; (2) si aun así no se puede leer, Comptus recupera solo la copia buena más reciente (`games.json.bak` o la copia diaria de `backups`) y avisa; (3) la copia diaria y la `.bak` ya no copian nunca un archivo dañado (antes, en una semana, las copias buenas se habrían sustituido por otras inservibles).
 
 ## 1.84.103
 - Modo escritorio: el deslizador de tamaño de portadas (abajo a la derecha) solo se ve donde hay portadas. Ya no tapa el porcentaje de la barra de Locales en Estadísticas ni aparece en Gratis, Eventos, Deseados, Comunidad o la ficha de un juego.
