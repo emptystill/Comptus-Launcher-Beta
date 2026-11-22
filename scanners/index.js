@@ -31,7 +31,7 @@ const providers = [
   { id: 'prime',     name: 'Amazon Games',    color: '#00a8e1', scan: () => scanAmazon() },
   { id: 'itch',      name: 'itch.io',         color: '#fa5c5c', openUri: 'itch://', scan: () => scanItch() },
   // Xbox usa PowerShell y puede tardar unos segundos: viene desactivada por defecto
-  { id: 'xbox',    name: 'Xbox / Game Pass', color: '#3fae2a', openUri: 'xbox:', scan: () => scanXbox(), defaultEnabled: false },
+  { id: 'xbox',    name: 'Xbox / Game Pass', color: '#3fae2a', openUri: 'xbox:', scan: (o) => scanXbox(null, { knownPfns: (o && o.xboxPfns) || [] }), defaultEnabled: false },
 ];
 
 // Los juegos agregados a mano siempre existen

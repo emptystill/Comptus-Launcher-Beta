@@ -118,7 +118,7 @@ function pickImage(images, ...types) {
 const isPcPackage = (t) => !!(t && t.pfn);
 async function fetchXboxTitles({ session, request }) {
   let r;
-  try { r = await request(`${TITLEHUB}/users/xuid(${session.xuid})/titles/titlehistory/decoration/achievement,image,detail,scid`, { headers: live(session) }); }
+  try { r = await request(`${TITLEHUB}/users/xuid(${session.xuid})/titles/titlehistory/decoration/achievement,image,detail,scid,productid`, { headers: live(session) }); }
   catch { return { code: 'net', error: 'No se pudo conectar con Xbox Live.' }; }
   if (r.status === 401 || r.status === 403) return { code: 'expired', error: 'Xbox rechazó el acceso. Vuelve a iniciar sesión en Configuración > Xbox.' };
   if (!(r.status === 200 && r.json && Array.isArray(r.json.titles))) return { code: 'net', error: `Xbox Live respondió con un error (${r.status}).` };
@@ -132,6 +132,7 @@ async function fetchXboxTitles({ session, request }) {
     games.push({
       titleId: String(t.titleId),
       pfn: t.pfn || '',
+      productId: String(t.productId || '').toUpperCase(), // para abrir su página en la app de Xbox (msxbox://)
       name: t.name,
       cover: pickImage(t.images, 'Poster', 'BoxArt'),
       banner: pickImage(t.images, 'TitledHeroArt', 'SuperHeroArt', 'Screenshot'),
@@ -179,6 +180,9 @@ async function fetchXboxAchievements({ session, titleId, request }) {
   return { data: { total: list.length, unlocked: list.filter((a) => a.achieved).length, list, fetchedAt: Date.now() } };
 }
 
+// Página del juego en la app de Xbox para PC (desde ahí se instala, se desinstala o se gestiona)
+const xboxAppUri = (productId) => `msxbox://game/?productId=${encodeURIComponent(productId)}`;
+
 const norm = (s) => String(s || '').toLowerCase().replace(/[™®©:’'"\-–—!?.,]/g, ' ').replace(/\s+/g, ' ').trim();
 
 // Juegos de tu cuenta que no están instalados (los instalados se enlazan aparte con `matchInstalled`)
@@ -190,7 +194,9 @@ function xboxOwnedToGames(list, installedIds) {
     if (installedIds.has(id)) continue;
     out.push({
       id, source: 'xbox', name: o.name, installed: false, xboxTitleId: o.titleId,
-      installUri: `ms-windows-store://search/?query=${encodeURIComponent(o.name)}`,
+      // se instala desde su página en la app de Xbox; sin identificador de producto, búsqueda en la Microsoft Store
+      installUri: o.productId ? xboxAppUri(o.productId) : `ms-windows-store://search/?query=${encodeURIComponent(o.name)}`,
+      ...(o.productId ? { xboxProductId: o.productId } : {}),
       ...(o.cover ? { cover: o.cover } : {}),
       ...(o.banner ? { banner: o.banner } : {}),
       ...(o.logo ? { logo: o.logo } : {}),
@@ -209,4 +215,4 @@ function matchInstalled(g, list) {
   return o || null;
 }
 
-module.exports = { CLIENT_IDS, startDeviceCode, pollDeviceCode, refreshMs, xboxSession, fetchXboxTitles, fetchXboxAchievements, xboxOwnedToGames, matchInstalled };
+module.exports = { CLIENT_IDS, startDeviceCode, pollDeviceCode, refreshMs, xboxSession, fetchXboxTitles, fetchXboxAchievements, xboxOwnedToGames, matchInstalled, xboxAppUri };

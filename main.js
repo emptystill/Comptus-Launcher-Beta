@@ -219,7 +219,9 @@ function withAutoImages(g) {
 // ---------- Biblioteca ----------
 async function getLibrary() {
   const store = loadStore();
-  const scanned = await scanAll(store.settings.sources || {}, { ubisoftViaStore: store.settings.ubisoftViaStore !== false });
+  // Los paquetes de tu lista de Xbox sirven para reconocer instalados los juegos antiguos sin MicrosoftGame.config (p. ej. Gears 4)
+  const xboxPfns = store.owned.xboxAuth ? ((store.owned.xbox || {}).games || []).map((g) => g.pfn).filter(Boolean) : [];
+  const scanned = await scanAll(store.settings.sources || {}, { ubisoftViaStore: store.settings.ubisoftViaStore !== false, xboxPfns });
   const local = store.local.map((g) => ({ ...g, source: 'local' }));
   // Juegos de tus cuentas que no están instalados (se sincronizan aparte; se pueden ocultar en Configuración)
   const installed = new Set(scanned.filter((g) => g.installed !== false).map((g) => g.id));
@@ -244,7 +246,7 @@ async function getLibrary() {
     for (const g of scanned) {
       if (g.source !== 'xbox') continue;
       const o = xboxLive.matchInstalled(g, xboxList);
-      if (o) { g.xboxTitleId = o.titleId; if (o.lastPlayed) g.lastPlayed = Math.max(g.lastPlayed || 0, o.lastPlayed); }
+      if (o) { g.xboxTitleId = o.titleId; if (o.productId) g.xboxProductId = o.productId; if (o.lastPlayed) g.lastPlayed = Math.max(g.lastPlayed || 0, o.lastPlayed); }
     }
   }
   // Los juegos sin instalar que ya trae un escáner (p. ej. Ubisoft) también se ocultan con «mostrar los que no están instalados»
@@ -962,6 +964,10 @@ ipcMain.handle('game:uninstall', async (_e, id) => {
   if (g.source === 'epic') {
     await openLauncher('epic');
     return { ok: true, message: 'Desinstálalo desde tu Biblioteca en Epic Games Launcher (menú ⋯ del juego).' };
+  }
+  if (g.source === 'xbox') { // los juegos de Xbox se gestionan en la app de Xbox (la página del juego, si se conoce)
+    try { await shell.openExternal(g.xboxProductId ? xboxLive.xboxAppUri(g.xboxProductId) : 'xbox:'); } catch { await shell.openExternal('ms-settings:appsfeatures'); return { ok: true, message: `Busca "${g.name}" en la lista de aplicaciones y pulsa Desinstalar.` }; }
+    return { ok: true, message: g.xboxProductId ? 'En la app de Xbox, pulsa ⋯ (junto a Jugar) y elige Desinstalar.' : `En la app de Xbox, abre Mi biblioteca > "${g.name}" > ⋯ > Desinstalar.` };
   }
   await shell.openExternal('ms-settings:appsfeatures');
   return { ok: true, message: `Busca "${g.name}" en la lista de aplicaciones y pulsa Desinstalar.` };

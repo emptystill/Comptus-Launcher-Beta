@@ -1134,6 +1134,10 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.106
+- **Xbox: se detectan instalados los juegos antiguos de PC** (2016-2018, por ejemplo Gears of War 4). No tienen el archivo `MicrosoftGame.config` de los juegos modernos y Comptus los mostraba como «No instalado» aunque lo estuvieran. Ahora también se reconocen si están en tu lista de juegos de Xbox (con la cuenta iniciada): el nombre y la forma de abrirlos se leen del manifiesto del paquete.
+- **Xbox: instalar y desinstalar desde la app de Xbox.** Instalar un juego de Xbox abre su página en la app de Xbox (antes abría una búsqueda en la Microsoft Store), y Desinstalar también lleva ahí, en lugar de a la lista de aplicaciones de Windows. Hace falta sincronizar Xbox una vez para que Comptus conozca la página de cada juego; mientras tanto se abre la app de Xbox sin más.
+
 ## 1.84.105
 - **Xbox: solo juegos de PC de verdad.** Al iniciar sesión en Xbox salían también juegos de Xbox 360 y títulos antiguos que alguna vez jugaste (el historial de Xbox los marca a veces como «PC»). Ahora solo aparecen los que tienen paquete de Windows, es decir, los que se instalan desde la app de Xbox o la Microsoft Store. Las listas ya guardadas también se filtran, sin tener que volver a iniciar sesión.
 
