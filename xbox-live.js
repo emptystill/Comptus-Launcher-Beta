@@ -109,7 +109,13 @@ function pickImage(images, ...types) {
   return null;
 }
 
-// Juegos de PC de tu historial (los de consola se descartan)
+// Juegos de PC de tu historial (los de consola se descartan).
+// Solo los que tienen paquete de Windows (pfn), es decir, los que se instalan desde la app de Xbox o la Microsoft Store:
+// el historial incluye todo lo jugado alguna vez (también títulos de Xbox 360 y de «Games for Windows – LIVE» marcados
+// como PC), que ni son de tu biblioteca de PC ni se pueden instalar desde aquí.
+// Nota (21/11/2026): no hay forma de distinguir comprados de Game Pass. Se probaron collections.mp.microsoft.com
+// (devuelve 0 con permiso de usuario: es para editores) e inventory.xboxlive.com (vacío). Los que no quieras, ocúltalos.
+const isPcPackage = (t) => !!(t && t.pfn);
 async function fetchXboxTitles({ session, request }) {
   let r;
   try { r = await request(`${TITLEHUB}/users/xuid(${session.xuid})/titles/titlehistory/decoration/achievement,image,detail,scid`, { headers: live(session) }); }
@@ -121,6 +127,7 @@ async function fetchXboxTitles({ session, request }) {
     const devices = (t.devices || []).map((d) => String(d).toLowerCase());
     if (!devices.includes('pc') && !devices.includes('win32')) continue;
     if (t.type && !/game/i.test(t.type)) continue;
+    if (!isPcPackage(t)) continue;
     const ach = t.achievement || {};
     games.push({
       titleId: String(t.titleId),
@@ -178,7 +185,8 @@ const norm = (s) => String(s || '').toLowerCase().replace(/[™®©:’'"\-–�
 function xboxOwnedToGames(list, installedIds) {
   const out = [];
   for (const o of list || []) {
-    const id = o.pfn ? `xbox:${o.pfn}` : `xbox:t${o.titleId}`;
+    if (!isPcPackage(o)) continue; // listas guardadas por versiones anteriores: también se filtran
+    const id = `xbox:${o.pfn}`;
     if (installedIds.has(id)) continue;
     out.push({
       id, source: 'xbox', name: o.name, installed: false, xboxTitleId: o.titleId,
