@@ -32,6 +32,26 @@ function list(ud, id) {
   }).sort((a, b) => b.time - a.time || (a.path < b.path ? 1 : -1));
 }
 
+// Las últimas capturas de todos los juegos (para el perfil): [{ path, time, folder }], de la más nueva a la más antigua.
+// `folder` es el nombre de la carpeta del juego (su id pasado por `safe`).
+function recent(ud, limit = 12) {
+  let dirs = [];
+  try { dirs = fs.readdirSync(root(ud), { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name); } catch { return []; }
+  const out = [];
+  for (const folder of dirs) {
+    let names = [];
+    try { names = fs.readdirSync(path.join(root(ud), folder)); } catch { continue; }
+    for (const n of names) {
+      if (!/\.(jpe?g|png)$/i.test(n)) continue;
+      const file = path.join(root(ud), folder, n);
+      let time = 0;
+      try { time = fs.statSync(file).mtimeMs; } catch { continue; }
+      out.push({ path: file, time, folder });
+    }
+  }
+  return out.sort((a, b) => b.time - a.time).slice(0, Math.max(1, Math.min(60, limit)));
+}
+
 // Solo se borra dentro de la carpeta de capturas (nunca una ruta cualquiera)
 function remove(ud, file) {
   const r = path.resolve(root(ud)) + path.sep;
@@ -40,4 +60,4 @@ function remove(ud, file) {
   try { fs.unlinkSync(f); return true; } catch { return false; }
 }
 
-module.exports = { save, list, remove, dirFor, root, safe };
+module.exports = { save, list, recent, remove, dirFor, root, safe };

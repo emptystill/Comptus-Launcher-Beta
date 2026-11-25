@@ -57,7 +57,55 @@
     dawn: () => svg(
       `<rect width="${W}" height="${H}" fill="url(#sky)"/><circle cx="1180" cy="520" r="190" fill="#fff3d6" opacity=".9"/><circle cx="1180" cy="520" r="360" fill="url(#halo)"/><g filter="url(#b9)" fill="#fff" opacity=".7"><ellipse cx="320" cy="640" rx="360" ry="46"/><ellipse cx="700" cy="720" rx="420" ry="52"/><ellipse cx="1350" cy="760" rx="380" ry="44"/><ellipse cx="520" cy="300" rx="260" ry="34" opacity=".6"/></g>`,
       lg('sky', [[0, '#c3b1ff'], [0.55, '#ffb3c1'], [1, '#ffd7b5']]) + rg('halo', [[0, '#fff3d6', 0.6], [1, '#fff3d6', 0]]) + blur('b9', 14)),
+    // ---- Inspirados en otros launchers: solo el ambiente (colores y formas); ningún logotipo ni marca ----
+    // Steam: azul pizarra con rayos de luz diagonales y un brillo celeste arriba
+    'l-steam': () => { let rays = ''; for (let i = 0; i < 9; i++) rays += `<path d="M${-200 + i * 230} 0L${-60 + i * 230} 0L${520 + i * 230} ${H}L${380 + i * 230} ${H}Z" fill="#66c0f4" opacity="${(0.025 + (i % 3) * 0.012).toFixed(3)}"/>`;
+      return svg(`<rect width="${W}" height="${H}" fill="url(#sky)"/>${rays}<ellipse cx="1180" cy="-40" rx="760" ry="330" fill="url(#glow)"/><rect y="${H - 220}" width="${W}" height="220" fill="url(#floor)"/>`,
+        lg('sky', [[0, '#1b2838'], [0.55, '#14202d'], [1, '#0e141c']]) + rg('glow', [[0, '#66c0f4', 0.3], [1, '#66c0f4', 0]]) + lg('floor', [[0, '#0e141c', 0], [1, '#0a0f15', 0.9]])); },
+    // Epic: monocromo. Negro con planos angulosos en grises (como paneles de cristal inclinados) y una franja de luz vertical
+    'l-epic': () => {
+      const shards = [
+        ['0,0 620,0 380,900 0,900', '#1b1b1f', 1], ['620,0 980,0 700,900 380,900', '#141417', 1], ['980,0 1600,0 1600,420 1180,900 700,900', '#18181c', 1],
+        ['1180,900 1600,420 1600,900', '#202025', 1], ['520,0 560,0 330,900 290,900', '#ffffff', 0.05], ['1040,0 1052,0 760,900 748,900', '#ffffff', 0.08],
+        ['1300,0 1420,0 1600,250 1600,330', '#ffffff', 0.03],
+      ].map(([p, c, o]) => `<polygon points="${p}" fill="${c}" opacity="${o}"/>`).join('');
+      return svg(`<rect width="${W}" height="${H}" fill="#0e0e11"/>${shards}<rect x="1010" y="0" width="70" height="${H}" fill="url(#beam)" filter="url(#be1)"/><rect width="${W}" height="${H}" fill="url(#vig)"/>`,
+        lg('beam', [[0, '#ffffff', 0.18], [0.6, '#ffffff', 0.05], [1, '#ffffff', 0]]) + rg('vig', [[0.45, '#000000', 0], [1, '#000000', 0.55]]) + blur('be1', 22));
+    },
+    // Xbox: negro con anillos concéntricos y un resplandor verde
+    'l-xbox': () => { let rings = ''; for (let i = 1; i <= 9; i++) rings += `<circle cx="1220" cy="450" r="${i * 95}" fill="none" stroke="#9bf00b" stroke-width="${i % 3 ? 1.2 : 2.4}" opacity="${(0.16 - i * 0.012).toFixed(3)}"/>`;
+      return svg(`<rect width="${W}" height="${H}" fill="#0b0d0b"/><circle cx="1220" cy="450" r="520" fill="url(#g)"/>${rings}<ellipse cx="200" cy="${H}" rx="700" ry="240" fill="url(#g2)"/>`,
+        rg('g', [[0, '#107c10', 0.5], [1, '#107c10', 0]]) + rg('g2', [[0, '#107c10', 0.22], [1, '#107c10', 0]])); },
+    // GOG Galaxy: violeta profundo con nebulosas y estrellas
+    'l-gog': () => svg(`<rect width="${W}" height="${H}" fill="url(#sky)"/><g filter="url(#bg1)"><ellipse cx="420" cy="260" rx="560" ry="220" fill="#7b3fe4" opacity=".42" transform="rotate(-14 420 260)"/><ellipse cx="1220" cy="640" rx="620" ry="230" fill="#e05ea8" opacity=".28" transform="rotate(10 1220 640)"/></g>${stars(260, 111, '#f3e9ff')}`,
+      lg('sky', [[0, '#120a22'], [1, '#1d1033']]) + blur('bg1', 60)),
+    // Ubisoft Connect: azul noche con un remolino de arcos azul y violeta
+    'l-ubisoft': () => { let arcs = ''; for (let i = 0; i < 7; i++) { const r = 160 + i * 70; arcs += `<path d="M${800 - r} 450A${r} ${r} 0 1 1 ${800 + r * 0.7} ${450 + r * 0.7}" fill="none" stroke="${i % 2 ? '#8a5cff' : '#2f7bff'}" stroke-width="${10 - i}" stroke-linecap="round" opacity="${(0.42 - i * 0.045).toFixed(2)}" transform="rotate(${i * 24} 800 450)"/>`; }
+      return svg(`<rect width="${W}" height="${H}" fill="url(#sky)"/><circle cx="800" cy="450" r="600" fill="url(#g)"/><g filter="url(#bu1)">${arcs}</g>${arcs}`,
+        lg('sky', [[0, '#050a1c'], [1, '#0b1638']]) + rg('g', [[0, '#2f7bff', 0.28], [1, '#2f7bff', 0]]) + blur('bu1', 14)); },
+    // EA app: grafito con franjas diagonales y un brillo rojo-naranja
+    'l-ea': () => { let st = ''; for (let i = -6; i < 14; i++) st += `<path d="M${i * 160} ${H}L${i * 160 + 520} 0L${i * 160 + 560} 0L${i * 160 + 40} ${H}Z" fill="#ff4747" opacity="${(i % 4 === 0 ? 0.08 : 0.025).toFixed(3)}"/>`;
+      return svg(`<rect width="${W}" height="${H}" fill="#0b0b10"/>${st}<ellipse cx="300" cy="${H - 60}" rx="760" ry="320" fill="url(#g)"/><ellipse cx="1400" cy="80" rx="520" ry="240" fill="url(#g2)"/>`,
+        rg('g', [[0, '#ff4747', 0.32], [1, '#ff4747', 0]]) + rg('g2', [[0, '#ff8a3d', 0.18], [1, '#ff8a3d', 0]])); },
+    // Battle.net: azul marino con horizonte brillante y chispas
+    'l-battlenet': () => svg(`<rect width="${W}" height="${H}" fill="url(#sky)"/><ellipse cx="800" cy="${H + 40}" rx="1100" ry="380" fill="url(#hz)"/><rect y="${H - 190}" width="${W}" height="2" fill="#00c8ff" opacity=".45" filter="url(#bb1)"/>${stars(160, 121, '#9fdcff', H - 200)}${stars(30, 122, '#ffffff', H - 260)}`,
+      lg('sky', [[0, '#070a12'], [1, '#0f1a2e']]) + rg('hz', [[0, '#148eff', 0.5], [1, '#148eff', 0]]) + blur('bb1', 4)),
+    // Rockstar: casi negro con franjas amarillas en diagonal y un resplandor ámbar
+    'l-rockstar': () => { let st = ''; for (let i = -8; i < 16; i++) st += `<rect x="${i * 120}" y="-200" width="${i % 5 === 0 ? 26 : 8}" height="${H + 400}" fill="#fcaf17" opacity="${i % 5 === 0 ? 0.12 : 0.035}" transform="rotate(28 ${i * 120} ${H / 2})"/>`;
+      return svg(`<rect width="${W}" height="${H}" fill="#0c0a06"/>${st}<ellipse cx="1300" cy="${H - 80}" rx="720" ry="340" fill="url(#g)"/>`, rg('g', [[0, '#fcaf17', 0.22], [1, '#fcaf17', 0]])); },
   };
+
+  // Temas inspirados en otros launchers (vienen con Comptus). Solo colores y ambiente: sin logotipos ni marcas.
+  const LAUNCHER = [
+    { id: 'l-steam',     name: 'Estilo Steam',       bg: '#171d25', panel: '#1b2838', text: '#c7d5e0', accent: '#66c0f4', accent2: '#1a9fff', art: 'l-steam',     dim: 30 },
+    { id: 'l-epic',      name: 'Estilo Epic',        bg: '#101013', panel: '#202024', text: '#f5f5f5', accent: '#f2f2f2', accent2: '#8f8f96', art: 'l-epic',      dim: 25 },
+    { id: 'l-xbox',      name: 'Estilo Xbox',        bg: '#0d0f0d', panel: '#1a1d1a', text: '#eef3ee', accent: '#45c11f', accent2: '#9bf00b', art: 'l-xbox',      dim: 28 },
+    { id: 'l-gog',       name: 'Estilo GOG Galaxy',  bg: '#130c20', panel: '#21163a', text: '#efe8fb', accent: '#a26bf4', accent2: '#e05ea8', art: 'l-gog',       dim: 28 },
+    { id: 'l-ubisoft',   name: 'Estilo Ubisoft',     bg: '#070c1e', panel: '#0f1838', text: '#e8eeff', accent: '#3b86ff', accent2: '#9a6bff', art: 'l-ubisoft',   dim: 28 },
+    { id: 'l-ea',        name: 'Estilo EA app',      bg: '#0c0c11', panel: '#18181f', text: '#f3f3f7', accent: '#ff4b4b', accent2: '#ff8a3d', art: 'l-ea',        dim: 28 },
+    { id: 'l-battlenet', name: 'Estilo Battle.net',  bg: '#090d15', panel: '#121a28', text: '#e6edf7', accent: '#1a92ff', accent2: '#00c8ff', art: 'l-battlenet', dim: 28 },
+    { id: 'l-rockstar',  name: 'Estilo Rockstar',    bg: '#0d0b07', panel: '#1a160e', text: '#f6eedb', accent: '#fcaf17', accent2: '#ff7a00', art: 'l-rockstar',  dim: 25 },
+  ];
 
   // dim = cuánto se oscurece el fondo con el color del tema (0-100)
   const THEMES = [
@@ -102,5 +150,6 @@
     ids: Object.keys(ART).concat(IMG.map((t) => t.id)),
   };
   window.ART_THEMES = THEMES;
+  window.LAUNCHER_THEMES = LAUNCHER;
   window.IMG_THEMES = IMG.map((t) => ({ ...t, art: t.id }));
 })();

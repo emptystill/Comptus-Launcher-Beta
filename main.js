@@ -645,7 +645,8 @@ ipcMain.handle('friends:get', async (_e, force) => {
 
 // Perfil de Steam propio (avatar, nombre, estado, nivel, código de amigo y cuenta local)
 let profMem = null;
-ipcMain.handle('profile:get', async (_e, force) => {
+ipcMain.handle('profile:get', (_e, force) => steamProfile(force));
+async function steamProfile(force) {
   try {
     if (!force && profMem && Date.now() - profMem.at < 60 * 1000) return profMem.res;
     const st = loadStore(); const key = String(st.settings.steamKey || '').trim();
@@ -659,7 +660,37 @@ ipcMain.handle('profile:get', async (_e, force) => {
     }
     profMem = { at: Date.now(), res: out }; return out;
   } catch { return { ok: false, code: 'net' }; }
+}
+
+// Cuentas conectadas para el selector de perfil del menú superior: [{ id, name, avatar, url }]
+// Steam (nombre y avatar), Xbox (gamertag y su imagen, pedida a Xbox Live con la sesión que ya hay) y Epic (nombre; Epic no da la foto).
+let xboxPicMem = null; // { xuid, pic, at }
+ipcMain.handle('accounts:list', async () => {
+  const out = [];
+  try { const p = await steamProfile(false); if (p && p.ok && (p.name || p.account)) out.push({ id: 'steam', name: p.name || p.account, avatar: p.avatar || '', url: p.url || '' }); } catch { /* sin Steam */ }
+  try {
+    const st = loadStore(); const xa = loadXboxAuth(st);
+    if (xa && xa.gamertag) {
+      let pic = xboxPicMem && xboxPicMem.xuid === xa.xuid && Date.now() - xboxPicMem.at < 3600000 ? xboxPicMem.pic : null;
+      if (pic === null) {
+        pic = '';
+        try {
+          const a = await xboxAuthed();
+          if (a.session) {
+            const r = await epicRequest(`https://profile.xboxlive.com/users/xuid(${a.session.xuid})/profile/settings?settings=GameDisplayPicRaw`, { headers: { Authorization: a.session.header, 'x-xbl-contract-version': '2', Accept: 'application/json' } });
+            const s = r && r.json && r.json.profileUsers && r.json.profileUsers[0] && (r.json.profileUsers[0].settings || []).find((x) => x.id === 'GameDisplayPicRaw');
+            if (s && s.value) pic = String(s.value).replace(/^http:/, 'https:') + (String(s.value).includes('?') ? '&' : '?') + 'w=128&h=128';
+          }
+        } catch { /* sin imagen */ }
+        xboxPicMem = { xuid: xa.xuid, pic, at: Date.now() };
+      }
+      out.push({ id: 'xbox', name: xa.gamertag, avatar: pic, url: `https://www.xbox.com/play/user/${encodeURIComponent(xa.gamertag)}` });
+    }
+  } catch { /* sin Xbox */ }
+  try { const ea = loadEpicAuth(loadStore()); if (ea && ea.name) out.push({ id: 'epic', name: ea.name, avatar: '', url: 'https://www.epicgames.com/account/personal' }); } catch { /* sin Epic */ }
+  return out;
 });
+
 const PROFILE_ACTIONS = {
   funds: 'https://store.steampowered.com/steamaccount/addfunds', privacy: 'https://steamcommunity.com/my/edit/settings', account: 'https://store.steampowered.com/account',
   addfriend: 'steam://friends/add', 'status:online': 'steam://friends/status/online', 'status:away': 'steam://friends/status/away', 'status:busy': 'steam://friends/status/busy', 'status:invisible': 'steam://friends/status/invisible', 'status:offline': 'steam://friends/status/offline',
@@ -2801,6 +2832,7 @@ ipcMain.on('overlay:resize', (_e, h) => {
 ipcMain.handle('overlay:hide', () => { if (overlay && !overlay.isDestroyed()) overlay.hide(); return true; });
 
 ipcMain.handle('shots:list', (_e, id) => shots.list(app.getPath('userData'), id));
+ipcMain.handle('shots:recent', (_e, n) => shots.recent(app.getPath('userData'), Number(n) || 12));
 ipcMain.handle('shots:delete', (_e, file) => shots.remove(app.getPath('userData'), file));
 ipcMain.handle('shots:openFolder', async (_e, id) => {
   const dir = shots.dirFor(app.getPath('userData'), id);

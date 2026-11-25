@@ -12,7 +12,8 @@ const SOURCE_ICONS = {
   prime: "<path d=\"M3 12.5C6 16.5 18 16.5 21 12.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/><text x=\"12\" y=\"11\" text-anchor=\"middle\" font-family=\"Segoe UI,Arial,sans-serif\" font-size=\"9\" font-weight=\"800\" fill=\"currentColor\">prime</text>",
   rockstar: "<rect x=\"2.5\" y=\"2.5\" width=\"19\" height=\"19\" rx=\"4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"/><text x=\"12\" y=\"17\" text-anchor=\"middle\" font-family=\"Segoe UI,Arial,sans-serif\" font-size=\"13\" font-weight=\"800\" fill=\"currentColor\">R</text>",
   other: "<path d=\"M5 8h14l-1 12H6zM9 8V6a3 3 0 016 0v2\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>",
-  local: "<rect x=\"2.5\" y=\"7\" width=\"19\" height=\"10.5\" rx=\"5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M8 10.3v4.4M5.8 12.5h4.4\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"15.6\" cy=\"11.6\" r=\"1.1\" fill=\"currentColor\"/><circle cx=\"18.2\" cy=\"13.6\" r=\"1.1\" fill=\"currentColor\"/>",
+  // Locales: mando relleno (más visible a tamaño pequeño que el de contorno), con la cruceta y dos botones recortados
+  local: "<path fill-rule=\"evenodd\" d=\"M7.2 5.5h9.6a5.2 5.2 0 0 1 5.1 4.2l1.05 5.6a3.2 3.2 0 0 1-5.5 2.7L15.6 16H8.4l-1.85 2a3.2 3.2 0 0 1-5.5-2.7l1.05-5.6A5.2 5.2 0 0 1 7.2 5.5zM6.75 8.9h1.7v1.55H10v1.7H8.45v1.55h-1.7v-1.55H5.2v-1.7h1.55zM14.55 10.3a1.25 1.25 0 1 0 2.5 0a1.25 1.25 0 1 0-2.5 0zM16.95 12.7a1.25 1.25 0 1 0 2.5 0a1.25 1.25 0 1 0-2.5 0z\"/>",
 };
 
 // Devuelve un <span> con el logo de la biblioteca (toma el color del texto de su contenedor)

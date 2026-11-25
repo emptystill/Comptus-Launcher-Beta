@@ -95,7 +95,9 @@
     bell = el('button', 'icon-btn'); bell.id = 'bellBtn'; bell.type = 'button'; bell.title = 'Avisos'; bell.append(iconEl('bell'));
     badge = el('span', 'fbadge hidden'); bell.append(badge); bell.onclick = bellMenu;
     const pw = el('button', 'icon-btn'); pw.id = 'powerBtn'; pw.type = 'button'; pw.title = 'Volumen y energía del equipo'; pw.append(iconEl('power')); pw.onclick = powerMenu; root.__pwrBtn = pw;
-    couchBtn.before(bell, pw); paintBell();
+    // la campana va en el menú superior, junto a tu nombre de Steam; energía, en la barra de iconos
+    const prof = $('#topProfile'); if (prof) prof.before(bell); else couchBtn.before(bell);
+    couchBtn.before(pw); paintBell();
     // Barra para cambiar el tamaño de las portadas: abajo a la derecha de la ventana
     const sz = $('#sizeQuick'); if (sz) { sz.classList.add('size-corner'); document.body.append(sz); }
     paintPill();

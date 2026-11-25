@@ -15,15 +15,12 @@
       <button class="filter active" data-filter="all"><i data-ic="gamepad"></i> Página principal <span class="count" data-count="all"></span></button>
       <button class="filter" data-filter="favorites"><i data-ic="star"></i> Favoritos <span class="count" data-count="favorites"></span></button>
       <button class="filter" data-filter="recent"><i data-ic="clock"></i> Recientes <span class="count" data-count="recent"></span></button>
-      <button class="filter" data-filter="wish"><i data-ic="heart"></i> Deseados <span class="count" data-count="wish"></span></button>
-      <button class="filter" data-filter="free"><i data-ic="gift"></i> Gratis <span class="count" data-count="free"></span></button>
-      <button class="filter" data-filter="events"><i data-ic="calendar"></i> Eventos <span class="count" data-count="events"></span></button>
-      <button class="filter" data-filter="community"><i data-ic="globe"></i> Comunidad</button>
       <button class="filter" data-filter="hidden"><i data-ic="eyeOff"></i> Ocultos <span class="count" data-count="hidden"></span></button>
       <div class="nav-title collapsible" data-sec="sources" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span>Bibliotecas</div>
       <div id="sourceFilters"></div>
-      <div class="nav-title collapsible" data-sec="colls" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span><span class="nav-link" id="collsLink" title="Ver todas las colecciones">Colecciones</span> <button id="newColl" class="mini" title="Nueva colección"><i data-ic="plus"></i></button></div>
-      <div id="collList"></div>
+      <!-- Colecciones: ahora en el menú superior (se dejan ocultas porque el código las sigue usando) -->
+      <div class="nav-title collapsible hidden" data-sec="colls" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span><span class="nav-link" id="collsLink" title="Ver todas las colecciones">Colecciones</span> <button id="newColl" class="mini" title="Nueva colección"><i data-ic="plus"></i></button></div>
+      <div id="collList" class="hidden"></div>
     </nav>
     <div class="nav-title list-title collapsible" data-sec="games" title="Mostrar u ocultar esta sección"><span><span class="sec-chev"><i data-ic="chevD"></i></span>Juegos</span> <span class="count" id="listCount"></span></div>
     <div id="gameList" class="game-list"></div>
@@ -33,6 +30,20 @@
 
   <main>
     <div id="bgLayer" class="bg-layer"></div>
+    <!-- Menú superior estilo Steam: cada apartado con su palabra; el activo, subrayado -->
+    <nav id="topNav" class="top-nav">
+      <div class="top-items">
+        <button class="top-item" data-top="all">Biblioteca</button>
+        <button class="top-item" data-top="collections">Colecciones</button>
+        <button class="top-item" data-top="wish">Deseados<span class="top-count" data-count="wish"></span></button>
+        <button class="top-item" data-top="free">Gratis<span class="top-count" data-count="free"></span></button>
+        <button class="top-item" data-top="events">Eventos<span class="top-count" data-count="events"></span></button>
+        <button class="top-item" data-top="community">Comunidad</button>
+        <button class="top-item" data-top="stats">Estadísticas</button>
+      </div>
+      <button id="topProfile" class="top-profile hidden"><img alt="" /><span class="tp-name"></span></button>
+    </nav>
+    <!-- Barra de iconos: con la ventana en horizontal, columna a la derecha; en vertical, fila debajo del menú -->
     <header class="toolbar">
       <div id="searchBox" class="search-box">
         <button id="searchBtn" class="icon-btn" title="Buscar juego (Ctrl + F)"><i data-ic="search"></i></button>
@@ -52,7 +63,7 @@
 <button id="filterBtn" class="icon-btn" title="Filtrar y ordenar"><i data-ic="filter"></i><span id="filterCount" class="fbadge hidden"></span></button>
       <button id="couchBtn" class="icon-btn" title="Modo consola (pantalla completa para televisor y mando)"><i data-ic="monitor"></i></button>
       <button id="diceBtn" class="icon-btn" title="¿Qué juego hoy?"><i data-ic="dice"></i></button>
-      <button id="statsBtn" class="icon-btn" title="Estadísticas"><i data-ic="chart"></i></button>
+      <button id="statsBtn" class="icon-btn hidden" title="Estadísticas"><i data-ic="chart"></i></button>
       <input id="sizeQuick" type="range" min="90" max="480" step="10" title="Tamaño de las portadas (también Ctrl + rueda del ratón)" />
       <button id="onlyInstalled" class="icon-btn on" title="Solo juegos instalados (los locales siempre se ven): activado"><i data-ic="hdd"></i></button>
       <button id="selectBtn" class="icon-btn" title="Seleccionar varios juegos para añadirlos a una colección (también Ctrl + clic)"><i data-ic="checkSquare"></i></button>
@@ -67,6 +78,7 @@
     <section id="wishPage" class="stats-page hidden"></section>
     <section id="eventsPage" class="stats-page hidden"></section>
     <section id="communityPage" class="stats-page hidden"></section>
+    <section id="profilePage" class="stats-page profile-page hidden"></section>
   </main>
 
   <aside id="filterSide" class="filter-side" aria-hidden="true"><div class="filter-inner"><div class="fhead"></div><div class="fbody"></div></div></aside>
@@ -103,6 +115,8 @@
       <section class="settings-page hidden" data-page="look">
       <h3 class="page-h">Temas</h3>
       <div id="presets" class="presets"></div>
+      <div class="section-label">Inspirados en launchers</div>
+      <div id="launcherPresets" class="presets"></div>
       <div class="section-label">Temas con ilustración</div>
       <div id="imgPresets" class="presets"></div>
       
@@ -471,6 +485,7 @@
   <script src="vendor/hls.min.js"></script>
   <script src="dupes.js"></script>
   <script src="stats.js"></script>
+  <script src="profile.js"></script>
   <script src="random.js"></script>
   <script src="padicons.js"></script>
   <script src="gamepad.js"></script>

@@ -265,12 +265,18 @@ function el(tag, cls, text) {
 
 // ---------- Menú contextual (para los botones de icono y el clic derecho) ----------
 let menuEl = null;
+let menuAnchor = null;      // botón que abrió el menú que está abierto
+let menuClosedFrom = null;  // el clic que acaba de cerrar el menú fue sobre su propio botón
 function closeMenu() {
   if (menuEl) { menuEl.remove(); menuEl = null; }
+  menuAnchor = null;
 }
 // `anchor` puede ser un elemento o un punto { x, y }
 function showMenu(anchor, items) {
+  // segundo clic en el mismo botón (p. ej. la campana): el menú se cierra y no se vuelve a abrir
+  if (anchor && menuClosedFrom === anchor) { menuClosedFrom = null; return; }
   closeMenu();
+  if (anchor && typeof anchor.contains === 'function') menuAnchor = anchor;
   const m = el('div', 'ctx-menu');
   for (const it of items) {
     if (it.sep) { m.append(el('div', 'ctx-sep')); continue; }
@@ -299,7 +305,13 @@ function showMenu(anchor, items) {
   m.style.left = left + 'px';
   m.style.top = top + 'px';
 }
-document.addEventListener('mousedown', (e) => { if (menuEl && !menuEl.contains(e.target)) closeMenu(); });
+document.addEventListener('mousedown', (e) => {
+  menuClosedFrom = null;
+  if (menuEl && !menuEl.contains(e.target)) {
+    if (menuAnchor && menuAnchor.contains(e.target)) menuClosedFrom = menuAnchor; // el clic que viene no debe reabrirlo
+    closeMenu();
+  }
+});
 window.addEventListener('blur', closeMenu);
 
 // ---------- Seguimiento: estado y etiquetas propias de cada juego ----------
@@ -552,6 +564,15 @@ function renderCollections(counts) {
   box.replaceChildren(...nodes);
 }
 
+// Últimos números de Gratis, Deseados y Eventos: se muestran al abrir hasta que llegan los datos (guardados solo en este equipo)
+let lastCounts = {};
+try { lastCounts = JSON.parse(localStorage.getItem('comptus.counts') || '{}') || {}; } catch { lastCounts = {}; }
+function rememberCounts(c) {
+  const next = { free: freeData ? c.free : lastCounts.free, wish: wishData ? c.wish : lastCounts.wish, events: evData ? c.events : lastCounts.events };
+  if (next.free === lastCounts.free && next.wish === lastCounts.wish && next.events === lastCounts.events) return;
+  lastCounts = next;
+  try { localStorage.setItem('comptus.counts', JSON.stringify(next)); } catch { /* sin almacenamiento */ }
+}
 function updateCounts() {
   const visible = state.games.filter((g) => !g.hidden);
   const counts = {
@@ -559,10 +580,12 @@ function updateCounts() {
     favorites: visible.filter((g) => !g.dupOf && g.favorite).length,
     recent: visible.filter((g) => !g.dupOf && g.lastPlayed).length,
     hidden: state.games.filter((g) => g.hidden).length,
-    free: (() => { try { return freeCount(); } catch { return 0; } })(),
-    wish: (() => { try { return wishCount(); } catch { return 0; } })(),
-    events: (() => { try { return evLive(); } catch { return 0; } })(),
+    // mientras no han llegado los datos (se cargan unos segundos después de abrir), el último número conocido
+    free: (() => { try { return freeData ? freeCount() : (lastCounts.free || 0); } catch { return 0; } })(),
+    wish: (() => { try { return wishData ? wishCount() : (lastCounts.wish || 0); } catch { return 0; } })(),
+    events: (() => { try { return evData ? evLive() : (lastCounts.events || 0); } catch { return 0; } })(),
   };
+  rememberCounts(counts);
   for (const g of visible) {
     if (g.viaStore && g.dupOf) continue;
     counts[g.source] = (counts[g.source] || 0) + 1;
@@ -654,6 +677,277 @@ function playIn(target) {
   window.__diceRestore = (s) => { if (s && modes.some((m) => m.id === s.diceMode)) $('#diceMode').value = s.diceMode; if (s && s.diceSkip === false) $('#diceSkip').checked = false; };
 }
 $('#statsBtn').onclick = () => { state.filter = state.filter === 'stats' ? 'all' : 'stats'; state.detailId = null; render(); };
+
+// ---------- Menú superior (estilo Steam) ----------
+// BIBLIOTECA queda subrayada en todo lo que es tu biblioteca: página principal, favoritos, bibliotecas, colecciones y la ficha de un juego
+const TOP_PAGES = ['wish', 'free', 'events', 'community', 'stats', 'profile'];
+const inCollView = () => state.filter === 'collections' || state.filter.startsWith('col:'); // todas las colecciones o una de ellas
+function syncTopNav() {
+  const cur = state.detailId ? 'all' : TOP_PAGES.includes(state.filter) ? state.filter : inCollView() ? 'collections' : 'all';
+  document.querySelectorAll('#topNav .top-item').forEach((b) => b.classList.toggle('active', b.dataset.top === cur));
+}
+$('#topNav').onclick = (e) => {
+  const b = e.target.closest('.top-item');
+  if (!b) return;
+  const key = b.dataset.top;
+  // en la ficha de un juego, BIBLIOTECA vuelve a la lista donde estabas; desde otro apartado o una colección, a la página principal
+  if (key === 'all') { if (TOP_PAGES.includes(state.filter) || inCollView()) state.filter = 'all'; }
+  else state.filter = key;
+  state.detailId = null;
+  render();
+};
+// Perfil de Comptus, arriba a la derecha: tu nombre y tu foto (los que pongas en tu página de perfil; si no, los de tu cuenta
+// de Steam —o la primera conectada— y, sin ninguna, tu usuario de Windows). Clic: abre tu página de perfil.
+// Se guarda en settings.profile = { name, avatar, cover } (avatar y portada: imágenes copiadas a «Comptus Media»).
+let topAccounts = [];
+let myProfile = { name: '', avatar: '', cover: '' };
+let profileDefaults = { name: '', avatar: '' };
+const profileName = () => myProfile.name || profileDefaults.name || 'Tu perfil';
+const profileAvatar = () => (myProfile.avatar ? imgUrl(myProfile.avatar) : profileDefaults.avatar || '');
+function applyTopProfile() {
+  const box = $('#topProfile');
+  const img = box.querySelector('img');
+  const av = profileAvatar();
+  if (av) { if (img.getAttribute('src') !== av) img.src = av; img.classList.remove('hidden'); } else { img.removeAttribute('src'); img.classList.add('hidden'); }
+  box.querySelector('.tp-name').textContent = profileName();
+  box.title = 'Ver mi perfil de Comptus';
+  box.onclick = openProfile;
+  box.classList.remove('hidden');
+}
+async function paintTopProfile() {
+  // 1) al instante: tu perfil guardado y el último nombre y foto conocidos de tu cuenta (sin esperar a internet)
+  try { const c = JSON.parse(localStorage.getItem('comptus.profileDefaults') || 'null'); if (c && typeof c === 'object') profileDefaults = { name: String(c.name || ''), avatar: String(c.avatar || '') }; } catch { /* nada guardado */ }
+  try { const s = await window.api.getSettings(); const p = (s && s.profile) || {}; myProfile = { name: String(p.name || ''), avatar: String(p.avatar || ''), cover: String(p.cover || '') }; } catch { /* sin ajustes */ }
+  if (!profileDefaults.name) { try { profileDefaults.name = await window.api.userName(); } catch { /* sin nombre */ } }
+  applyTopProfile();
+  // 2) después: tus cuentas (Steam y Xbox se consultan por internet) por si cambiaron tu nombre o tu foto
+  try { topAccounts = window.api.accountsList ? await window.api.accountsList() : []; } catch { topAccounts = []; }
+  const acc = topAccounts.find((a) => a.id === 'steam') || topAccounts[0] || null;
+  let defName = acc ? acc.name : '';
+  if (!defName) { try { defName = await window.api.userName(); } catch { defName = ''; } }
+  const next = { name: defName || profileDefaults.name, avatar: acc && acc.avatar ? acc.avatar : (topAccounts.length ? '' : profileDefaults.avatar) };
+  if (next.name !== profileDefaults.name || next.avatar !== profileDefaults.avatar) {
+    profileDefaults = next;
+    try { localStorage.setItem('comptus.profileDefaults', JSON.stringify(next)); } catch { /* sin almacenamiento */ }
+    applyTopProfile();
+    if (state.filter === 'profile' && !profileEditing) renderProfile();
+  }
+}
+paintTopProfile();
+
+// ---------- Perfil de Comptus (página) ----------
+// Reúne todo lo tuyo (los cálculos están en profile.js): nivel de Comptus, insignias, escaparate, actividad, logros, colecciones y tiendas
+if (!UI_ICONS.moon) UI_ICONS.moon = '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>';
+if (!UI_ICONS.flame) UI_ICONS.flame = '<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.2 1.2-3.6 2.4-4.8.3 1.6 1.1 2.6 2.1 3C11 8.6 11.2 5.6 12 3z"/>';
+if (!UI_ICONS.flag) UI_ICONS.flag = '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>';
+if (!UI_ICONS.layers) UI_ICONS.layers = '<path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/>';
+const TIER_COLORS = ['#c98a4b', '#c3ccd6', '#f5c542', '#6fe3d3', '#9fd8ff']; // bronce, plata, oro, platino, diamante
+function openProfile() { profileEditing = false; state.filter = 'profile'; state.detailId = null; render(); $('#profilePage').scrollTop = 0; }
+// Personalizar el perfil: nombre, foto y portada (vacío = se vuelve a lo de por defecto)
+let profileEditing = false;
+async function saveProfile(patch, repaint = true) {
+  myProfile = { ...myProfile, ...patch };
+  await window.api.setSettings({ profile: { name: myProfile.name || '', avatar: myProfile.avatar || '', cover: myProfile.cover || '' } });
+  const b = $('#topProfile'); // el botón de arriba a la derecha, al momento
+  b.querySelector('.tp-name').textContent = profileName();
+  const img = b.querySelector('img'); const av = profileAvatar();
+  if (av) { img.src = av; img.classList.remove('hidden'); } else { img.removeAttribute('src'); img.classList.add('hidden'); }
+  if (repaint && state.filter === 'profile') renderProfile();
+}
+async function pickProfileImage(kind) {
+  const p = await window.api.pickImage(kind === 'avatar' ? 'icon' : 'banner', kind === 'avatar' ? 'Perfil - foto' : 'Perfil - portada');
+  if (!p) return;
+  const i = $('.pf-name-input'); if (i) myProfile.name = i.value.trim(); // no perder el nombre a medio escribir
+  saveProfile(kind === 'avatar' ? { avatar: p } : { cover: p });
+}
+async function renderProfile() {
+  const box = $('#profilePage');
+  if (!statsLoaded && window.api.statsSessions) { try { statsSessions = await window.api.statsSessions(); } catch { statsSessions = []; } statsLoaded = true; }
+  if (state.filter !== 'profile' || state.detailId) return;
+  const P = window.Profile.compute(state.games, statsSessions, { collections });
+  const T = window.Stats.fmtTime;
+  const byId = (id) => state.games.find((x) => x.id === id);
+  const name = profileName();
+
+  const card = (title, cls, ...kids) => { const c = el('section', 'pf-card' + (cls ? ' ' + cls : '')); c.append(el('h3', null, title), ...kids); return c; };
+  const hint = (t) => el('p', 'hint', t);
+  const achBar = (a) => { const w = el('div', 'pf-achbar'); const f = el('i'); f.style.width = Math.round((a.unlocked / a.total) * 100) + '%'; w.append(f); return w; };
+
+  // --- Cabecera: tu portada (o el banner del juego al que más has jugado), tu foto, tu nombre y tu nivel ---
+  const hero = el('div', 'pf-hero' + (profileEditing ? ' editing' : ''));
+  const bgEl = el('div', 'pf-hero-bg');
+  const favG = P.fav && byId(P.fav.id);
+  if (myProfile.cover) setBackground(bgEl, [imgUrl(myProfile.cover)], 'var(--panel)');
+  else if (favG) setBackground(bgEl, [favG.bannerSm || favG.banner, favG.bannerFallback].filter(Boolean).map(imgUrl), colorFor(favG.name));
+  const av = el('div', 'pf-avatar');
+  const avUrl = profileAvatar();
+  if (avUrl) { const i = document.createElement('img'); i.src = avUrl; i.alt = ''; av.append(i); } else av.append(el('span', null, (name || '?').slice(0, 1).toUpperCase()));
+  const who = el('div', 'pf-who');
+  if (profileEditing) {
+    // edición: el nombre se escribe aquí mismo; la foto se cambia pulsándola
+    const inp = el('input', 'pf-name-input'); inp.value = myProfile.name || ''; inp.placeholder = profileDefaults.name || 'Tu nombre'; inp.maxLength = 32;
+    inp.onchange = () => saveProfile({ name: inp.value.trim() }, false);
+    inp.onkeydown = (e) => { if (e.key === 'Enter') { inp.blur(); } };
+    who.append(inp);
+    const pick = el('button', 'pf-av-edit', '[[camera]]'); pick.type = 'button'; pick.title = 'Cambiar la foto de perfil';
+    pick.onclick = () => pickProfileImage('avatar');
+    av.append(pick);
+  } else who.append(el('h1', null, name));
+  who.append(el('div', 'pf-sub', `Perfil de Comptus${P.since ? ' · jugando desde ' + new Date(P.since).toLocaleDateString('es', { month: 'long', year: 'numeric' }) : ''}`));
+  // botones de personalización (arriba a la derecha de la cabecera)
+  const tools = el('div', 'pf-tools');
+  if (profileEditing) {
+    const b = (txt, fn, cls) => { const x = el('button', 'small' + (cls ? ' ' + cls : ''), txt); x.type = 'button'; x.onclick = fn; return x; };
+    tools.append(
+      b('[[camera]] Foto', () => pickProfileImage('avatar')),
+      ...(myProfile.avatar ? [b('[[undo]] Foto original', () => saveProfile({ avatar: '' }))] : []),
+      b('[[image]] Portada', () => pickProfileImage('cover')),
+      ...(myProfile.cover ? [b('[[undo]] Portada original', () => saveProfile({ cover: '' }))] : []),
+      b('[[check]] Listo', () => { const i = $('.pf-name-input'); if (i) myProfile.name = i.value.trim(); profileEditing = false; saveProfile({ name: myProfile.name }); }, 'primary'),
+    );
+  } else {
+    const e = el('button', 'small ghost pf-edit', '[[pencil]] Editar perfil'); e.type = 'button';
+    e.onclick = () => { profileEditing = true; renderProfile(); };
+    tools.append(e);
+  }  const lv = el('div', 'pf-level');
+  const ring = el('div', 'pf-ring'); ring.style.setProperty('--p', (P.level.pct * 100).toFixed(1)); ring.append(el('b', null, String(P.level.level)));
+  const lvTx = el('div', 'pf-lvtx');
+  const bar = el('div', 'pf-xpbar'); const fill = el('i'); fill.style.width = (P.level.pct * 100).toFixed(1) + '%'; bar.append(fill);
+  lvTx.append(el('div', 'pf-lvt', `Nivel ${P.level.level}`), bar, el('div', 'pf-xp', `${P.level.xp.toLocaleString('es')} XP · faltan ${(P.level.next - P.level.xp).toLocaleString('es')} para el nivel ${P.level.level + 1}`));
+  lv.append(ring, lvTx);
+  const xp = P.xpParts;
+  lv.title = `Cómo se gana experiencia en Comptus:\n· Horas de juego: ${xp.hours.toLocaleString('es')} XP\n· Logros: ${xp.achievements.toLocaleString('es')} XP\n· Juegos al 100 %: ${xp.perfect.toLocaleString('es')} XP\n· Juegos jugados: ${xp.played.toLocaleString('es')} XP\n· Terminados: ${xp.finished.toLocaleString('es')} XP\n· Colecciones: ${xp.collections.toLocaleString('es')} XP`;
+  hero.append(bgEl, tools, av, who, lv);
+
+  // --- Cifras ---
+  const tiles = el('div', 'pf-tiles');
+  const tile = (v, l, ic) => { const t = el('div', 'pf-tile'); const tx = el('div', 'pf-tile-tx'); tx.append(el('b', null, v), el('span', null, l)); t.append(el('span', 'pf-tile-ic', `[[${ic}]]`), tx); return t; };
+  tiles.append(tile(T(P.totals.min), 'jugado en total', 'clock'), tile(`${P.totals.played} / ${P.totals.library}`, 'juegos jugados', 'gamepad'),
+    tile(String(P.totals.perfect), 'juegos al 100 %', 'trophy'), tile(P.totals.achUnlocked.toLocaleString('es'), 'logros conseguidos', 'gem'),
+    tile(String(P.totals.collections), 'colecciones', 'folder'), tile(`${P.earnedBadges} / ${P.badges.length}`, 'insignias', 'star'));
+
+  // --- Escaparate: tu juego más jugado ---
+  let show = null;
+  if (favG) {
+    const sc = el('div', 'pf-show');
+    const art = el('div', 'pf-show-art'); setBackground(art, [favG.bannerSm || favG.banner, favG.bannerFallback].filter(Boolean).map(imgUrl), colorFor(favG.name));
+    const info = el('div', 'pf-show-info');
+    info.append(el('div', 'pf-show-name', favG.name), el('div', 'pf-show-big', T(P.fav.min)), el('div', 'hint', 'jugadas'));
+    if (P.fav.ach) info.append(el('div', 'pf-show-ach', `${P.fav.ach.unlocked} de ${P.fav.ach.total} logros`), achBar(P.fav.ach));
+    const st = statusDef(P.fav.status); if (st) { const c = el('span', 'st-chip on', st.label); c.style.setProperty('--sc', st.color); c.style.cursor = 'default'; info.append(c); }
+    const open = el('button', 'small', '[[file]] Abrir ficha'); open.type = 'button'; open.onclick = () => openDetail(favG.id); info.append(open);
+    sc.append(art, info);
+    show = card('Escaparate · tu juego más jugado', 'wide', sc);
+  }
+
+  // --- Actividad reciente ---
+  const recent = el('div', 'pf-recent');
+  for (const r of P.recent) {
+    const g = byId(r.id); if (!g) continue;
+    const row = el('button', 'pf-rrow'); row.type = 'button'; row.onclick = () => openDetail(g.id);
+    const cv = el('div', 'pf-rcov'); cv.append(makeCover(g, true));
+    const tx = el('div', 'pf-rtx');
+    tx.append(el('div', 'pf-rname', g.name), el('div', 'hint', `${r.twoWeeks ? T(r.twoWeeks) + ' en las últimas 2 semanas · ' : ''}${T(r.min)} en total`), el('div', 'hint', `Última sesión: ${formatLastSession(r.lastPlayed)}`));
+    if (r.ach) { tx.append(el('div', 'pf-rach', `Logros: ${r.ach.unlocked} / ${r.ach.total}`), achBar(r.ach)); }
+    row.append(cv, tx); recent.append(row);
+  }
+  const recentCard = card('Actividad reciente', '', ...(recent.childElementCount ? [el('div', 'pf-sub2', `${T(P.totals.twoWeeksMin)} en las últimas 2 semanas`), recent] : [hint('Todavía no has jugado nada desde Comptus.')]));
+
+  // --- Capturas recientes (las que haces con el atajo mientras juegas), de todos los juegos ---
+  let shotList = [];
+  try { shotList = window.api.recentShots ? await window.api.recentShots(5) : []; } catch { shotList = []; } // 5: la grande (2×2) + 4 a su lado, sin huecos
+  if (state.filter !== 'profile' || state.detailId) return;
+  const safeId = (id) => String(id || '_otros').replace(/[^a-zA-Z0-9._-]+/g, '_'); // igual que shots.js: carpeta de cada juego
+  const byFolder = new Map(state.games.map((g) => [safeId(g.id), g]));
+  let shotsCard;
+  if (shotList.length) {
+    const viewer = shotList.map((x) => ({ full: fileUrl(x.path), thumb: fileUrl(x.path) }));
+    const sg = el('div', 'pf-shots');
+    shotList.forEach((x, i) => {
+      const g = byFolder.get(x.folder);
+      const cell = el('button', 'pf-shot'); cell.type = 'button'; cell.title = 'Ver en grande';
+      const im = el('img'); im.loading = 'lazy'; im.alt = g ? g.name : 'Captura'; im.src = fileUrl(x.path);
+      const cap = el('div', 'pf-shot-cap');
+      const gname = el('span', 'pf-shot-game', g ? g.name : 'Otro');
+      if (g) { gname.title = 'Abrir la página del juego'; gname.onclick = (e) => { e.stopPropagation(); openDetail(g.id); }; }
+      cap.append(gname, el('span', 'pf-shot-date', new Date(x.time).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })));
+      cell.append(im, cap);
+      cell.onclick = () => openLightbox(viewer, i);
+      sg.append(cell);
+    });
+    shotsCard = card('Capturas recientes', '', sg);
+  } else {
+    const p = el('p', 'hint');
+    p.append(document.createTextNode(overlayOn ? 'Todavía no hay capturas. Mientras juegas pulsa ' : 'Las capturas están desactivadas (actívalas en Configuración > Overlay y capturas). Atajo: '), el('span', 'kbd', hotkeys.shot), document.createTextNode('.'));
+    shotsCard = card('Capturas recientes', '', p);
+  }
+
+  // --- Insignias ---
+  const bgrid = el('div', 'pf-badges');
+  for (const b of P.badges) {
+    const it = el('div', 'pf-badge' + (b.earned ? ' on' : ''));
+    if (b.earned) it.style.setProperty('--tc', TIER_COLORS[b.tier]);
+    const md = el('div', 'pf-medal', `[[${b.icon}]]`);
+    const tx = el('div', 'pf-btx');
+    tx.append(el('div', 'pf-bname', b.name), el('div', 'pf-btier', b.earned ? b.tierName + (b.max ? ' · máximo' : '') : 'Sin conseguir'));
+    if (!b.max) { const pb = el('div', 'pf-bbar'); const f = el('i'); f.style.width = Math.round(b.pct * 100) + '%'; pb.append(f); tx.append(pb, el('div', 'pf-bnext', `${b.value.toLocaleString('es')} / ${b.nextGoal.toLocaleString('es')} ${b.unit}`)); }
+    else tx.append(el('div', 'pf-bnext', `${b.value.toLocaleString('es')} ${b.unit}`));
+    it.append(md, tx); bgrid.append(it);
+  }
+  const badgeCard = card(`Insignias · ${P.earnedBadges} de ${P.badges.length}`, 'wide', bgrid);
+
+  // --- Logros: juegos al 100 %, los más raros y los últimos ---
+  const achKids = [];
+  if (P.perfect.length) {
+    const strip = el('div', 'pf-perfect');
+    for (const p of P.perfect) { const g = byId(p.id); if (!g) continue; const b = el('button', 'pf-pcov'); b.type = 'button'; b.title = `${g.name} · 100 %`; b.append(makeCover(g, true), el('span', 'pf-ptro', '[[trophy]]')); b.onclick = () => openDetail(g.id); strip.append(b); }
+    achKids.push(el('div', 'pf-sub2', `Juegos al 100 % · ${P.totals.perfect}`), strip);
+  }
+  const achList = (title, list, fmt) => {
+    if (!list.length) return [];
+    const l = el('div', 'pf-alist');
+    for (const a of list) {
+      const r = el('button', 'pf-arow'); r.type = 'button'; r.onclick = () => openDetail(a.gameId);
+      const ic = el('div', 'pf-aic'); if (a.icon) { const i = document.createElement('img'); i.src = a.icon; i.alt = ''; i.loading = 'lazy'; ic.append(i); } else ic.append(el('span', null, '[[trophy]]'));
+      const tx = el('div', 'pf-atx'); tx.append(el('div', 'pf-aname', a.name), el('div', 'hint', a.game));
+      r.append(ic, tx, el('span', 'pf-aval', fmt(a))); l.append(r);
+    }
+    return [el('div', 'pf-sub2', title), l];
+  };
+  achKids.push(...achList('Los más raros que tienes', P.rare, (a) => `${String(a.percent).replace('.', ',')} %`));
+  achKids.push(...achList('Conseguidos hace poco', P.lastAch, (a) => new Date(a.at * 1000).toLocaleDateString('es', { day: 'numeric', month: 'short' })));
+  const achCard = card(`Logros · ${P.totals.achUnlocked.toLocaleString('es')} de ${P.totals.achTotal.toLocaleString('es')}`, 'wide', ...(achKids.length ? achKids : [hint('Abre la ficha de tus juegos de Steam, Epic o Xbox para que Comptus descargue sus logros.')]));
+
+  // --- Colecciones y tiendas ---
+  const colls = el('div', 'pf-colls');
+  for (const c of P.topColls) {
+    const full = collections.find((x) => x.id === c.id);
+    const b = el('button', 'pf-coll'); b.type = 'button'; b.append(full ? collIcon(full) : el('span', null, '[[folder]]'), el('span', 'pf-cname', c.name), el('b', null, String(c.count)));
+    b.onclick = () => { state.filter = 'col:' + c.id; state.detailId = null; render(); };
+    colls.append(b);
+  }
+  const collCard = card(`Colecciones · ${P.totals.collections}`, '', ...(P.topColls.length ? [colls] : [hint('Aún no tienes colecciones.')]));
+  const stores = el('div', 'pf-stores');
+  const maxS = Math.max(1, ...P.stores.map((s) => s.count));
+  for (const s of P.stores) {
+    const d = SOURCES.find((x) => x.id === s.source);
+    const r = el('div', 'pf-store'); const ic = sourceIcon(s.source, 18); if (d && d.color) ic.style.color = d.color;
+    const f = el('span', 'pf-sfill'); f.style.width = Math.max(4, Math.round((s.count / maxS) * 100)) + '%'; if (d && d.color) f.style.background = `color-mix(in srgb, ${d.color} 45%, transparent)`;
+    r.append(f, ic, el('span', 'pf-sname', d ? d.name : s.source), el('b', null, String(s.count)));
+    stores.append(r);
+  }
+  const storeCard = card(`Tiendas · ${P.totals.stores}`, '', stores);
+
+  // Como el perfil de Steam: columna principal (escaparate, actividad, logros) y columna lateral (insignias, colecciones, tiendas)
+  const mainCol = el('div', 'pf-main'); mainCol.append(...[show, recentCard, shotsCard, achCard].filter(Boolean));
+  const sideCol = el('div', 'pf-side'); sideCol.append(badgeCard, collCard, storeCard);
+  const cols = el('div', 'pf-cols'); cols.append(mainCol, sideCol);
+  box.replaceChildren(hero, tiles, cols);
+}
+// al volver a la ventana se actualiza (p. ej. si acabas de iniciar o cerrar sesión en una tienda); Steam y Xbox van con caché
+// Dónde termina el menú superior (la fila de iconos desplegable cuelga justo debajo)
+try { const nav = $('#topNav'); new ResizeObserver(() => document.querySelector('main').style.setProperty('--nav-h', (nav.offsetTop + nav.offsetHeight) + 'px')).observe(nav); } catch { /* sin ResizeObserver: altura por defecto */ }
+{ let last = Date.now(); addEventListener('focus', () => { if (Date.now() - last > 30000) { last = Date.now(); paintTopProfile(); } }); }
 let statsYear = null, statsSessions = [], statsLoaded = false;
 async function renderStats() {
   const box = $('#statsPage');
@@ -923,14 +1217,23 @@ function renderWish() {
       img.append(tags);
       const body = el('div', 'fr-body');
       body.append(el('div', 'fr-title', it.title));
-      const pr = el('div', 'fr-meta', it.unavailable ? 'No disponible en tu país o retirado de la tienda' : (it.price || (it.soon ? 'Sin precio aún' : '')));
-      if (it.orig) pr.append(document.createTextNode(' · '), Object.assign(document.createElement('s'), { textContent: it.orig }));
-      body.append(pr);
+      // Precio bien visible, al lado del botón: [−90 %] PRECIO ACTUAL (grande; verde si está en oferta) y el anterior tachado
+      let pr = null;
+      if (it.unavailable || !(it.price || it.free)) body.append(el('div', 'fr-meta', it.unavailable ? 'No disponible en tu país o retirado de la tienda' : (it.soon ? 'Sin precio aún' : '')));
+      else {
+        const sale = it.free || it.discount > 0;
+        pr = el('div', 'wi-price' + (sale ? ' sale' : ''));
+        if (it.discount > 0 && !it.free) pr.append(el('span', 'wi-pct', `−${it.discount} %`));
+        const nums = el('div', 'wi-nums');
+        if (it.orig) nums.append(el('s', 'wi-was', it.orig));
+        nums.append(el('span', 'wi-now', it.free ? 'Gratis' : it.price));
+        pr.append(nums);
+      }
       const act = el('div', 'fr-actions');
       if (it.owned) act.append(el('span', 'fr-owned', '✓ Ya la tienes'));
       const b = el('button', it.owned ? 'ghost' : (it.free || it.discount > 0) ? 'primary' : 'ghost', it.store === 'epic' ? 'Ver en Epic' : 'Ver en Steam'); b.type = 'button';
       b.onclick = () => window.api.freeOpen(it.url, it.app);
-      act.append(b); body.append(act); c.append(img, body); g.append(c);
+      act.append(b); if (pr) act.append(pr); body.append(act); c.append(img, body); g.append(c);
     }
     s.append(g); return s;
   };
@@ -1337,10 +1640,80 @@ function makeCard(g) {
   };
   card.oncontextmenu = (e) => {
     e.preventDefault();
+    // clic derecho sobre uno de varios seleccionados: el menú es el de la selección
+    if (selected.size > 1 && selected.has(g.id)) { showMenu({ x: e.clientX, y: e.clientY }, selectionMenuItems()); return; }
     showMenu({ x: e.clientX, y: e.clientY }, gameMenuItems(g));
   };
+  // Destello de cristal al pasar el ratón (basado en el dkShine del modo consola). Una vez empieza termina su recorrido
+  // aunque quites el ratón (si dependiera solo de :hover se cortaría a mitad); no se repite hasta que acaba.
+  const glare = el('span', 'card-glare'); card.append(glare);
+  // sale al instante al entrar el ratón, y solo hay UN destello a la vez en toda la biblioteca: al pasar a otra portada,
+  // el de la anterior se corta (al cruzar varias no se acumulan animaciones, que era lo que daba tirones)
+  card.addEventListener('mouseenter', () => {
+    if (shiningCard && shiningCard !== card) shiningCard.classList.remove('shining');
+    if (!card.classList.contains('shining')) card.classList.add('shining');
+    shiningCard = card;
+  });
+  glare.addEventListener('animationend', (e) => { if (e.animationName === 'cardShine') { card.classList.remove('shining'); if (shiningCard === card) shiningCard = null; } });
+  // Arrastrar la portada (o todas las seleccionadas, si es una de ellas) hasta una colección del panel que aparece
+  card.draggable = true;
+  card.addEventListener('dragstart', (e) => {
+    const ids = selected.has(g.id) ? [...selected] : [g.id];
+    dragIds = ids;
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('text/plain', ids.join(','));
+    const ghost = el('div', 'drag-ghost', ids.length === 1 ? g.name : `${ids.length} juegos`);
+    document.body.append(ghost); e.dataTransfer.setDragImage(ghost, 18, 18); setTimeout(() => ghost.remove(), 0);
+    setTimeout(() => showCollDrop(ids), 0); // después de empezar el arrastre (tocar la página en dragstart lo cancelaría)
+  });
+  card.addEventListener('dragend', () => { dragIds = null; hideCollDrop(); });
   return card;
 }
+
+let shiningCard = null; // la única portada con el destello en marcha
+
+// Menú de clic derecho con varios juegos seleccionados
+function selectionMenuItems() {
+  const ids = [...selected], n = ids.length;
+  const cur = state.filter.startsWith('col:') ? collections.find((c) => 'col:' + c.id === state.filter) : null;
+  const items = [{ node: el('div', 'acct-h', `${n} juegos seleccionados`) }];
+  items.push({ icon: 'folder', label: `Añadir ${n} juegos a una colección…`, run: () => openCollPick(ids, true) });
+  if (cur) items.push({ icon: 'minus', label: `Quitar ${n} juegos de «${cur.name}»`, run: () => { setInCollection(cur, ids, false); setSelecting(false); toast(`Quitados ${n} juegos de «${cur.name}»`); } });
+  items.push({ sep: true }, { icon: 'x', label: 'Quitar la selección', run: () => setSelecting(false) });
+  return items;
+}
+
+// ---------- Arrastrar juegos a una colección ----------
+// Al arrastrar una portada aparece un panel con tus colecciones: se suelta encima de la que quieras (o de «Nueva colección»)
+let dragIds = null;
+function hideCollDrop() { const p = $('#collDrop'); if (p) p.classList.add('hidden'); }
+function showCollDrop(ids) {
+  let p = $('#collDrop');
+  if (!p) { p = el('div', 'coll-drop hidden'); p.id = 'collDrop'; document.body.append(p); }
+  const target = (node, onDrop) => {
+    node.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; node.classList.add('over'); });
+    node.addEventListener('dragleave', () => node.classList.remove('over'));
+    node.addEventListener('drop', (e) => { e.preventDefault(); const got = dragIds; dragIds = null; hideCollDrop(); if (got && got.length) onDrop(got); });
+    return node;
+  };
+  const list = el('div', 'cd-list');
+  for (const c of sortedCollections()) {
+    const chip = el('div', 'cd-chip'); chip.append(collIcon(c), el('span', 'cd-name', c.name));
+    list.append(target(chip, (got) => {
+      const before = new Set(c.games);
+      const added = got.filter((id) => !before.has(id)).length;
+      setInCollection(c, got, true);
+      toast(added ? `${added === 1 ? 'Añadido 1 juego' : `Añadidos ${added} juegos`} a «${c.name}»` : `Ya estaban en «${c.name}»`);
+      if (selecting) setSelecting(false);
+    }));
+  }
+  list.append(target(el('div', 'cd-chip cd-new', '[[plus]] Nueva colección'), (got) => openCollName(null, got)));
+  p.replaceChildren(el('div', 'cd-head', ids.length === 1 ? 'Suelta el juego en una colección' : `Suelta los ${ids.length} juegos en una colección`), list);
+  p.classList.remove('hidden');
+}
+// si se suelta fuera del panel o se cancela con Esc, el panel se cierra igual
+document.addEventListener('drop', () => { dragIds = null; hideCollDrop(); });
+document.addEventListener('dragend', () => { dragIds = null; hideCollDrop(); });
 
 function render() {
   try { if (window.Couch) Couch.onRender(); } catch {}
@@ -1359,25 +1732,29 @@ function render() {
   const inEvents = state.filter === 'events' && !inDetail;
   const inWish = state.filter === 'wish' && !inDetail;
   const inCommunity = state.filter === 'community' && !inDetail;
+  const inProfile = state.filter === 'profile' && !inDetail;
   { // transición suave al entrar a otro apartado
     const key = `${state.filter}|${state.detailId || ''}`;
     if (key !== lastViewKey) {
       const first = lastViewKey === null; lastViewKey = key;
-      if (!first) playIn(inDetail ? '#detail' : inStats ? '#statsPage' : inFree ? '#freePage' : inWish ? '#wishPage' : inEvents ? '#eventsPage' : inCommunity ? '#communityPage' : '#grid');
+      if (!first) playIn(inDetail ? '#detail' : inStats ? '#statsPage' : inFree ? '#freePage' : inWish ? '#wishPage' : inEvents ? '#eventsPage' : inCommunity ? '#communityPage' : inProfile ? '#profilePage' : '#grid');
     }
   }
+  $('#profilePage').classList.toggle('hidden', !inProfile);
   $('#statsPage').classList.toggle('hidden', !inStats);
   $('#freePage').classList.toggle('hidden', !inFree);
   $('#eventsPage').classList.toggle('hidden', !inEvents);
   $('#wishPage').classList.toggle('hidden', !inWish);
   $('#communityPage').classList.toggle('hidden', !inCommunity);
-  updatePageTitle(inDetail || inStats || inFree || inEvents || inWish || inCommunity);
+  updatePageTitle(inDetail || inStats || inFree || inEvents || inWish || inCommunity || inProfile);
   if (!inDetail) destroyTrailer();
-  document.querySelector('.toolbar').classList.toggle('hidden', inDetail || inFree || inEvents || inWish || inCommunity);
+  document.querySelector('.toolbar').classList.toggle('hidden', inDetail || inFree || inEvents || inWish || inCommunity || inStats || inProfile);
   document.querySelector('.toolbar').classList.toggle('stats-mode', inStats);
+  syncTopNav();
   $('#statsBtn').classList.toggle('on', inStats);
   $('#detail').classList.toggle('hidden', !inDetail);
-  document.body.classList.toggle('no-cards', inDetail || inStats || inFree || inEvents || inWish || inCommunity); // sin portadas: se oculta el deslizador de tamaño
+  document.body.classList.toggle('no-cards', inDetail || inStats || inFree || inEvents || inWish || inCommunity || inProfile); // sin portadas: se oculta el deslizador de tamaño
+  if (inProfile) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderProfile(); return; }
   if (inStats) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderStats(); return; }
   if (inCommunity) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderCommunity(); if (!cmLoading && (!cmData || Date.now() - cmData.at > 600000)) loadCommunity(false); return; }
   if (inEvents) { grid.classList.add('hidden'); $('#empty').classList.add('hidden'); renderEvents(); if (!evLoading && (!evData || Date.now() - evData.at > 3600000)) loadEvents(false); return; }
@@ -1472,26 +1849,57 @@ const collMenuItems = (c) => [
   { icon: 'trash', label: 'Eliminar colección', run: () => deleteCollection(c) },
 ];
 // Tarjeta horizontal de una colección: tu portada o, si no hay, un collage con las de sus juegos
+// Mosaico al estilo de las colecciones de Steam: las portadas de sus juegos en una cuadrícula inclinada
+// (se repiten si hay pocas, para que no queden huecos al girarla). Solo el modo escritorio; el modo consola usa collCollage.
+const cssUrl = (u) => `url("${String(u).replace(/["\\]/g, '\\$&')}")`;
+function collMosaic(c, games, art) {
+  art.replaceChildren();
+  art.classList.remove('empty');
+  delete art.dataset.n;
+  const srcs = games.map(coverSrc).filter(Boolean);
+  if (!srcs.length) { // sin portadas: el icono grande, como antes
+    art.classList.add('empty');
+    const big = collIcon(c); big.classList.add('coll-big'); art.append(big);
+    return;
+  }
+  // Todas en abanico, como cartas en la mano: hasta 5 portadas distintas (nunca se repite ninguna)
+  const pick = srcs.slice(0, 5), k = pick.length;
+  const spread = k === 1 ? 0 : Math.min(12 * (k - 1), 44); // grados entre la primera y la última carta
+  const fan = el('div', 'coll-fan'); fan.dataset.k = String(k);
+  pick.forEach((s, i) => {
+    const r = k === 1 ? 0 : -spread / 2 + (spread * i) / (k - 1);
+    const cardEl = el('div', 'coll-fcard');
+    cardEl.style.backgroundImage = cssUrl(s);
+    cardEl.style.setProperty('--r', r + 'deg');
+    cardEl.style.zIndex = String(10 - Math.abs(i - (k - 1) / 2) * 2); // la del centro, encima
+    fan.append(cardEl);
+  });
+  art.append(fan);
+}
 function makeCollCard(c) {
   const games = state.games.filter((g) => !g.hidden && !g.dupOf && inColl(c, g))
     .sort((a, z) => a.name.localeCompare(z.name, 'es', { sensitivity: 'base', numeric: true }));
-  const card = el('article', 'card coll-card');
+  const card = el('article', 'card coll-card' + (c.cover ? ' has-cover' : ''));
   const art = el('div', 'coll-art');
   if (c.cover) {
     const im = el('img'); im.alt = ''; im.src = imgUrl(c.coverSm || c.cover);
     if (c.coverAnim) im.dataset.anim = '1';
-    im.onerror = () => collCollage(c, games, art);
+    im.onerror = () => { card.classList.remove('has-cover'); collMosaic(c, games, art); };
     art.dataset.n = '1';
     art.append(im);
-  } else collCollage(c, games, art);
+  } else collMosaic(c, games, art);
   card.append(art);
+  // baño de color: la misma imagen (tu portada o la del primer juego) muy desenfocada encima, como en Steam
+  const tintSrc = c.cover ? imgUrl(c.coverSm || c.cover) : games.map(coverSrc).find(Boolean);
+  if (tintSrc) { const tint = el('div', 'coll-tint'); tint.style.backgroundImage = cssUrl(tintSrc); card.append(tint); }
+  card.append(el('div', 'coll-shade'));
   if (c.coverAnim) wireAnim(card, c.coverAnim);
   const over = el('div', 'overlay coll-over');
   const title = el('div', 'title');
-  title.append(collIcon(c), document.createTextNode(' ' + c.name));
-  over.append(title, el('div', 'meta', `${games.length} ${games.length === 1 ? 'juego' : 'juegos'}`));
+  title.append(collIcon(c), el('span', 'coll-name', c.name));
+  over.append(title, el('div', 'coll-line'), el('div', 'meta coll-count', `${games.length} ${games.length === 1 ? 'juego' : 'juegos'}`));
   card.append(over);
-  card.title = c.name;
+  card.title = `${c.name} · ${games.length} ${games.length === 1 ? 'juego' : 'juegos'}`;
   card.onclick = () => { openNav('col:' + c.id, true); state.filter = 'col:' + c.id; state.detailId = null; render(); };
   card.oncontextmenu = (e) => { e.preventDefault(); showMenu({ x: e.clientX, y: e.clientY }, collMenuItems(c)); };
   return card;
@@ -1525,7 +1933,7 @@ function renderCollectionsPage() {
   const q = state.query.trim().toLowerCase();
   const list = sortedCollections().filter((c) => !q || c.name.toLowerCase().includes(q));
   const add = el('article', 'card coll-card coll-new');
-  add.append(el('div', 'coll-newbody', '[[plus]]'), el('div', 'coll-newlabel', 'Nueva colección'));
+  add.append(el('div', 'coll-newbody', '[[plus]]'), el('div', 'coll-newlabel', 'Crear una nueva colección'));
   add.onclick = () => openCollName(null);
   grid.replaceChildren(...list.map(makeCollCard), add);
   const empty = $('#empty');
@@ -2965,6 +3373,7 @@ const PRESETS = [
 ];
 const ART_PRESETS = window.ART_THEMES || [];
 const IMG_PRESETS = window.IMG_THEMES || [];
+const LAUNCHER_PRESETS = window.LAUNCHER_THEMES || []; // inspirados en otros launchers (theme-art.js)
 const THEME_KEYS = { cBg: 'bg', cPanel: 'panel', cText: 'text', cAccent: 'accent', cAccent2: 'accent2' };
 let theme = { ...PRESETS[0], preset: 'midnight' };
 let cardSize = 170;
@@ -3022,7 +3431,8 @@ function layoutGrid() {
   const cs = getComputedStyle(grid);
   const avail = grid.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
   const gap = parseFloat(cs.columnGap) || 0;
-  const wide = grid.classList.contains('coll-grid') || grid.classList.contains('wide-cards'); // tarjetas horizontales en la página de colecciones
+  // tarjetas horizontales con la forma «ancha»; las colecciones van siempre en vertical, como las portadas de los juegos
+  const wide = grid.classList.contains('wide-cards') && !grid.classList.contains('coll-grid');
   const minW = wide ? Math.round(cardSize * 1.9) : cardSize;
   const n = Math.max(1, Math.floor((avail + gap) / (minW + gap)));
   let w = Math.max(40, Math.floor(((avail - gap * (n - 1)) / n) * 100) / 100);
@@ -3125,7 +3535,7 @@ function syncThemeModal() {
 
 // ---------- Tema automático (por hora o según el modo claro/oscuro de Windows) ----------
 let autoTheme = { mode: 'off', day: '', night: '', from: '07:00', to: '19:00' }, autoPeriod = null, autoTimer = null;
-const allThemes = () => [...PRESETS, ...IMG_PRESETS, ...myThemes];
+const allThemes = () => [...PRESETS, ...LAUNCHER_PRESETS, ...IMG_PRESETS, ...myThemes];
 function autoIsDay() {
   if (autoTheme.mode === 'system') return !(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
   const toMin = (t) => { const [h, m] = String(t || '').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
@@ -3146,7 +3556,7 @@ function fillAutoThemeSelects() {
   for (const [sel, cur] of [['#autoDay', autoTheme.day], ['#autoNight', autoTheme.night]]) {
     const el2 = $(sel); el2.replaceChildren();
     const add = (label, list) => { if (!list.length) return; const g = document.createElement('optgroup'); g.label = label; for (const t of list) { const o = document.createElement('option'); o.value = t.id; o.textContent = t.name; g.append(o); } el2.append(g); };
-    add('Temas', PRESETS); add('Con ilustración', IMG_PRESETS); add('Mis temas', myThemes);
+    add('Temas', PRESETS); add('Inspirados en launchers', LAUNCHER_PRESETS); add('Con ilustración', IMG_PRESETS); add('Mis temas', myThemes);
     el2.value = cur || '';
   }
   $('#autoMode').value = autoTheme.mode; $('#autoFrom').value = autoTheme.from; $('#autoTo').value = autoTheme.to;
@@ -3220,6 +3630,7 @@ function themeButton(p, mine) {
 function buildPresets() {
   $('#presets').replaceChildren(...PRESETS.map((p) => themeButton(p, false)));
   $('#imgPresets').replaceChildren(...IMG_PRESETS.map((p) => themeButton(p, false)));
+  $('#launcherPresets').replaceChildren(...LAUNCHER_PRESETS.map((p) => themeButton(p, false)));
   $('#myThemes').replaceChildren(...myThemes.map((p) => themeButton(p, true)));
   $('#myThemes').classList.toggle('hidden', !myThemes.length);
   $('#myThemesEmpty').classList.toggle('hidden', myThemes.length > 0);
@@ -3434,6 +3845,7 @@ const closeCollPick = () => $('#collPickModal').classList.add('hidden');
 const SECTION_BODY = { sources: '#sourceFilters', colls: '#collList', games: '#gameList' };
 function applyCollapsed() {
   document.querySelectorAll('.nav-title.collapsible').forEach((t) => {
+    if (t.dataset.sec === 'colls') return; // las colecciones ya no van en la barra lateral (están en el menú superior)
     const off = !!navCollapsed[t.dataset.sec];
     document.querySelector(SECTION_BODY[t.dataset.sec]).classList.toggle('hidden', off);
     t.classList.toggle('collapsed', off);
