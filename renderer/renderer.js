@@ -24,8 +24,12 @@ function fileUrl(p) {
   return encodeURI('file:///' + p.replace(/\\/g, '/')).replace(/#/g, '%23').replace(/\?/g, '%3F');
 }
 
+// fecha de cada imagen propia (la da main.js): va en la dirección, así una imagen cambiada con el mismo nombre se vuelve a leer
+const imgVer = new Map();
 function imgUrl(p) {
-  return /^https?:/.test(p) ? p : fileUrl(p);
+  if (/^https?:/.test(p)) return p;
+  const v = imgVer.get(p);
+  return v ? fileUrl(p) + '?v=' + v : fileUrl(p);
 }
 
 // Versiones reducidas (en caché en disco) de las imágenes propias grandes; ver 'img:small' en main.js
@@ -38,7 +42,7 @@ const ANIM_BUDGET = 4; // en modo 'few': cuántas tarjetas a la vez
 // para mostrarlo en movimiento cuando toca. `still` fuerza una copia fija aunque la imagen sea animada.
 function smallImage(p, width, fmt = 'jpg', still = false) {
   if (!p || /^https?:/.test(p)) return Promise.resolve({ url: p || null, anim: null });
-  const k = `${p}|${width}|${fmt}|${still ? 1 : 0}|${animMode === 'all' ? 1 : 0}`;
+  const k = `${p}|${imgVer.get(p) || 0}|${width}|${fmt}|${still ? 1 : 0}|${animMode === 'all' ? 1 : 0}`;
   if (!smallCache.has(k)) {
     smallCache.set(k, (async () => {
       let r;
@@ -79,6 +83,7 @@ async function smallifyLibrary(games) {
   try { await smallifyLibrary0(games); if (cardShape === 'wide') { await Promise.all(games.map(compLookup)); } } catch { /* sin imagen unida */ }
 }
 async function smallifyLibrary0(games) {
+  for (const g of games) if (g.imgMt) for (const [p, v] of Object.entries(g.imgMt)) imgVer.set(p, v);
   // las imágenes de las tiendas (web) se guardan en disco y se usan desde ahí
   let loc = (u) => u;
   if (window.api.imgRemote) {
@@ -694,6 +699,27 @@ function playIn(target) {
   window.__diceRestore = (s) => { if (s && modes.some((m) => m.id === s.diceMode)) $('#diceMode').value = s.diceMode; if (s && s.diceSkip === false) $('#diceSkip').checked = false; };
 }
 document.body.append($('#hiddenLink')); // fuera de la barra lateral: junto al deslizador de tamaño (abajo a la derecha)
+// Vista de la biblioteca: icono desplegable a la izquierda del deslizador de tamaño
+const VIEWS = [
+  { id: 'tall', shape: 'tall', view: 'grid', icon: 'viewTall', label: 'Portadas verticales' },
+  { id: 'wide', shape: 'wide', view: 'grid', icon: 'viewWide', label: 'Portadas horizontales' },
+  { id: 'details', shape: 'tall', view: 'details', icon: 'viewDetails', label: 'Portadas con detalles' },
+  { id: 'list', shape: 'tall', view: 'list', icon: 'viewList', label: 'Lista' },
+];
+const curView = () => VIEWS.find((v) => v.view === cardView && (v.view !== 'grid' || v.shape === cardShape)) || VIEWS[0];
+const viewBtn = el('button', 'view-corner');
+viewBtn.id = 'viewBtn'; viewBtn.type = 'button';
+function paintViewBtn() { const v = curView(); viewBtn.replaceChildren(iconEl(v.icon)); viewBtn.title = 'Vista: ' + v.label.toLowerCase(); }
+function setView(v) {
+  const reload = v.shape !== cardShape;
+  cardShape = v.shape; cardView = v.view;
+  window.api.setSettings({ cardShape, cardView });
+  $('#cardShape').value = cardShape;
+  paintViewBtn(); applyShape(); layoutGrid();
+  if (reload) load(); // las horizontales necesitan otras imágenes (banners); vertical, detalles y lista solo cambian el estilo
+}
+viewBtn.onclick = () => showMenu(viewBtn, VIEWS.map((v) => ({ icon: v.icon, label: (v === curView() ? '✓ ' : '') + v.label, run: () => setView(v) })));
+document.body.append(viewBtn);
 $('#hiddenLink').onclick = () => { state.filter = state.filter === 'hidden' ? 'all' : 'hidden'; state.detailId = null; render(); };
 $('#statsBtn').onclick = () => { state.filter = state.filter === 'stats' ? 'all' : 'stats'; state.detailId = null; render(); };
 
@@ -1644,6 +1670,16 @@ function makeCard(g) {
   }
   overlay.append(actions);
   card.append(overlay);
+  { // nombre y datos («con detalles» y «lista»); siempre se crean, así cambiar entre esas vistas es solo CSS (instantáneo)
+    const ci = el('div', 'card-info');
+    const src = el('span', 'ci-src'); src.style.color = def.color; src.append(sourceIcon(g.source, 12), document.createTextNode(def.name));
+    ci.append(el('div', 'ci-name', g.name), src,
+      el('span', 'ci-time', formatPlayTime(g.playTime).replace(' jugados', '') || '—'),
+      el('span', 'ci-last', formatLastPlayed(g.lastPlayed).replace('Jugado ', '')),
+      el('span', 'ci-inst', g.installed === false ? 'No instalado' : 'Instalado'));
+    ci.title = g.name;
+    card.append(ci);
+  }
   // Clic en la portada = abrir la página del juego (los botones tienen su propia acción)
   card.append(check);
   card.onclick = (e) => {
@@ -3426,6 +3462,7 @@ let cardSize = 170;
 let cardSizes = {};
 const screenKey = () => `${screen.width}x${screen.height}@${window.devicePixelRatio || 1}`;
 let curScreen = screenKey();
+let cardView = 'grid'; // 'grid' (solo portadas), 'details' (portada con nombre y tiempo debajo) o 'list' (filas)
 let cardShape = 'tall', hideNames = false, wideLogos = true; // forma de las portadas (vertical/horizontal) y si se ocultan los nombres
 const CARD_MIN = 90, CARD_MAX = 480;
 
@@ -3477,6 +3514,7 @@ function layoutGrid() {
   const avail = grid.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
   const gap = parseFloat(cs.columnGap) || 0;
   // tarjetas horizontales con la forma «ancha»; las colecciones van siempre en vertical, como las portadas de los juegos
+  if (cardView === 'list' && !grid.classList.contains('coll-grid')) { grid.style.setProperty('--card-w', Math.floor(avail) + 'px'); grid.style.gridTemplateColumns = 'minmax(0, 1fr)'; return; }
   const wide = grid.classList.contains('wide-cards') && !grid.classList.contains('coll-grid');
   const minW = wide ? Math.round(cardSize * 1.9) : cardSize;
   const n = Math.max(1, Math.floor((avail + gap) / (minW + gap)));
@@ -3491,6 +3529,9 @@ if (typeof ResizeObserver !== 'undefined') new ResizeObserver(layoutGrid).observ
 function applyShape() {
   const g = $('#grid'); if (!g) return;
   g.classList.toggle('wide-cards', cardShape === 'wide');
+  g.classList.toggle('details-view', cardView === 'details');
+  g.classList.toggle('list-view', cardView === 'list');
+  document.body.classList.toggle('list-mode', cardView === 'list'); // en lista no hay tamaño de portadas que cambiar
   g.classList.toggle('no-names', !!hideNames);
 }
 function applyCardSize() {
@@ -4311,7 +4352,7 @@ for (const [id, key] of Object.entries(THEME_KEYS)) {
     refreshPageStyle();
   };
 }
-$('#cardShape').onchange = (e) => { cardShape = e.target.value === 'wide' ? 'wide' : 'tall'; window.api.setSettings({ cardShape }); applyShape(); layoutGrid(); load(); };
+$('#cardShape').onchange = (e) => { cardShape = e.target.value === 'wide' ? 'wide' : 'tall'; if (cardShape === 'wide') cardView = 'grid'; window.api.setSettings({ cardShape, cardView }); paintViewBtn(); applyShape(); layoutGrid(); load(); };
 $('#wideLogos').onchange = (e) => { wideLogos = e.target.checked; window.api.setSettings({ wideLogos }); load(); };
 $('#sizeAnim').onchange = (e) => { sizeAnim = e.target.checked; window.api.setSettings({ sizeAnim }); };
 $('#hideNames').onchange = (e) => { hideNames = e.target.checked; window.api.setSettings({ hideNames }); applyShape(); load(); };
@@ -4354,6 +4395,7 @@ $('#sizeQuick').oninput = onSizeSlider;
 $('#grid').addEventListener('wheel', (e) => {
   if (!e.ctrlKey) return;
   e.preventDefault();
+  if (cardView === 'list') return;
   const m = measureGrid(); if (!m) return;
   setCardCols(colsFor(cardSize, m) + (e.deltaY < 0 ? -1 : 1));
 }, { passive: false });
@@ -4698,6 +4740,7 @@ window.api.gameState().then(applyRunState).catch(() => {});
   if (s && s.autoTheme) autoTheme = { ...autoTheme, ...s.autoTheme };
   cardShape = s && s.cardShape === 'wide' ? 'wide' : 'tall'; hideNames = !!(s && s.hideNames); wideLogos = !(s && s.wideLogos === false);
   $('#wideLogos').checked = wideLogos;
+  cardView = s && (s.cardView === 'details' || s.cardView === 'list') ? s.cardView : 'grid'; paintViewBtn();
   $('#cardShape').value = cardShape; $('#hideNames').checked = hideNames; applyShape();
   sizeAnim = !(s && s.sizeAnim === false); $('#sizeAnim').checked = sizeAnim;
   if (s && s.background) bg = { ...bg, ...s.background };

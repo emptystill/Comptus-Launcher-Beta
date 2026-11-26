@@ -251,6 +251,9 @@ async function getLibrary() {
   }
   // Los juegos sin instalar que ya trae un escáner (p. ej. Ubisoft) también se ocultan con «mostrar los que no están instalados»
   const scannedShown = store.settings.showOwned === false ? scanned.filter((g) => g.installed !== false) : scanned;
+  // minutos que midió Comptus en cada sesión (lo usan los juegos sin tiempo propio de su tienda, p. ej. los locales)
+  const sessMins = {};
+  for (const x of store.sessions || []) if (x && x.id && x.m > 0) sessMins[x.id] = (sessMins[x.id] || 0) + x.m;
   cache = [...scannedShown, ...notInstalled, ...local].map((g) => {
     const meta = store.meta[g.id] || {};
     // Imágenes de la carpeta de Comptus: «media:…» -> ruta real, y las que dejaste con el nombre del juego se usan solas (si no elegiste otra)
@@ -258,7 +261,8 @@ async function getLibrary() {
     const mm = {};
     for (const k of IMG_KEYS) {
       const own = meta[k] || (g.source === 'local' && k === 'cover' ? g[k] : null);
-      const auto = !own && media.autoFor(mi, g, k);
+      // la imagen con el nombre del juego en la carpeta se usa sola, salvo que la hayas restablecido o quitado (noAuto)
+      const auto = !own && !(Array.isArray(meta.noAuto) && meta.noAuto.includes(k)) && media.autoFor(mi, g, k);
       const v = auto || (typeof meta[k] === 'string' ? meta[k] : g[k]);
       if (typeof v === 'string' && v.startsWith('media:')) mm[k] = media.resolve(userDir(), v) || undefined;
       else if (auto) mm[k] = auto;
@@ -275,11 +279,24 @@ async function getLibrary() {
       ...(meta.customTrailer && meta.customTrailer.path && String(meta.customTrailer.path).startsWith('media:') ? { customTrailer: { ...meta.customTrailer, path: media.resolve(userDir(), meta.customTrailer.path) || '' } } : {}),
       // Steam aporta sus propios datos; nos quedamos con el mayor de cada uno
       lastPlayed: Math.max(g.lastPlayed || 0, meta.lastPlayed || 0) || null,
-      playTime: Math.max(g.playTime || 0, meta.playTime || 0),
+      // …y también el total de sesiones medidas por Comptus (antes, en los juegos que se abren con un lanzador propio, solo contaba lo que duraba ese lanzador)
+      playTime: Math.max(g.playTime || 0, meta.playTime || 0, sessMins[g.id] || 0),
     };
-  }).map(withAutoImages);
+  }).map(withAutoImages).map(withImgMt);
   scheduleTray();
   return cache;
+}
+
+// Fecha de cada imagen propia del disco: si cambias el archivo (aunque se llame igual), Comptus lo nota y no enseña la versión vieja
+function withImgMt(g) {
+  const mt = {};
+  for (const k of IMG_KEYS) {
+    const v = g[k];
+    if (typeof v !== 'string' || !path.isAbsolute(v)) continue;
+    try { mt[v] = Math.round(fs.statSync(v).mtimeMs); } catch { /* ya no existe */ }
+  }
+  if (Object.keys(mt).length) g.imgMt = mt;
+  return g;
 }
 
 function splitArgs(str) {
@@ -287,6 +304,8 @@ function splitArgs(str) {
   return (str.match(/"[^"]*"|\S+/g) || []).map((a) => a.replace(/^"|"$/g, ''));
 }
 
+// Juegos cuyo tiempo mide el seguimiento por carpeta (desde que se ven sus procesos hasta que se cierran todos)
+const trackedRun = new Set();
 // Ejecuta el .exe del juego directamente y mide el tiempo de juego
 function runExe(g) {
   if (!fs.existsSync(g.exe)) return { ok: false, error: 'No se encontró el ejecutable. ¿Lo moviste de carpeta?' };
@@ -304,6 +323,7 @@ function runExe(g) {
   });
   child.on('error', () => shell.openPath(g.exe)); // p. ej. si pide permisos de administrador
   child.on('exit', () => {
+    if (trackedRun.has(g.id)) return; // el seguimiento por carpeta mide el tiempo real (aunque este .exe solo sea un lanzador que se cierra enseguida)
     const mins = Math.round((Date.now() - start) / 60000);
     if (mins > 0) {
       const prev = (loadStore().meta[g.id] || {}).playTime || 0;
@@ -339,7 +359,7 @@ function launchGame(id) {
   }
   if (res.ok) {
     updateMeta(id, { lastPlayed: Date.now() });
-    if (tracker.track(g, res.pid)) { stopping = false; sendGameState(g.id, 'starting'); }
+    if (tracker.track(g, res.pid)) { stopping = false; trackedRun.add(g.id); sendGameState(g.id, 'starting'); }
     showLaunchPopup(g);
   } else showLaunchPopup(g, res.error || 'No se pudo abrir el juego');
   return { ok: res.ok, error: res.error };
@@ -562,6 +582,11 @@ ipcMain.handle('game:setCustom', (_e, id, patch) => {
       v = out.length ? out.slice(0, 12) : null;
     }
     if (IMG_KEYS.includes(k) && typeof v === 'string') v = media.toToken(userDir(), k, v, gname);
+    if (IMG_KEYS.includes(k)) { // restablecer o quitar = de verdad: ya no se coge sola la imagen con el nombre del juego de la carpeta
+      const na = new Set(Array.isArray(meta.noAuto) ? meta.noAuto : []);
+      if (v) na.delete(k); else na.add(k);
+      if (na.size) meta.noAuto = [...na]; else delete meta.noAuto;
+    }
     if (k === 'cover' && local) { local.cover = v || null; continue; }
     if (v === null || v === '') delete meta[k]; // vuelve al valor por defecto
     else meta[k] = v;
@@ -2807,6 +2832,14 @@ function bringMainFront() {
 function onGameEnd(g) {
   stopping = false;
   logSession(g);
+  // tiempo jugado: lo que estuvo abierto el juego (cualquiera de sus procesos), también si lo abriste fuera de Comptus
+  try {
+    if (g && g.seen && g.startedAt) {
+      const mins = Math.round((Date.now() - g.startedAt) / 60000);
+      if (mins > 0) { const prev = (loadStore().meta[g.id] || {}).playTime || 0; updateMeta(g.id, { playTime: prev + mins }); }
+    }
+  } catch { /* no es crítico */ }
+  if (g) trackedRun.delete(g.id);
   if (g) { sendGameState(g.id, null); setTimeout(() => detectNewAch(cache.find((x) => x.id === g.id) || g), 6000); }
   if (overlay && !overlay.isDestroyed()) overlay.hide();
   if (win && !win.isDestroyed()) {

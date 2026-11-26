@@ -3514,3 +3514,73 @@ body:not(:has(#hiddenLink:not(.hidden))) #sizeQuick.size-corner { right: 16px; }
 .saga-games { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .saga-no { flex: none; }
 .saga-target { padding: 3px 0; color: var(--text); }
+
+/* Próxima versión · selector de vista (icono a la izquierda del deslizador de tamaño) */
+.view-corner { position: fixed; right: 222px; bottom: 1px; z-index: 40; width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; border-radius: 8px; color: var(--muted); opacity: .55; cursor: pointer; transition: opacity .15s, background .15s; }
+.view-corner .ic { width: 17px; height: 17px; }
+.view-corner:hover { opacity: 1; background: color-mix(in srgb, var(--text) 8%, transparent); border: 0; }
+body:not(:has(#hiddenLink:not(.hidden))) .view-corner { right: 188px; }
+body:has(.toolbar.hidden) .view-corner, body.couch-on .view-corner, body.no-cards .view-corner, body:has(.toolbar.coll-mode) .view-corner { display: none; }
+/* en lista no hay tamaño: el icono se queda en la esquina y el deslizador se oculta */
+body.list-mode #sizeQuick.size-corner { display: none; }
+body.list-mode .view-corner { right: 50px; }
+body.list-mode:not(:has(#hiddenLink:not(.hidden))) .view-corner { right: 16px; }
+.card-info { display: none; }
+
+/* Portadas con detalles: la portada y, debajo, el nombre y el tiempo jugado */
+.grid.details-view:not(.coll-grid) { grid-auto-rows: calc(var(--card-w, var(--card-min)) * 1.5 + 50px); }
+.grid.details-view .card { background: none; border: 0; overflow: visible; }
+.grid.details-view .card:hover { transform: none; box-shadow: none; }
+.grid.details-view .card > div:first-child { height: calc(100% - 50px) !important; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: var(--panel-2); transition: transform .15s, box-shadow .15s, border-color .15s; }
+.grid.details-view .card:hover > div:first-child { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0,0,0,.5); border-color: var(--accent); }
+.grid.details-view .card .overlay { bottom: 50px; border-radius: 0 0 12px 12px; }
+.grid.details-view .card .overlay .title, .grid.details-view .card .overlay .meta { display: none; }
+.grid.details-view .card .card-glare, .grid.details-view .card .card-shine { bottom: 50px; height: auto; }
+.grid.details-view .card-info { display: block; position: absolute; left: 2px; right: 2px; bottom: 0; height: 46px; padding-top: 6px; }
+.grid.details-view .ci-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grid.details-view .ci-time { font-size: 11.5px; color: var(--muted); }
+.grid.details-view .ci-src, .grid.details-view .ci-last, .grid.details-view .ci-inst { display: none; }
+
+/* Lista: una fila por juego con portada pequeña, nombre, tienda, tiempo, última vez y estado */
+.grid.list-view:not(.coll-grid) { grid-auto-rows: 62px; gap: 4px; }
+.grid.list-view .card { display: flex; align-items: center; gap: 14px; padding: 0 14px 0 6px; border-radius: 10px; background: color-mix(in srgb, var(--panel-2) 70%, transparent); }
+.grid.list-view .card:hover { transform: none; box-shadow: none; background: var(--panel-2); }
+.grid.list-view .card > div:first-child { width: 34px !important; height: 50px !important; flex: none; border-radius: 5px; overflow: hidden; }
+.grid.list-view .card .placeholder { font-size: 18px; }
+.grid.list-view .badge, .grid.list-view .st-pill, .grid.list-view .card-glare, .grid.list-view .card-shine, .grid.list-view .card-trophy, .grid.list-view .card-logo { display: none; }
+.grid.list-view .card-info { display: grid; flex: 1; min-width: 0; grid-template-columns: minmax(0, 1fr) 120px 110px 150px 100px; align-items: center; gap: 12px; font-size: 12.5px; color: var(--muted); }
+.grid.list-view .ci-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grid.list-view .ci-src { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.grid.list-view .card.notinstalled .ci-inst { opacity: .6; }
+.grid.list-view .card:not(.notinstalled) .ci-inst { color: var(--text); }
+.grid.list-view .card .overlay { position: static; padding: 0; background: none; flex: none; order: 3; }
+.grid.list-view .card .overlay .title, .grid.list-view .card .overlay .meta { display: none; }
+.grid.list-view .card .actions { opacity: 0; }
+.grid.list-view .card:hover .actions { opacity: 1; }
+.grid.list-view .card .actions .play { padding: 5px 14px; }
+.grid.list-view .card .actions .icon { padding: 5px 8px; }
+.grid.list-view .fav { position: static; flex: none; order: 4; width: 28px; height: 28px; background: none; color: var(--muted); }
+.grid.list-view .card-info { order: 2; }
+.grid.list-view .sel-check { left: 6px; top: 6px; }
+/* ventana estrecha (o pantalla vertical): menos columnas en la lista */
+@media (max-width: 1000px) { .grid.list-view .card-info { grid-template-columns: minmax(0, 1fr) 100px 120px; } .grid.list-view .ci-last, .grid.list-view .ci-inst { display: none; } }
+.grid.list-view .card.notinstalled::after { display: none; }
+.grid.details-view .card.notinstalled::after { bottom: 58px; }
+
+/* Próxima versión · lista con columnas fijas: todas las filas alinean igual (los botones ya no empujan los textos) */
+.grid.list-view .card { display: grid; grid-template-columns: 34px minmax(0, 1fr) 190px 28px; gap: 14px; align-items: center; padding: 0 12px 0 6px; }
+.grid.list-view .card > div:first-child { grid-column: 1; grid-row: 1; }
+.grid.list-view .card-info { grid-column: 2; grid-row: 1; grid-template-columns: minmax(0, 1fr) 120px 110px 150px 100px; }
+.grid.list-view .card .overlay { grid-column: 3; grid-row: 1; justify-self: end; }
+.grid.list-view .card .actions { justify-content: flex-end; }
+.grid.list-view .card .actions .play { flex: none; }
+.grid.list-view .fav { grid-column: 4; grid-row: 1; }
+/* lo demás de la portada (trofeo, estrellas, logotipo, vídeo, etc.) no ocupa sitio en la fila */
+.grid.list-view .card > :not(:first-child):not(.card-info):not(.overlay):not(.fav):not(.sel-check) { display: none; }
+.grid.list-view .card .sel-check { position: absolute; }
+.grid.list-view .card.complete { box-shadow: none; }
+@media (max-width: 1000px) { .grid.list-view .card-info { grid-template-columns: minmax(0, 1fr) 100px 110px; } .grid.list-view .card { grid-template-columns: 34px minmax(0, 1fr) 150px 28px; } }
+.grid.list-view.compact .actions { display: flex; }
+.grid.list-view .card .overlay, .grid.list-view .card:hover .overlay, .grid.no-names.list-view .card:hover .overlay, .grid.no-names.list-view .card:has(.placeholder) .overlay { background: none; padding: 0; }
+.grid.list-view .card .overlay .title, .grid.list-view .card .overlay .meta, .grid.details-view .card .overlay .title, .grid.details-view .card .overlay .meta { display: none !important; }

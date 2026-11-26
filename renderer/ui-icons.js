@@ -57,6 +57,11 @@ const UI_ICONS = {
   skipPrev: '<path class="f" d="M18 5l-9 7 9 7zM4.5 5H7v14H4.5z"/>',
   music: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
   eyeOff: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
+  // vistas de la biblioteca
+  viewTall: '<rect x="3" y="3" width="7.5" height="11" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="11" rx="1.5"/><path d="M3 18h7.5M13.5 18h7.5"/>',
+  viewWide: '<rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/>',
+  viewDetails: '<rect x="3" y="3" width="7.5" height="10" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="10" rx="1.5"/><path d="M3 16.5h7.5M3 20h4.5M13.5 16.5h7.5M13.5 20h4.5"/>',
+  viewList: '<rect x="3" y="4" width="4" height="4" rx="1"/><rect x="3" y="10" width="4" height="4" rx="1"/><rect x="3" y="16" width="4" height="4" rx="1"/><path d="M10 6h11M10 12h11M10 18h11"/>',
 };
 // <svg> del icono (cadena). Los nombres que no existen se devuelven como texto tal cual.
 function iconSvg(name) {
