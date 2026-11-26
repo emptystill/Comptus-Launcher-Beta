@@ -2000,6 +2000,7 @@ async function stopGame(g) {
 }
 function applyRunState(s) {
   runState = s && s.state ? s : null;
+
   syncIdle(); // con un juego abierto se congelan las animaciones
   try { if (window.Couch) Couch.onRun(); } catch {}
   try { if (window.DeskPlus) DeskPlus.onRun(); } catch {}
@@ -2016,11 +2017,11 @@ async function launch(g) {
     if (sib) return launch(sib);
   }
   const res = await window.api.launch(g.id);
-  if (res.ok) toast(res.installing ? `Abriendo la instalación de ${g.name}…` : `Abriendo ${g.name}…`);
+  // al jugar, Comptus abre su ventana «Iniciando juego» (main.js); el aviso solo al instalar, en modo consola o si falla
+  if (res.ok) { if (res.installing || document.body.classList.contains('couch-on')) toast(res.installing ? `Abriendo la instalación de ${g.name}…` : `Abriendo ${g.name}…`); }
   else { toast(res.error || 'No se pudo abrir el juego'); try { if (window.Couch && Couch.launchFailed) Couch.launchFailed(); } catch {} }
   setTimeout(load, 500);
 }
-
 function openEdit(g) {
   editing = g;
   editCover = g.cover;

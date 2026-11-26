@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.108
+- **Ventana «Iniciando juego»**: al pulsar Jugar aparece una ventana propia, por encima de todo y sin quitar el foco, centrada en la pantalla de Comptus. Es vertical, como una carta, con el estilo de Comptus y los colores de tu tema: el banner del juego desenfocado de fondo, la portada grande e inclinada con un brillo de acento, la marca «COMPTUS», el estado y un botón para abrir su launcher, con una barra de progreso en el borde. Cuando el juego pasa al frente (o se detecta en marcha) muestra «En ejecución» y se cierra, siempre después de al menos 3 s en pantalla para que dé tiempo a verla (como mucho 25 s si el juego no llega a verse); si algo falla, lo explica ahí mismo. No sale al instalar ni en el modo consola.
+
 ## 1.84.107
 - **Menú superior estilo Steam** (modo escritorio): Biblioteca · Colecciones · Deseados · Gratis · Eventos · Comunidad · Estadísticas, con el apartado activo en el color de acento y subrayado. A la derecha, la campana de avisos (un segundo clic la cierra) y tu perfil de Comptus. Colecciones, Deseados, Gratis, Eventos y Comunidad salen de la barra lateral, que queda solo para tu biblioteca; el icono de Estadísticas pasa al menú.
 - **Fila de iconos desplegable:** búsqueda, filtros, solo instalados, seleccionar, ¿Qué juego hoy?, escanear, energía y modo consola van en una fila bajo el menú que, escondida, deja una franja fina con una marca y baja al pasar el ratón, por encima de las portadas (que aprovechan todo el alto). Al buscar, el cuadro de texto aparece centrado debajo de la fila, sin empujar los iconos.

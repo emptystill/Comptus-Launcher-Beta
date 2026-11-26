@@ -27,7 +27,7 @@ let win;
 let cache = [];
 let quitting = false;
 // Juego que abrimos desde el lanzador y sigue en ejecución (para el overlay)
-const tracker = createTracker({ onEnd: (g) => onGameEnd(g), onSeen: (g) => sendGameState(g.id, 'running') });
+const tracker = createTracker({ onEnd: (g) => onGameEnd(g), onSeen: (g) => { sendGameState(g.id, 'running'); try { launchPopupRunning(g.id); } catch {} } });
 let stopping = false;
 // Hay un juego realmente en marcha (visto y con procesos vivos), no solo «a la espera» de abrirse
 const gameRunning = () => { const a = tracker.active; return !!(a && a.seen && ((a.procs && a.procs.length) || (a.pids && a.pids.size))); };
@@ -340,8 +340,121 @@ function launchGame(id) {
   if (res.ok) {
     updateMeta(id, { lastPlayed: Date.now() });
     if (tracker.track(g, res.pid)) { stopping = false; sendGameState(g.id, 'starting'); }
-  }
+    showLaunchPopup(g);
+  } else showLaunchPopup(g, res.error || 'No se pudo abrir el juego');
   return { ok: res.ok, error: res.error };
+}
+
+// ---------- Ventana «Iniciando juego» (al estilo de la de Steam) ----------
+// Ventana propia, por encima de todo y sin quitar el foco: portada, nombre, estado y botón para abrir el launcher.
+// Pasa a «En ejecución» cuando el vigilante ve el juego y se cierra sola. No sale en el modo consola (tiene la suya).
+let launchPop = null; // { win, id, timer }
+function closeLaunchPopup() {
+  if (!launchPop) return;
+  clearTimeout(launchPop.timer);
+  const w = launchPop.win; launchPop = null;
+  try { if (!w.isDestroyed()) w.close(); } catch { /* ya cerrada */ }
+}
+function popImage(src, wide) { // la imagen como data URL (la ventana no puede leer archivos locales) o la URL https tal cual
+  try {
+    if (!src) return '';
+    if (/^https?:/i.test(src)) return src;
+    const im = nativeImage.createFromPath(src);
+    if (im.isEmpty()) return '';
+    return (wide ? im.resize({ width: 640, quality: 'good' }) : im.resize({ height: 360, quality: 'good' })).toDataURL();
+  } catch { return ''; }
+}
+// Diseño propio de Comptus: banner del juego desenfocado de fondo, portada inclinada con brillo de acento, marca «COMPTUS»
+// con la fuente del logo, estado y una barra de progreso fina en el borde inferior. Colores del tema del usuario.
+let auFont = null; // la fuente del logo (Audiowide) incrustada: la ventana no puede leer archivos locales
+function audiowideCss() {
+  if (auFont === null) { try { auFont = fs.readFileSync(path.join(__dirname, 'renderer', 'fonts', 'audiowide.woff2')).toString('base64'); } catch { auFont = ''; } }
+  return auFont ? `@font-face{font-family:Au;src:url(data:font/woff2;base64,${auFont}) format('woff2')}` : '';
+}
+const LAUNCH_HTML = (fontCss) => `<!doctype html><html><head><meta charset="utf-8"><style>${fontCss}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:transparent;font-family:'Segoe UI',system-ui,sans-serif;color:var(--t,#eef);overflow:hidden;user-select:none}
+.w{position:relative;margin:10px;border-radius:20px;overflow:hidden;background:var(--p,#16181d);border:1px solid color-mix(in srgb,var(--a) 45%,transparent);
+box-shadow:0 0 0 1px rgba(0,0,0,.4),0 0 26px color-mix(in srgb,var(--a) 28%,transparent),0 14px 34px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;gap:20px;padding:36px 26px 30px;text-align:center;animation:in .28s cubic-bezier(.2,.9,.3,1.12)}
+@keyframes in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.bg{position:absolute;inset:-30px;background:center/cover no-repeat;filter:blur(18px) saturate(1.25);opacity:.55}
+.bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--p) 40%,transparent),color-mix(in srgb,var(--p) 95%,transparent) 60%)}
+.cv{position:relative;width:176px;height:264px;flex:none;border-radius:12px;background:#111 center/cover no-repeat;transform:rotate(-3deg);
+box-shadow:0 0 0 2px color-mix(in srgb,var(--a) 75%,transparent),0 0 22px color-mix(in srgb,var(--a) 45%,transparent),0 10px 24px rgba(0,0,0,.6)}
+.tx{position:relative;width:100%;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.br{font-family:Au,'Segoe UI',sans-serif;font-size:13px;letter-spacing:.14em;color:var(--a)}.br span{font-family:'Segoe UI',sans-serif;letter-spacing:.02em;color:color-mix(in srgb,var(--t) 70%,transparent);font-size:14px;margin-left:6px}
+.n{font-size:22px;font-weight:800;line-height:1.2;text-wrap:balance;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.s{display:flex;align-items:center;justify-content:center;gap:9px;font-size:14px;font-weight:600;margin-top:4px;color:color-mix(in srgb,var(--t) 85%,transparent)}
+.s i{width:10px;height:10px;border-radius:50%;background:var(--a);box-shadow:0 0 0 0 var(--a);animation:pu 1.2s ease-out infinite}
+@keyframes pu{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--a) 70%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+.ok .s{color:#8fd14f}.ok .s i{background:#5ba32b;animation:none}.er .s{color:#ff8a8a}.er .s i{background:#d9534f;animation:none}
+.m{font-size:13px;color:color-mix(in srgb,var(--t) 70%,transparent)}
+.ac{display:flex;justify-content:center;margin-top:12px}.b{height:34px;padding:0 18px;border-radius:999px;border:1px solid color-mix(in srgb,var(--a) 70%,transparent);background:color-mix(in srgb,var(--a) 14%,transparent);color:var(--t);font:600 13px 'Segoe UI',sans-serif;cursor:pointer}
+.b:hover{background:color-mix(in srgb,var(--a) 30%,transparent)}.b[hidden]{display:none}
+.pb{position:absolute;left:0;right:0;bottom:0;height:3px;background:color-mix(in srgb,var(--t) 10%,transparent);overflow:hidden}
+.pb i{position:absolute;top:0;bottom:0;width:30%;background:linear-gradient(90deg,transparent,var(--a),transparent);animation:run 1.3s ease-in-out infinite}
+@keyframes run{from{left:-30%}to{left:100%}}.ok .pb i{left:0;width:100%;animation:none;background:#5ba32b}.er .pb i{left:0;width:100%;animation:none;background:#d9534f}
+.x{position:absolute;top:10px;right:12px;width:28px;height:28px;border:0;border-radius:8px;background:none;color:color-mix(in srgb,var(--t) 60%,transparent);font-size:20px;line-height:1;cursor:pointer;z-index:2}
+.x:hover{background:rgba(255,255,255,.1);color:var(--t)}
+</style></head><body><div class="w" id="w"><div class="bg" id="bg"></div><div class="cv" id="cv"></div><div class="tx">
+<div class="br">COMPTUS<span id="k">· Iniciando juego</span></div><div class="n" id="n"></div>
+<div class="s"><i></i><span id="s">Iniciando…</span></div><div class="m" id="m"></div><div class="ac"><button class="b" id="b" hidden></button></div></div>
+<div class="pb"><i></i></div><button class="x" title="Cerrar" onclick="location.href='comptus-pop://close'">×</button></div>
+<script>function set(d){const $=(i)=>document.getElementById(i),R=document.body.style;
+for(const[k,v]of[['--a',d.accent],['--p',d.panel],['--t',d.text]])if(v)R.setProperty(k,v);
+const u=(x)=>'url("'+String(x).replace(/"/g,'%22')+'")';if(d.cover!=null)$('cv').style.backgroundImage=d.cover?u(d.cover):'';if(d.banner!=null)$('bg').style.backgroundImage=d.banner?u(d.banner):'';
+if(d.name!=null)$('n').textContent=d.name;if(d.kind!=null)$('k').textContent='· '+d.kind;if(d.status!=null)$('s').textContent=d.status;$('m').textContent=d.msg||'';
+const w=$('w');w.classList.toggle('ok',d.state==='ok');w.classList.toggle('er',d.state==='error');
+const b=$('b');if(d.button){b.hidden=false;b.textContent=d.button;b.onclick=()=>{location.href='comptus-pop://open'};}else if(d.button!==undefined)b.hidden=true;}</script></body></html>`;
+function showLaunchPopup(g, error) {
+  try {
+    if (couchOn) return;
+    const prov = providers.find((p) => p.id === g.source);
+    const th = loadStore().settings.theme || {};
+    // (una imagen WebP local no se puede leer: se usa la alternativa)
+    const data = { name: g.name, cover: popImage(g.cover) || popImage(g.coverFallback),
+      banner: popImage(g.bannerSm || g.banner, true) || popImage(g.bannerFallback, true),
+      accent: th.accent || '#6c8cff', panel: th.panel || '#171a21', text: th.text || '#e8eaf0',
+      kind: error ? 'No se pudo iniciar' : 'Iniciando juego', status: error ? 'No se pudo abrir' : 'Iniciando…', msg: error || '', state: error ? 'error' : '',
+      button: prov && prov.openUri ? `Abrir ${prov.name}` : '' };
+    closeLaunchPopup();
+    const area = (win && !win.isDestroyed() ? screen.getDisplayMatching(win.getBounds()) : screen.getPrimaryDisplay()).workArea;
+    const W = 360, H = 560; // vertical, como una carta
+    const pw = new BrowserWindow({ width: W, height: H, x: Math.round(area.x + (area.width - W) / 2), y: Math.round(area.y + (area.height - H) / 2),
+      frame: false, transparent: true, resizable: false, movable: true, alwaysOnTop: true, skipTaskbar: true, show: false, focusable: true, hasShadow: false,
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true } });
+    pw.setAlwaysOnTop(true, 'floating');
+    launchPop = { win: pw, id: g.id, timer: 0 };
+    // los botones de la ventana «navegan» a comptus-pop://…; aquí se interceptan
+    pw.webContents.on('will-navigate', (e, url) => {
+      e.preventDefault();
+      if (url.startsWith('comptus-pop://open') && prov) { shell.openExternal(prov.openUri).catch(() => {}); }
+      closeLaunchPopup();
+    });
+    pw.on('closed', () => { if (launchPop && launchPop.win === pw) { clearTimeout(launchPop.timer); launchPop = null; } });
+    pw.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(LAUNCH_HTML(audiowideCss()))).then(async () => {
+      if (pw.isDestroyed()) return;
+      // se rellena y se ajusta el alto de la ventana a la tarjeta (sin botón, p. ej. en un juego local, sobraba espacio abajo)
+      let h = 0;
+      try { h = await pw.webContents.executeJavaScript(`set(${JSON.stringify(data)}); document.getElementById('w').offsetHeight + 20`); } catch { /* alto por defecto */ }
+      if (pw.isDestroyed()) return;
+      if (h > 100 && h < H) pw.setBounds({ x: Math.round(area.x + (area.width - W) / 2), y: Math.round(area.y + (area.height - h) / 2), width: W, height: Math.ceil(h) });
+      pw.showInactive(); // sin quitar el foco (al juego o a lo que estés usando)
+      if (launchPop && launchPop.win === pw) launchPop.shownAt = Date.now();
+    }).catch(() => {});
+    // con error, 15 s para leerlo; si no, como mucho 25 s (por si el juego no llega a verse)
+    launchPop.timer = setTimeout(closeLaunchPopup, error ? 15000 : 25000);
+  } catch { /* sin ventana: no pasa nada */ }
+}
+// El juego ya está en marcha: se marca «En ejecución» y se cierra, pero sin bajar de LAUNCH_MIN_MS en pantalla
+// (si el juego arranca muy rápido, la ventana apenas se veía) y dejando el estado verde un momento a la vista
+const LAUNCH_MIN_MS = 3000;
+function launchPopupRunning(id) {
+  if (!launchPop || launchPop.id !== id || launchPop.win.isDestroyed() || launchPop.done) return;
+  launchPop.done = true;
+  launchPop.win.webContents.executeJavaScript(`set(${JSON.stringify({ kind: 'Juego iniciado', status: 'En ejecución · ¡a jugar!', state: 'ok' })})`).catch(() => {});
+  clearTimeout(launchPop.timer);
+  const shown = launchPop.shownAt ? Date.now() - launchPop.shownAt : 0;
+  launchPop.timer = setTimeout(closeLaunchPopup, Math.max(1200, LAUNCH_MIN_MS - shown));
 }
 
 // ---------- IPC ----------
@@ -2616,6 +2729,7 @@ function fgChanged(p, pid) {
     const t = tracker.active;
     on = !!g || !!(t && ((t.dir && trackerUnder(t.dir, p)) || (t.procs || []).some((q) => q.path && q.path.toLowerCase() === p.toLowerCase())));
     if (g && !t) { if (tracker.track(g)) sendGameState(g.id, 'starting'); }
+    if (on && launchPop && t && t.id === launchPop.id) launchPopupRunning(t.id); // el juego ya está delante: «En ejecución» y se cierra
     if (on && pid) tracker.addPid(pid); // así «Cerrar el juego» lo encuentra aunque Windows no deje leer su ruta (anti-trampas) // se le sigue la pista (nombre en el overlay, cerrarlo, tiempo jugado)
   }
   let why = on ? 'juego de la biblioteca' : 'no es un juego de la biblioteca';
