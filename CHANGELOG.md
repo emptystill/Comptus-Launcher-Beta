@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.114
+- **Borde de las portadas en «con detalles»:** se dibuja por encima de la imagen, así se ve igual por los cuatro lados (antes solo asomaba a los lados), y el dorado de los juegos completados rodea solo la portada, no el texto de debajo. El borde dorado ahora «respira» suavemente en todas las vistas de portadas (se pausa con el resto de animaciones cuando Comptus no se ve).
+
 ## 1.84.113
 - **Tiempo jugado de los juegos locales, corregido:** antes solo contaba mientras seguía abierto el .exe que Comptus lanzaba, así que en los juegos que arrancan con un lanzador propio (que abre el juego y se cierra) se perdía casi todo, y lo que jugabas abriéndolos fuera de Comptus no sumaba. Ahora cuenta desde que se ve el juego hasta que se cierran todos sus procesos (los de su carpeta), lo abras desde donde lo abras. El total también recupera el tiempo de las sesiones ya registradas (p. ej. Darkwatch: de 4 min a 161 min).
 - **Imágenes propias que no se quitaban ni se actualizaban:** «Restablecer» (portada, banner, icono) y «Quitar logotipo» ahora sí quitan la imagen; antes Comptus volvía a coger sola la que hay con el nombre del juego en Comptus Media y parecía que no hacía nada. Y si cambias un archivo de esas carpetas por otro con el mismo nombre, Comptus enseña el nuevo en la siguiente actualización de la biblioteca, sin tener que reiniciarlo.

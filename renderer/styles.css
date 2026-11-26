@@ -3584,3 +3584,18 @@ body.list-mode:not(:has(#hiddenLink:not(.hidden))) .view-corner { right: 16px; }
 .grid.list-view.compact .actions { display: flex; }
 .grid.list-view .card .overlay, .grid.list-view .card:hover .overlay, .grid.no-names.list-view .card:hover .overlay, .grid.no-names.list-view .card:has(.placeholder) .overlay { background: none; padding: 0; }
 .grid.list-view .card .overlay .title, .grid.list-view .card .overlay .meta, .grid.details-view .card .overlay .title, .grid.details-view .card .overlay .meta { display: none !important; }
+
+/* Próxima versión · en «con detalles» el borde se dibuja ENCIMA de la portada (antes la portada animada lo tapaba arriba y abajo
+   y solo se veía a los lados) y rodea solo la portada, no el texto de debajo. Los completados: dorado que «respira». */
+.grid.details-view .card::before, .grid:not(.list-view) .card.complete::before { content: ''; position: absolute; pointer-events: none; z-index: 6; border-radius: 12px; transition: box-shadow .15s; }
+.grid.details-view .card::before { inset: 0 0 50px 0; box-shadow: inset 0 0 0 1px var(--border); }
+.grid.details-view .card:hover::before, body.pad-mode #grid.details-view .card:focus::before { box-shadow: inset 0 0 0 2px var(--accent); }
+.grid.details-view .card > div:first-child { border: 0; }
+.grid.details-view .card:hover { transform: translateY(-4px); }
+.grid.details-view .card:hover > div:first-child { transform: none; box-shadow: 0 10px 28px rgba(0,0,0,.5); }
+.grid:not(.list-view):not(.details-view) .card.complete::before { inset: -1px; }
+.grid:not(.list-view) .card.complete { box-shadow: none; }
+.grid:not(.list-view) .card.complete::before, .grid.details-view .card.complete::before { box-shadow: inset 0 0 0 1.5px rgba(255,214,90,.95), 0 0 16px rgba(245,184,46,.55); animation: goldBreath 2.8s ease-in-out infinite; }
+.grid:not(.list-view) .card.complete:hover::before { box-shadow: inset 0 0 0 2px rgba(255,220,110,1), 0 0 24px rgba(245,184,46,.75); }
+@keyframes goldBreath { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .grid .card.complete::before { animation: none; } }
