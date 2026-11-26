@@ -3482,3 +3482,12 @@ body:not(:has(#hiddenLink:not(.hidden))) #sizeQuick.size-corner { right: 16px; }
   .top-items { column-gap: clamp(8px, 1.4cqw, 14px); }
   .top-right { gap: 8px; }
 }
+/* Próxima versión · Ficha: solo «⋯» a la vista; al pulsarlo se despliegan los botones de personalizar a su izquierda */
+.hero .tools { align-items: center; }
+.tools-set { display: flex; gap: 8px; overflow: hidden; max-width: 0; opacity: 0; transform: translateX(14px); pointer-events: none;
+  transition: max-width .3s cubic-bezier(.2,.8,.2,1), opacity .2s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+.hero .tools.open .tools-set { max-width: 340px; opacity: 1; transform: none; pointer-events: auto; }
+.tools-toggle .ic { transition: transform .25s ease; }
+.hero .tools.open .tools-toggle .ic { transform: rotate(90deg); }
+.tools-toggle.on { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .tools-set, .tools-toggle .ic { transition: none; } }

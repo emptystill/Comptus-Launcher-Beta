@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.110
+- **Ficha del juego más limpia:** arriba a la derecha solo se ve «⋯»; al pulsarlo se despliegan a su izquierda los botones de personalizar (banner, portada, icono, logotipo y color) y un engranaje con las opciones del juego. Se recogen con otro clic en «⋯» o haciendo clic en cualquier otra parte. Las opciones del juego también siguen con clic derecho en la cabecera.
+
 ## 1.84.109
 - **Destello de las portadas, ahora como un reflejo:** la luz se funde con la portada (suma luz a la propia imagen) en lugar de pintar una franja blanca encima, que se veía como una línea. Franja ancha y difuminada con un núcleo brillante, otra más tenue con tu color de acento y un brillo suave arriba, como en una superficie pulida. Cruza la portada entera a ritmo uniforme, de fuera a fuera, con un núcleo de luz intenso que contrasta bien; mientras pasa, la portada entera destella un instante y vuelve a su brillo normal.
 - **«Ocultos», más discreto:** sale de la barra lateral y queda solo como un icono de ojo, abajo a la derecha, a la derecha del deslizador de tamaño de las portadas (con el número de ocultos al pasar el ratón). Solo aparece si tienes juegos ocultos.

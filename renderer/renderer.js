@@ -2478,6 +2478,17 @@ function logoControls(g) {
 }
 
 
+let detailToolsOpen = false; // botones de personalizar de la ficha desplegados (se recuerda mientras navegas; al abrir Comptus, recogidos)
+// Un clic en cualquier otra parte los recoge (no los clics dentro del grupo ni en los menús que abren sus botones)
+document.addEventListener('mousedown', (e) => {
+  if (!detailToolsOpen) return;
+  if (e.target.closest('.hero .tools') || e.target.closest('.ctx-menu')) return;
+  detailToolsOpen = false;
+  document.querySelectorAll('.hero .tools.open').forEach((t) => {
+    t.classList.remove('open');
+    const b = t.querySelector('.tools-toggle'); if (b) { b.classList.remove('on'); b.title = 'Personalizar y más opciones'; }
+  });
+}, true);
 function renderDetail() {
   const box = $('#detail');
   const g = state.games.find((x) => x.id === state.detailId);
@@ -2531,16 +2542,23 @@ function renderDetail() {
       : { icon: 'x', label: 'Quitar logotipo (mostrar nombre)', run: () => saveCustom(g, { logo: null, logoOff: true }) },
   ]);
 
-  const moreTool = el('button', 'tool', '[[more]]');
-  moreTool.title = 'Más opciones';
-  moreTool.onclick = () => showMenu(moreTool, gameMenuItems(g, true));
-
-  tools.append(
+  // Personalizar: solo se ve «⋯»; al pulsarlo se despliegan a su izquierda banner, portada, icono, logotipo, color
+  // y el menú del juego (engranaje; también con clic derecho en la cabecera). Otro clic los recoge.
+  const menuTool = el('button', 'tool', '[[settings]]');
+  menuTool.title = 'Opciones del juego';
+  menuTool.onclick = () => showMenu(menuTool, gameMenuItems(g, true));
+  const set = el('div', 'tools-set');
+  set.append(
     imageTool(g, { icon: 'image', title: 'Banner', key: 'banner', pick: 'Elegir banner…', reset: 'Restablecer banner' }),
     imageTool(g, { icon: 'card', title: 'Portada', key: 'cover', pick: 'Elegir portada…', reset: 'Restablecer portada' }),
     imageTool(g, { icon: 'diamond', title: 'Icono', key: 'icon', pick: 'Elegir icono…', reset: 'Restablecer icono' }),
-    logoTool, colorTool, moreTool, colorInput,
+    logoTool, colorTool, menuTool,
   );
+  const moreTool = el('button', 'tool tools-toggle', '[[more]]');
+  const syncTools = () => { tools.classList.toggle('open', detailToolsOpen); moreTool.title = detailToolsOpen ? 'Ocultar las opciones' : 'Personalizar y más opciones'; moreTool.classList.toggle('on', detailToolsOpen); };
+  moreTool.onclick = () => { detailToolsOpen = !detailToolsOpen; syncTools(); };
+  tools.append(set, moreTool, colorInput);
+  syncTools();
 
   const poster = el('div', 'poster');
   poster.append(makeCover(g, true));
