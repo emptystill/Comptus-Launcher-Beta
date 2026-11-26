@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.115
+- **Colecciones con la vista «con detalles» o «lista»:** la página de Colecciones perdía el nombre y el número de juegos de cada colección, y el botón «Crear una nueva colección» se veía deformado. Las vistas de la biblioteca ya no se aplican a esa página.
+
 ## 1.84.114
 - **Borde de las portadas en «con detalles»:** se dibuja por encima de la imagen, así se ve igual por los cuatro lados (antes solo asomaba a los lados), y el dorado de los juegos completados rodea solo la portada, no el texto de debajo. El borde dorado ahora «respira» suavemente en todas las vistas de portadas (se pausa con el resto de animaciones cuando Comptus no se ve).
 

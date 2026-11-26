@@ -3529,9 +3529,10 @@ if (typeof ResizeObserver !== 'undefined') new ResizeObserver(layoutGrid).observ
 function applyShape() {
   const g = $('#grid'); if (!g) return;
   g.classList.toggle('wide-cards', cardShape === 'wide');
-  g.classList.toggle('details-view', cardView === 'details');
-  g.classList.toggle('list-view', cardView === 'list');
-  document.body.classList.toggle('list-mode', cardView === 'list'); // en lista no hay tamaño de portadas que cambiar
+  const coll = g.classList.contains('coll-grid'); // la página de Colecciones tiene sus propias tarjetas: no le afecta la vista elegida
+  g.classList.toggle('details-view', cardView === 'details' && !coll);
+  g.classList.toggle('list-view', cardView === 'list' && !coll);
+  document.body.classList.toggle('list-mode', cardView === 'list' && !coll); // en lista no hay tamaño de portadas que cambiar
   g.classList.toggle('no-names', !!hideNames);
 }
 function applyCardSize() {
