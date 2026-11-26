@@ -32,6 +32,18 @@ function detectSteamId(steamPath, { parseVdf, getCI, fs, path }) {
 
 function pct(v) { const n = parseFloat(v); return Number.isFinite(n) ? Math.round(n * 10) / 10 : null; }
 const httpsOnly = (u) => (/^https:\/\//.test(u || '') ? u : '');
+// Steam devuelve los iconos en su servidor antiguo (steamcdn-a.akamaihd.net…), donde ya no suben los de los logros
+// añadidos hace poco (dan 404). En el actual están todos, los viejos y los nuevos.
+const STEAM_ICON_RE = /^https?:\/\/[^/]+\/steamcommunity\/public\/images\/apps\//;
+const steamIcon = (u) => httpsOnly(String(u || '').replace(STEAM_ICON_RE, 'https://shared.fastly.steamstatic.com/community_assets/images/apps/'));
+// Corrige las direcciones de unos logros ya guardados. Devuelve true si cambió algo.
+function fixSteamIcons(data) {
+  let changed = false;
+  for (const a of (data && data.list) || []) for (const k of ['icon', 'iconGray']) {
+    if (a[k] && STEAM_ICON_RE.test(a[k])) { a[k] = steamIcon(a[k]); changed = true; }
+  }
+  return changed;
+}
 
 // Devuelve { data } o { error, code }. code: 'nokey' | 'badkey' | 'private' | 'none' | 'net'
 async function fetchAchievements({ appid, steamId, key, getJson, lang = 'spanish' }) {
@@ -80,8 +92,8 @@ async function fetchAchievements({ appid, steamId, key, getJson, lang = 'spanish
         name: d.displayName || d.name,
         description: d.description || '',
         hidden: !!d.hidden,
-        icon: httpsOnly(d.icon),
-        iconGray: httpsOnly(d.icongray) || httpsOnly(d.icon),
+        icon: steamIcon(d.icon),
+        iconGray: steamIcon(d.icongray) || steamIcon(d.icon),
         achieved,
         unlockTime: achieved && m.unlocktime ? m.unlocktime * 1000 : 0,
         percent: percents.has(d.name) ? percents.get(d.name) : null,
@@ -93,4 +105,4 @@ async function fetchAchievements({ appid, steamId, key, getJson, lang = 'spanish
   }
 }
 
-module.exports = { fetchAchievements, detectSteamId, toSteamId64 };
+module.exports = { fetchAchievements, detectSteamId, toSteamId64, fixSteamIcons };

@@ -16,7 +16,15 @@ const shots = require('./shots');
 const backup = require('./backup')
 const updaterMod = require('./updater');
 const Dupes = require('./renderer/dupes.js');
-const { fetchAchievements, detectSteamId } = require('./achievements');
+const { fetchAchievements, detectSteamId, fixSteamIcons } = require('./achievements');
+// Una vez al arrancar: pasa los iconos de logros de Steam ya guardados al servidor actual (en el antiguo faltan los de los logros nuevos)
+function migrateAchIcons() {
+  try {
+    const st = loadStore(); let changed = false;
+    for (const m of Object.values(st.meta || {})) if (m && m.achievements && fixSteamIcons(m.achievements)) changed = true;
+    if (changed) saveStore(st);
+  } catch { /* se corrigen igual al volver a pedirlos */ }
+}
 const { fetchOwnedSteam, steamOwnedToGames } = require('./owned');
 const epicOwned = require('./epic-owned');
 const itchOwned = require('./itch-owned');
@@ -3142,7 +3150,7 @@ function allowSteamVideo() {
 app.whenReady().then(() => { if (!gotLock) return; if (!process.argv.includes('--oculto') && sysSettings().splash !== false) openSplash(); /* lo primero: que se vea cuanto antes */
   // El resto del arranque (copias, bandeja, ventana principal…) bloquea el hilo principal: se hace cuando la pantalla de inicio ya se ve (o a los 700 ms como máximo)
   let started = false;
-  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); if (storeRecovered) setTimeout(() => sendNotice('backup', { title: 'Datos recuperados', body: `Tu archivo de datos estaba dañado (posible apagón a mitad de guardar). Se recuperó la copia «${path.basename(storeRecovered)}».` }), 6000); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
+  const rest = () => { if (started) return; started = true; adoptInstallerMediaDir(); applyMediaRoot(); migrateAchIcons(); try { backup.autoBackup(app.getPath('userData')); } catch { /* sin copia automática */ } try { app.setAppUserModelId('com.mateo.gamelauncher'); } catch {} registerToastIdentity(); allowSteamVideo(); createTray(); createWindow(); if (storeRecovered) setTimeout(() => sendNotice('backup', { title: 'Datos recuperados', body: `Tu archivo de datos estaba dañado (posible apagón a mitad de guardar). Se recuperó la copia «${path.basename(storeRecovered)}».` }), 6000); registerHotkeys(); startFgWatch(); syncPadWatch(); startLibraryWatch(); if (sysSettings().startWithWindows) applyLoginItem(); else cleanLegacyLogin();
   updater.start(); setTimeout(async () => { await autoSyncOwned().catch(() => {}); backgroundInfo().catch(() => {}); setTimeout(() => startDiskScan(false).catch(() => {}), 15000); startFreeNotify(); backgroundSgdb(); }, 4000); };
   if (splash) { afterSplash = rest; setTimeout(() => { afterSplash = null; rest(); }, 700); } else rest(); });
 app.on('window-all-closed', () => app.quit());
