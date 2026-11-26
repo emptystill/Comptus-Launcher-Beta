@@ -3491,3 +3491,26 @@ body:not(:has(#hiddenLink:not(.hidden))) #sizeQuick.size-corner { right: 16px; }
 .hero .tools.open .tools-toggle .ic { transform: rotate(90deg); }
 .tools-toggle.on { border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .tools-set, .tools-toggle .ic { transition: none; } }
+
+/* Próxima versión · colecciones que se rellenan solas (sagas) */
+.coll-match-row { display: flex; gap: 8px; align-items: center; }
+.coll-match-row input { flex: 1; min-width: 0; }
+.coll-match-row button { white-space: nowrap; }
+#collMatchHint { margin: 6px 0 4px; font-size: 12px; line-height: 1.4; }
+.coll-auto-tag { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--text); cursor: help; white-space: nowrap; }
+.coll-pick-auto { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; font-size: 13px; cursor: pointer; }
+.coll-pick-auto .hint { display: block; font-size: 12px; }
+
+/* Próxima versión · sagas detectadas */
+.saga-box { width: min(660px, calc(100vw - 32px)); max-height: calc(100vh - 80px); display: flex; flex-direction: column; }
+.saga-list { overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin: 8px 0; padding-right: 4px; min-height: 0; flex: 1; }
+.saga-row { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.04); cursor: pointer; }
+.saga-row:hover { background: rgba(255,255,255,.07); }
+.saga-covers { display: flex; flex: none; width: 90px; height: 52px; }
+.saga-covers img { width: 36px; height: 52px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.saga-covers img + img { margin-left: -18px; }
+.saga-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.saga-name { font-weight: 600; padding: 3px 6px; }
+.saga-games { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.saga-no { flex: none; }
+.saga-target { padding: 3px 0; color: var(--text); }

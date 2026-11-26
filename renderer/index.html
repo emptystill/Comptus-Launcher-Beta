@@ -419,6 +419,10 @@
     <form id="collNameForm" class="modal-box">
       <h2 id="collNameTitle">Nueva colección</h2>
       <label>Nombre<input id="collNameInput" maxlength="40" placeholder="Ej.: Call of Duty" autocomplete="off" required /></label>
+      <div class="section-label">Se rellena sola (opcional)</div>
+      <div class="coll-match-row"><input id="collMatchInput" maxlength="200" placeholder="Ej.: Gears of War, Gears 5, Gears Tactics" autocomplete="off" />
+        <button type="button" id="collMatchUseName" class="ghost small" title="Usar el nombre de la colección">Usar el nombre</button></div>
+      <p class="hint" id="collMatchHint">Nombres de la saga, separados por comas: entra sola cualquier juego cuyo nombre los contenga, también los que añadas más adelante.</p>
       <div class="section-label">Icono</div>
       <div class="icon-pick">
         <span id="collIconPreview" class="coll-ico big"></span>
@@ -439,6 +443,7 @@
       <h2 id="collPickTitle">Añadir a colección</h2>
       <div id="collPickList" class="coll-pick"></div>
       <label>Crear una nueva<span class="inline"><input id="collPickNew" maxlength="40" placeholder="Nombre de la colección" autocomplete="off" /><button type="button" id="collPickCreate">Crear y añadir</button></span></label>
+      <label class="check coll-pick-auto"><input type="checkbox" id="collPickAuto" checked /> <span>⚡ Añadir sola el resto de la saga <span class="hint" id="collPickAutoHint"></span></span></label>
       <div class="modal-actions"><button type="button" id="collPickClose" class="ghost">Cancelar</button></div>
     </form>
   </div>

@@ -328,7 +328,18 @@ const gameTags = (g) => (Array.isArray(g.tags) ? g.tags : []);
 let mergeDupes = true;
 let ubiVia = true;
 const groupIds = (g) => g.group || [g.id];
-const inColl = (c, g) => groupIds(g).some((id) => c.games.includes(id));
+// Colecciones de sagas que se rellenan solas: c.match = términos («Assassin's Creed», «Gears 5»…); entra todo juego cuyo nombre
+// los contenga como palabras completas (sin mayúsculas, tildes ni símbolos). c.exclude = juegos que quitaste a mano (no vuelven).
+const normSaga = (s) => ' ' + String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  .replace(/[™®©]/g, '').replace(/['’´`]/g, '').replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+const collAuto = (c, g) => {
+  if (!Array.isArray(c.match) || !c.match.length || !g || !g.name) return false;
+  const ids = groupIds(g);
+  if (Array.isArray(c.exclude) && ids.some((id) => c.exclude.includes(id))) return false;
+  const n = normSaga(g.name);
+  return c.match.some((t) => { const k = normSaga(t); return k.trim() && n.includes(k); });
+};
+const inColl = (c, g) => groupIds(g).some((id) => c.games.includes(id)) || collAuto(c, g);
 // En «todos», favoritos, recientes y colecciones los repetidos se ven una sola vez; dentro de una biblioteca, cada uno lo suyo
 const mixedView = () => !SOURCES.some((x) => state.filter === x.id || state.filter.startsWith(x.id + ':')) && state.f.sources.size === 0;
 const runStateFor = (g) => (runState && groupIds(g).includes(runState.id) ? runState : null);
@@ -1919,7 +1930,13 @@ function updatePageTitle(hide) {
   if (c) {
     const n = state.games.filter((g) => !g.hidden && !g.dupOf && inColl(c, g)).length;
     const ico = collIcon(c); ico.classList.add('page-ico');
-    kids.push(ico, el('h1', null, c.name), el('span', 'hint', `${n} ${n === 1 ? 'juego' : 'juegos'}`), el('span', 'page-fill'));
+    kids.push(ico, el('h1', null, c.name), el('span', 'hint', `${n} ${n === 1 ? 'juego' : 'juegos'}`));
+    if (Array.isArray(c.match) && c.match.length) {
+      const auto = el('span', 'coll-auto-tag', '⚡ Se rellena sola');
+      auto.title = 'Entran solos los juegos cuyo nombre contiene: ' + c.match.join(', ') + (c.exclude && c.exclude.length ? `\n(${c.exclude.length} quitados a mano)` : '');
+      kids.push(auto);
+    }
+    kids.push(el('span', 'page-fill'));
     const edit = el('button', 'ghost small', '[[pencil]] Editar');
     edit.onclick = () => openCollName(c);
     const cover = el('button', 'ghost small', '[[image]] Portada');
@@ -1930,7 +1947,10 @@ function updatePageTitle(hide) {
     bgb.onclick = () => showMenu(bgb, collBgItems(c));
     kids.push(edit, cover, bgb);
   } else {
-    kids.push(el('h1', null, 'Colecciones'), el('span', 'hint', `${collections.length}`));
+    const det = el('button', 'ghost small', '⚡ Detectar sagas');
+    det.title = 'Busca juegos de una misma saga (por el nombre) y te propone crear sus colecciones';
+    det.onclick = () => openSagaSuggest();
+    kids.push(el('h1', null, 'Colecciones'), el('span', 'hint', `${collections.length}`), el('span', 'page-fill'), det);
   }
   box.replaceChildren(...kids);
   box.classList.remove('hidden');
@@ -3774,8 +3794,18 @@ function selectRange(fromId, toId) {
 }
 function setInCollection(c, ids, add) {
   const set = new Set(c.games);
-  for (const id of ids) { if (add) set.add(id); else set.delete(id); }
+  const ex = new Set(Array.isArray(c.exclude) ? c.exclude : []);
+  for (const id of ids) {
+    if (add) { set.add(id); ex.delete(id); } // añadido a mano: deja de estar excluido
+    else {
+      set.delete(id);
+      // si entraba por el nombre de la saga, se excluye para que no vuelva solo
+      const g = state.games.find((x) => x.id === id);
+      if (g && Array.isArray(c.match) && c.match.length) { const was = c.exclude; c.exclude = []; if (collAuto(c, g)) ex.add(id); c.exclude = was; }
+    }
+  }
   c.games = [...set];
+  if (ex.size) c.exclude = [...ex]; else delete c.exclude;
   saveCollections();
   render();
 }
@@ -3786,6 +3816,153 @@ function collIcon(c) {
   if (c.iconImage) { const im = el('img'); im.src = imgUrl(c.iconImage); im.alt = ''; sp.append(im); }
   else if (c.icon) sp.textContent = c.icon; else sp.append(iconEl('folder'));
   return sp;
+}
+// ── Sagas detectadas: agrupa los juegos por el comienzo del nombre y propone colecciones que se rellenan solas ──
+let sagaDismissed = [];
+const SAGA_TAIL = new Set(['remastered', 'remaster', 'definitive', 'edition', 'goty', 'deluxe', 'ultimate', 'complete', 'enhanced', 'directors', 'cut', 'hd', 'collection', 'anniversary', 'year', 'game', 'of', 'the', 'gold', 'premium', 'standard', 'special', 'legendary', 'redux', 'reloaded', 'trilogy', 'bundle', 'pc', 'beta', 'tech', 'demo', 'playtest', 'public', 'testing', 'test', 'multiplayer', 'zombies', 'campaign']);
+const SAGA_SOLO_BAD = new Set(['the', 'a', 'an', 'el', 'la', 'los', 'las', 'de', 'super', 'new', 'dark', 'red', 'black', 'dead', 'star', 'world', 'grand', 'little', 'my', 'tom', 'call', 'age', 'lego', 'disney', 'marvel', 'marvels', 'sid', 'sids', 'microsoft', 'steam', 'test', 'demo']);
+const SAGA_LINK = new Set(['of', 'the', 'a', 'an', 'and', 'in', 'to', 'for', 'on', 'at', 'de', 'del', 'la', 'el', 'los', 'las', 'y', 'en', 'season', 'part', 'episode', 'chapter', 'vol']);
+const sagaNum =(t) => /^\d+$/.test(t) || /^(i|ii|iii|iv|v|vi|vii|viii|ix|x|xi|xii)$/.test(t);
+function sagaKey(name) { // palabras del título base: antes de «:» o « - », sin número final ni coletillas de edición
+  const base = String(name || '').replace(/[™®©]/g, '').split(/\s*[:–—|]\s*|\s+-\s+/)[0];
+  const t = normSaga(base).trim().split(' ').filter(Boolean);
+  while (t.length > 1 && (sagaNum(t[t.length - 1]) || SAGA_TAIL.has(t[t.length - 1]))) t.pop();
+  return t;
+}
+function sagaLabel(name, k) { // las k primeras palabras del nombre original (respeta «Half-Life», «Assassin's»)
+  const clean = String(name || '').replace(/[™®©]/g, '');
+  const re = /[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu;
+  let m, i = 0, end = 0;
+  while (i < k && (m = re.exec(clean))) { i += normSaga(m[0]).trim().split(' ').filter(Boolean).length || 1; end = m.index + m[0].length; }
+  return clean.slice(0, end).trim();
+}
+function detectSagas() {
+  const games = state.games.filter((g) => !g.hidden && !g.dupOf && g.name);
+  const keys = games.map((g) => ({ g, t: sagaKey(g.name) })).filter((x) => x.t.length);
+  const whole = new Set(keys.map((x) => x.t.join(' ')));
+  const pre = new Map(); // prefijo → juegos que empiezan así
+  for (const x of keys) {
+    for (let k = 1; k <= Math.min(6, x.t.length); k++) {
+      const p = x.t.slice(0, k).join(' ');
+      if (SAGA_LINK.has(x.t[k - 1])) continue; // «call of», «rise of the»: a medias, no es una saga
+      // una sola palabra solo cuenta si algún juego se llama exactamente así («Gears 5» → «gears», «Halo: …» → «halo»)
+      if (k === 1 && (SAGA_SOLO_BAD.has(p) || p.length < 3 || sagaNum(p) || !whole.has(p))) continue;
+      if (!pre.has(p)) pre.set(p, new Set());
+      pre.get(p).add(x.g);
+    }
+  }
+  // cuenta nombres distintos: el mismo juego en dos tiendas no hace una saga
+  // cuenta títulos distintos: el mismo juego en dos tiendas o en otra edición («: Definitive Edition», «Tech Beta») no hace una saga
+  const sagaBase = (n) => { const t = normSaga(String(n || '').replace(/[™®©]/g, '').split(/\s*[:–—|]\s*|\s+-\s+/)[0]).trim().split(' '); while (t.length > 1 && SAGA_TAIL.has(t[t.length - 1])) t.pop(); return t.join(' '); };
+  const distinct = (set) => new Set([...set].map((g) => sagaBase(g.name))).size;
+  const cands = [...pre.entries()].filter(([, set]) => distinct(set) >= 2)
+    .sort((a, b) => a[0].split(' ').length - b[0].split(' ').length || b[1].size - a[1].size);
+  const sizes = new Map();
+  const collSize = (c) => { if (!sizes.has(c.id)) sizes.set(c.id, games.filter((g) => inColl(c, g)).length); return sizes.get(c.id); };
+  const out = [], taken = new Set();
+  for (const [p0, set] of cands) {
+    const list = [...set];
+    if (list.every((g) => taken.has(g.id))) continue; // ya lo cubre una saga más corta («gears» cubre «gears of war»)
+    let p = p0;
+    for (const [q, s2] of cands) if (q.startsWith(p + ' ') && s2.size === set.size) p = q; // alarga mientras sea el mismo grupo («call of» → «call of duty»)
+    // si se reparte en dos o más sagas más largas que cubren casi todo, mejor esas
+    // («Sniper» → Sniper Elite + Sniper Ghost Warrior; «Tom Clancy's» → Splinter Cell, The Division, Ghost Recon)
+    const kids = cands.filter(([q]) => q.startsWith(p + ' ') && !cands.some(([r]) => r !== q && r.startsWith(p + ' ') && q.startsWith(r + ' ')));
+    if (kids.length >= 2 && new Set(kids.flatMap(([, s2]) => [...s2])).size >= list.length * 0.7) continue;
+    const len = p.split(' ').length;
+    const first = list.find((g) => sagaKey(g.name).length === len) || list[0];
+    const label = sagaLabel(first.name, len) || p;
+    const key = normSaga(label).trim();
+    list.forEach((g) => taken.add(g.id));
+    if (!key || sagaDismissed.includes(key)) continue;
+    list.sort((a, b) => a.name.localeCompare(b.name, 'es', { numeric: true }));
+    // ¿ya hay una colección con esta saga (mismo nombre o la mayoría de sus juegos)? → proponer solo los que le faltan
+    // «mismo nombre» admite que uno empiece por el otro («Gears» ↔ «Gears of War»); por mayoría, solo si la colección es casi toda de esta saga
+    // (así «Mortal Kombat» no se mete en «Warner Games», que es de una editorial)
+    const best = collections.map((c) => { const cn = normSaga(c.name).trim(); return { c, n: list.filter((g) => inColl(c, g)).length, same: cn === key || cn.startsWith(key + ' ') || key.startsWith(cn + ' ') }; })
+      .filter((x) => x.same || x.n >= list.length / 2 && x.n >= collSize(x.c) * 0.6)
+      .sort((a, b) => b.same - a.same || b.n - a.n)[0];
+    if (best) {
+      const ex = new Set(best.c.exclude || []);
+      const missing = list.filter((g) => !inColl(best.c, g) && !groupIds(g).some((id) => ex.has(id))); // los que quitaste a mano no vuelven
+      const dkey = 'add:' + best.c.id + ':' + key;
+      if (missing.length && !sagaDismissed.includes(dkey)) out.push({ key: dkey, label, target: best.c, games: missing });
+      continue;
+    }
+    out.push({ key, label, games: list });
+  }
+  return out.sort((a, b) => !!b.target - !!a.target || b.games.length - a.games.length || a.label.localeCompare(b.label, 'es'));
+}
+function openSagaSuggest() {
+  const found = detectSagas();
+  const modal = el('div', 'modal saga-modal'), box = el('div', 'modal-box saga-box');
+  const close = () => { modal.remove(); document.removeEventListener('keydown', onKey, true); };
+  const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+  document.addEventListener('keydown', onKey, true);
+  modal.onclick = (e) => { if (e.target === modal) close(); };
+  box.append(el('h2', null, '⚡ Sagas detectadas'));
+  const acts = el('div', 'modal-actions');
+  if (!found.length) {
+    box.append(el('p', 'hint', 'No he encontrado sagas nuevas: o ya tienen su colección, o no hay al menos dos juegos con el mismo comienzo de nombre.'));
+    const ok = el('button', null, 'Vale'); ok.onclick = close;
+    acts.append(ok); box.append(acts);
+  } else {
+    box.append(el('p', 'hint', 'Marca lo que quieras aplicar (puedes cambiar el nombre de las nuevas). Arriba, juegos que les faltan a tus colecciones; debajo, sagas nuevas. Todas quedan rellenándose solas: también entrarán los juegos de la saga que añadas más adelante.'));
+    const list = el('div', 'saga-list');
+    const rows = found.map((f) => {
+      const row = el('div', 'saga-row');
+      const ck = document.createElement('input'); ck.type = 'checkbox'; ck.checked = true;
+      const name = document.createElement('input'); name.value = f.label; name.maxLength = 40; name.className = 'saga-name';
+      const head = f.target ? el('div', 'saga-name saga-target', `Añadir a «${f.target.name}»`) : name;
+      const covers = el('div', 'saga-covers');
+      f.games.slice(0, 4).forEach((g) => {
+        const src = g.coverSm || g.cover; if (!src) return;
+        const im = document.createElement('img'); im.loading = 'lazy'; im.src = src; im.onerror = () => im.remove(); covers.append(im);
+      });
+      const info = el('div', 'saga-info');
+      const what = f.target ? `${f.games.length === 1 ? 'Le falta' : `Le faltan ${f.games.length}`}: ` : `${f.games.length} juegos: `;
+      info.append(head, el('div', 'hint saga-games', what + f.games.slice(0, 6).map((g) => g.name).join(', ') + (f.games.length > 6 ? '…' : '')));
+      info.lastChild.title = f.games.map((g) => g.name).join('\n');
+      const no = el('button', 'ghost small saga-no', f.target ? 'No, gracias' : 'No es una saga');
+      no.type = 'button'; no.title = 'Quitarla y no volver a proponerla';
+      no.onclick = () => { sagaDismissed.push(f.key); window.api.setSettings({ sagaDismissed }); row.remove(); f.gone = true; };
+      row.onclick = (e) => { if (e.target === row || e.target === covers || e.target.tagName === 'IMG') ck.checked = !ck.checked; };
+      row.append(ck, covers, info, no);
+      list.append(row);
+      return { f, ck, name };
+    });
+    const all = el('button', 'ghost small', 'Desmarcar todas'); all.type = 'button';
+    all.onclick = () => { const on = !rows.some((r) => r.ck.checked); rows.forEach((r) => { r.ck.checked = on; }); all.textContent = on ? 'Desmarcar todas' : 'Marcar todas'; };
+    const cancel = el('button', 'ghost', 'Cancelar'); cancel.type = 'button'; cancel.onclick = close;
+    const go = el('button', null, 'Aplicar las marcadas'); go.type = 'button';
+    go.onclick = () => {
+      let made = 0, added = 0;
+      for (const r of rows) {
+        if (r.f.gone || !r.ck.checked) continue;
+        if (r.f.target) { // colección que ya tenías: se le añaden los que faltan y se queda con la regla del nombre
+          const c = r.f.target;
+          c.games = [...new Set([...c.games, ...r.f.games.map((g) => g.id)])];
+          if (!(c.match || []).some((t) => normSaga(t).trim() === normSaga(r.f.label).trim())) c.match = [...(c.match || []), r.f.label].slice(0, 12);
+          added += r.f.games.length;
+          continue;
+        }
+        const nm = r.name.value.trim() || r.f.label;
+        const c = createCollection(nm, [], {});
+        if (!c) continue;
+        // regla: el nombre detectado (y el que escribiste, si cambia); si aun así se queda alguno fuera, se añade a mano
+        c.match = [...new Set([r.f.label, nm].filter((x) => normSaga(x).trim()))].slice(0, 12);
+        const left = r.f.games.filter((g) => !collAuto(c, g)).map((g) => g.id);
+        if (left.length) c.games = [...new Set([...c.games, ...left])];
+        made++;
+      }
+      saveCollections(); render(); close();
+      const msg = [made && `${made} ${made === 1 ? 'colección creada' : 'colecciones creadas'}`, added && `${added} ${added === 1 ? 'juego añadido' : 'juegos añadidos'} a tus colecciones`].filter(Boolean);
+      if (msg.length) toast(msg.join(' · '));
+    };
+    acts.append(all, el('span', 'page-fill'), cancel, go);
+    box.append(list, acts);
+  }
+  modal.append(box); document.body.append(modal);
 }
 function createCollection(name, ids = [], icon = {}) {
   const clean = String(name || '').trim().slice(0, 40);
@@ -3819,6 +3996,8 @@ function openCollName(c, ids = []) {
   draftIcon = { icon: (c && c.icon) || '', iconImage: (c && c.iconImage) || '' };
   $('#collNameTitle').textContent = c ? 'Editar colección' : 'Nueva colección';
   $('#collNameInput').value = c ? c.name : '';
+  $('#collMatchInput').value = c && Array.isArray(c.match) ? c.match.join(', ') : '';
+  updateMatchHint();
   const grid = $('#collEmojis');
   if (!grid.childElementCount) {
     for (const e of EMOJIS) {
@@ -3831,6 +4010,19 @@ function openCollName(c, ids = []) {
   $('#collNameModal').classList.remove('hidden');
   $('#collNameInput').focus();
 }
+// Sagas automáticas: términos escritos → lista; y aviso en vivo de cuántos juegos entrarían
+const parseMatch = (s) => [...new Set(String(s || '').split(',').map((x) => x.trim()).filter((x) => normSaga(x).trim()))].slice(0, 12);
+function updateMatchHint() {
+  const terms = parseMatch($('#collMatchInput').value), hint = $('#collMatchHint');
+  if (!terms.length) { hint.textContent = 'Nombres de la saga, separados por comas: entra sola cualquier juego cuyo nombre los contenga, también los que añadas más adelante.'; return; }
+  const probe = { match: terms, exclude: renaming && renaming.exclude };
+  const hits = state.games.filter((g) => !g.hidden && !g.dupOf && collAuto(probe, g));
+  hint.textContent = hits.length
+    ? `Entrarían solos ${hits.length} ${hits.length === 1 ? 'juego' : 'juegos'}: ${hits.slice(0, 6).map((g) => g.name).join(', ')}${hits.length > 6 ? '…' : ''}`
+    : 'Ahora mismo ningún juego coincide (entrarán los que añadas más adelante).';
+}
+$('#collMatchInput').oninput = updateMatchHint;
+$('#collMatchUseName').onclick = () => { const n = $('#collNameInput').value.trim(); if (n) { $('#collMatchInput').value = n; updateMatchHint(); } };
 const closeCollName = () => { $('#collNameModal').classList.add('hidden'); renaming = null; pendingIds = []; };
 let pickIds = [];
 let pickFromSelection = false;
@@ -3838,11 +4030,13 @@ function renderCollPick() {
   const box = $('#collPickList');
   if (!collections.length) { box.replaceChildren(el('p', 'hint', 'Todavía no tienes colecciones. Crea la primera abajo.')); return; }
   box.replaceChildren(...sortedCollections().map((c) => {
-    const n = pickIds.filter((id) => c.games.includes(id)).length;
+    const isIn = (id) => { const g = state.games.find((x) => x.id === id); return g ? inColl(c, g) : c.games.includes(id); }; // también los que entran por el nombre de la saga
+    const n = pickIds.filter(isIn).length;
     const all = n === pickIds.length;
     const b = el('button', 'pick-row' + (all ? ' on' : ''));
     b.type = 'button';
-    b.append(el('span', 'pick-mark', all ? '[[check]]' : n ? '[[minus]]' : ''), collIcon(c), el('span', 'pick-name', c.name), el('span', 'count', String(c.games.length)));
+    const total = state.games.filter((g) => !g.hidden && !g.dupOf && inColl(c, g)).length;
+    b.append(el('span', 'pick-mark', all ? '[[check]]' : n ? '[[minus]]' : ''), collIcon(c), el('span', 'pick-name', c.name), el('span', 'count', String(total)));
     b.onclick = () => {
       setInCollection(c, pickIds, !all);
       toast(all ? `Quitados de «${c.name}»` : `Añadidos a «${c.name}»`);
@@ -3860,7 +4054,7 @@ function openCollPick(ids, fromSelection = false) {
   pickIds = ids;
   pickFromSelection = fromSelection;
   $('#collPickTitle').textContent = ids.length === 1 ? 'Añadir a colección' : `Añadir ${ids.length} juegos a una colección`;
-  $('#collPickNew').value = '';
+  $('#collPickNew').value = ''; updatePickAutoHint();
   renderCollPick();
   $('#collPickModal').classList.remove('hidden');
 }
@@ -3908,9 +4102,12 @@ $('#collNameForm').onsubmit = (e) => {
   e.preventDefault();
   const name = $('#collNameInput').value.trim();
   if (!name) return;
-  if (renaming) { renaming.name = name.slice(0, 40); renaming.icon = draftIcon.icon; renaming.iconImage = draftIcon.iconImage; saveCollections(); render(); }
+  const match = parseMatch($('#collMatchInput').value);
+  const setMatch = (c) => { if (match.length) c.match = match; else { delete c.match; delete c.exclude; } };
+  if (renaming) { renaming.name = name.slice(0, 40); renaming.icon = draftIcon.icon; renaming.iconImage = draftIcon.iconImage; setMatch(renaming); saveCollections(); render(); }
   else {
     const c = createCollection(name, pendingIds, { ...draftIcon });
+    if (c && match.length) { setMatch(c); saveCollections(); }
     if (c && pendingIds.length) { toast(`Añadidos a «${c.name}»`); setSelecting(false); }
     else if (c) { state.filter = 'col:' + c.id; state.detailId = null; render(); }
   }
@@ -3919,10 +4116,20 @@ $('#collNameForm').onsubmit = (e) => {
 $('#collPickClose').onclick = closeCollPick;
 $('#collPickModal').onclick = (e) => { if (e.target.id === 'collPickModal') closeCollPick(); };
 $('#collPickForm').onsubmit = (e) => { e.preventDefault(); $('#collPickCreate').click(); };
+// Aviso en vivo: cuántos juegos entrarían solos con el nombre escrito
+function updatePickAutoHint() {
+  const v = $('#collPickNew').value.trim(), h = $('#collPickAutoHint');
+  if (!v || !normSaga(v).trim()) { h.textContent = '(los que tengan ese nombre, también los que añadas más adelante)'; return; }
+  const n = state.games.filter((g) => !g.hidden && !g.dupOf && collAuto({ match: [v] }, g)).length;
+  h.textContent = n ? `(ahora mismo ${n} ${n === 1 ? 'juego' : 'juegos'} con «${v}» en el nombre)` : `(ningún juego tiene «${v}» en el nombre por ahora)`;
+}
+$('#collPickNew').oninput = updatePickAutoHint;
 $('#collPickCreate').onclick = () => {
   const c = createCollection($('#collPickNew').value, pickIds);
   if (!c) return;
-  toast(`Añadidos a «${c.name}»`);
+  if ($('#collPickAuto').checked && !(c.match && c.match.length) && normSaga(c.name).trim()) { c.match = [c.name]; saveCollections(); render(); }
+  const n = state.games.filter((g) => !g.hidden && !g.dupOf && inColl(c, g)).length;
+  toast(`«${c.name}»: ${n} ${n === 1 ? 'juego' : 'juegos'}`);
   finishPick();
 };
 function updateOnlyTitle() { $('#onlyInstalled').title = `Solo juegos instalados (los locales siempre se ven): ${onlyInstalled ? 'activado' : 'desactivado'}`; }
@@ -4525,7 +4732,9 @@ window.api.gameState().then(applyRunState).catch(() => {});
   onlyInstalled = !(s && s.onlyInstalled === false);
   $('#onlyInstalled').classList.toggle('on', onlyInstalled);
   updateOnlyTitle();
-  collections = Array.isArray(s && s.collections) ? s.collections.filter((c) => c && c.id && c.name).map((c) => ({ id: String(c.id), name: String(c.name), games: Array.isArray(c.games) ? c.games : [], icon: c.icon || '', iconImage: c.iconImage || '', cover: c.cover || '', ...(c.bg && typeof c.bg.path === 'string' && c.bg.path ? { bg: { path: c.bg.path } } : {}) })) : [];
+  collections = Array.isArray(s && s.collections) ? s.collections.filter((c) => c && c.id && c.name).map((c) => ({ id: String(c.id), name: String(c.name), games: Array.isArray(c.games) ? c.games : [], icon: c.icon || '', iconImage: c.iconImage || '', cover: c.cover || '', ...(c.bg && typeof c.bg.path === 'string' && c.bg.path ? { bg: { path: c.bg.path } } : {}),
+    ...(Array.isArray(c.match) && c.match.length ? { match: c.match.map(String).filter(Boolean).slice(0, 12) } : {}), ...(Array.isArray(c.exclude) && c.exclude.length ? { exclude: c.exclude.map(String) } : {}) })) : [];
+  sagaDismissed = Array.isArray(s && s.sagaDismissed) ? s.sagaDismissed.map(String).slice(-300) : [];
   navOpen = (s && s.navOpen) || {};
   navCollapsed = (s && s.navCollapsed) || {};
   if (s && s.filterOpen && !filterPanelEl) openFilter();

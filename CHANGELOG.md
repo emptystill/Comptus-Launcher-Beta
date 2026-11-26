@@ -1134,6 +1134,10 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.112
+- **⚡ Detectar sagas** (página de Colecciones): Comptus agrupa tus juegos por el comienzo del nombre (Far Cry 3 + Far Cry Primal, Gears of War 2 + Gears 5…) y te propone, para marcar y aplicar de una vez, los juegos que les faltan a tus colecciones de saga y las sagas nuevas que aún no tienen colección (con el nombre editable). Todas quedan rellenándose solas. No cuenta como saga el mismo juego en dos tiendas o ediciones, no mete una saga en una colección de editorial y no vuelve a proponer lo que descartas con «No es una saga» o «No, gracias».
+- **Colecciones que se rellenan solas (sagas):** al crear o editar una colección puedes escribir los nombres de la saga separados por comas (p. ej. «Far Cry» o «Gears of War, Gears 5, Gears Tactics»), o pulsar «Usar el nombre». Entra sola cualquier juego cuyo nombre los contenga, también los que instales o añadas más adelante, y la ventana te dice al momento cuántos coincidirían. También desde «Añadir a colección» → «Crear una nueva», con la casilla «⚡ Añadir sola el resto de la saga» (marcada por defecto). Se compara por palabras completas, sin tener en cuenta mayúsculas, tildes ni ™/®. Si quitas a mano un juego que entró solo, se queda fuera; si lo vuelves a añadir, vuelve. Las colecciones con esta regla muestran «⚡ Se rellena sola» junto al título.
+
 ## 1.84.111
 - **Interruptor para la animación de tamaño** (Configuración, junto al tamaño de las portadas): al pasar la ventana a otra pantalla, las portadas pueden cambiar de tamaño con la animación (se deslizan y se asientan con un pequeño rebote) o al instante. Viene activado.
 
