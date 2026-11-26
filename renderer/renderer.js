@@ -586,6 +586,12 @@ function updateCounts() {
     events: (() => { try { return evData ? evLive() : (lastCounts.events || 0); } catch { return 0; } })(),
   };
   rememberCounts(counts);
+  // Ocultos: enlace discreto al pie de la barra lateral, solo si hay alguno
+  { const hl = $('#hiddenLink'); if (hl) {
+    hl.classList.toggle('hidden', !counts.hidden && state.filter !== 'hidden');
+    const on = state.filter === 'hidden' && !state.detailId; hl.classList.toggle('active', on);
+    hl.title = on ? 'Volver a la biblioteca' : `Ver los juegos que ocultaste (${counts.hidden})`;
+  } }
   for (const g of visible) {
     if (g.viaStore && g.dupOf) continue;
     counts[g.source] = (counts[g.source] || 0) + 1;
@@ -676,6 +682,8 @@ function playIn(target) {
   $('#dicePlay').onclick = () => { if (cur) { const g = cur; close(); launch(g); } };
   window.__diceRestore = (s) => { if (s && modes.some((m) => m.id === s.diceMode)) $('#diceMode').value = s.diceMode; if (s && s.diceSkip === false) $('#diceSkip').checked = false; };
 }
+document.body.append($('#hiddenLink')); // fuera de la barra lateral: junto al deslizador de tamaño (abajo a la derecha)
+$('#hiddenLink').onclick = () => { state.filter = state.filter === 'hidden' ? 'all' : 'hidden'; state.detailId = null; render(); };
 $('#statsBtn').onclick = () => { state.filter = state.filter === 'stats' ? 'all' : 'stats'; state.detailId = null; render(); };
 
 // ---------- Menú superior (estilo Steam) ----------
@@ -1553,7 +1561,6 @@ function makeCard(g) {
   const card = el('article', 'card' + (g.installed === false ? ' notinstalled' : '') + (selected.has(g.id) ? ' selected' : ''));
   const check = el('span', 'sel-check', '[[check]]');
   card.dataset.id = g.id;
-  if (hideNames) card.title = g.name;
   card.append(makeCover(g));
   if (cardShape === 'wide' && wideLogos && g.logo && !g.logoOff && !g.compCard) { // logotipo del juego centrado sobre el banner
     const lg = new Image(); lg.className = 'card-logo'; lg.alt = ''; lg.decoding = 'async'; lg.loading = 'eager'; card.classList.add('has-logo'); // se marca ya: así no cambia el estilo de la tarjeta cuando termina de cargar el logo
@@ -1899,7 +1906,6 @@ function makeCollCard(c) {
   title.append(collIcon(c), el('span', 'coll-name', c.name));
   over.append(title, el('div', 'coll-line'), el('div', 'meta coll-count', `${games.length} ${games.length === 1 ? 'juego' : 'juegos'}`));
   card.append(over);
-  card.title = `${c.name} · ${games.length} ${games.length === 1 ? 'juego' : 'juegos'}`;
   card.onclick = () => { openNav('col:' + c.id, true); state.filter = 'col:' + c.id; state.detailId = null; render(); };
   card.oncontextmenu = (e) => { e.preventDefault(); showMenu({ x: e.clientX, y: e.clientY }, collMenuItems(c)); };
   return card;
@@ -3440,6 +3446,7 @@ function layoutGrid() {
   if (n === 1) w = Math.min(w, Math.round(minW * 1.4)); // una sola columna: que no ocupe todo el ancho
   grid.style.setProperty('--card-w', w + 'px');
   grid.style.gridTemplateColumns = `repeat(${n}, ${w}px)`;
+  syncSizeSliders(); // con otro ancho caben otras columnas: los deslizadores se ajustan
 }
 if (typeof ResizeObserver !== 'undefined') new ResizeObserver(layoutGrid).observe($('#grid'));
 
@@ -3458,7 +3465,7 @@ function applyCardSize() {
 // Al cambiar de pantalla (otro monitor o giro): se recupera el tamaño guardado para esa pantalla; si es nueva, se conserva el actual
 let screenT = null;
 function switchCardSize(saved) { // cambio de pantalla: cada portada viaja (posición y tamaño) de donde estaba a donde queda, sin parpadeo
-  const g = $('#grid'), apply = () => { cardSize = saved; applyCardSize(); $('#cardSize').value = cardSize; $('#sizeQuick').value = cardSize; saveTheme(); };
+  const g = $('#grid'), apply = () => { cardSize = saved; applyCardSize(); syncSizeSliders(); saveTheme(); };
   if (!g || !g.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return; }
   const kids = Array.from(g.children), first = new Map(), clamp = (v, m) => Math.max(-m, Math.min(m, v));
   if (kids.length <= 2500) kids.forEach((el) => { const r = el.getBoundingClientRect(); if (r.width) first.set(el, r); }); // posición de todas, también las que no se veían (en vertical caben muchas más)
@@ -3489,8 +3496,7 @@ function setCardSize(v) {
   cardSize = Math.min(CARD_MAX, Math.max(CARD_MIN, Math.round(v)));
   cardSizes[screenKey()] = cardSize;
   applyCardSize();
-  $('#cardSize').value = cardSize;
-  $('#sizeQuick').value = cardSize;
+  syncSizeSliders(); // los deslizadores van por columnas
   saveTheme();
 }
 
@@ -3528,8 +3534,7 @@ function syncThemeModal() {
   $('#hkShot').value = hotkeys.shot;
   $('#hkSearch').value = hotkeys.search || 'Ctrl+Alt+Space';
   for (const [id, key] of Object.entries(THEME_KEYS)) $('#' + id).value = theme[key];
-  $('#cardSize').value = cardSize;
-  $('#sizeQuick').value = cardSize;
+  syncSizeSliders(); // los deslizadores van por columnas
   document.querySelectorAll('.preset').forEach((b) => b.classList.toggle('active', b.dataset.id === theme.preset));
 }
 
@@ -4083,13 +4088,47 @@ for (const [id, key] of Object.entries(THEME_KEYS)) {
 $('#cardShape').onchange = (e) => { cardShape = e.target.value === 'wide' ? 'wide' : 'tall'; window.api.setSettings({ cardShape }); applyShape(); layoutGrid(); load(); };
 $('#wideLogos').onchange = (e) => { wideLogos = e.target.checked; window.api.setSettings({ wideLogos }); load(); };
 $('#hideNames').onchange = (e) => { hideNames = e.target.checked; window.api.setSettings({ hideNames }); applyShape(); load(); };
-$('#cardSize').oninput = (e) => setCardSize(parseInt(e.target.value, 10));
-$('#sizeQuick').oninput = (e) => setCardSize(parseInt(e.target.value, 10));
-// Ctrl + rueda sobre la biblioteca: acerca o aleja las portadas
+// Tamaño de las portadas POR COLUMNAS: las portadas llenan la fila justa, así que su tamaño solo cambia cuando cabe una
+// columna más o una menos. Antes el deslizador iba en píxeles y muchas posiciones no hacían nada; ahora cada paso es una
+// columna menos (más grandes, a la derecha) o una más, y siempre se nota. Se sigue guardando el tamaño en píxeles (por pantalla).
+let gridM = null; // última medida de la cuadrícula: { avail, gap, k } (k = 1,9 con portadas anchas)
+function measureGrid() {
+  const g = $('#grid');
+  if (!g || !g.clientWidth) return gridM; // oculta (p. ej. en la ficha de un juego): la última medida
+  const cs = getComputedStyle(g);
+  gridM = { avail: g.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0), gap: parseFloat(cs.columnGap) || 0,
+    k: g.classList.contains('wide-cards') && !g.classList.contains('coll-grid') ? 1.9 : 1 };
+  return gridM;
+}
+const colsFor = (size, m) => Math.max(1, Math.floor((m.avail + m.gap) / (Math.round(size * m.k) + m.gap)));
+const sizeForCols = (n, m) => Math.floor((m.avail - m.gap * (n - 1)) / n / m.k); // tamaño con el que caben justo n columnas
+function colRange(m) { return { most: colsFor(CARD_MIN, m), fewest: colsFor(CARD_MAX, m) }; }
+// pone los deslizadores en «columnas»: 0 = la mayor cantidad (más pequeñas) … máximo = la menor (más grandes)
+function syncSizeSliders() {
+  const m = measureGrid(); if (!m) return;
+  const r = colRange(m), cur = colsFor(cardSize, m);
+  for (const id of ['#sizeQuick', '#cardSize']) {
+    const s = $(id); if (!s) continue;
+    s.min = 0; s.max = Math.max(1, r.most - r.fewest); s.step = 1; s.value = r.most - Math.min(r.most, Math.max(r.fewest, cur));
+    s.title = `Tamaño de las portadas: ${cur} ${cur === 1 ? 'columna' : 'columnas'} (también Ctrl + rueda del ratón)`;
+  }
+}
+function setCardCols(n) {
+  const m = measureGrid(); if (!m) return;
+  const r = colRange(m);
+  n = Math.min(r.most, Math.max(r.fewest, n));
+  setCardSize(Math.min(CARD_MAX, Math.max(CARD_MIN, sizeForCols(n, m))));
+  syncSizeSliders();
+}
+const onSizeSlider = (e) => { const m = measureGrid(); if (!m) return; setCardCols(colRange(m).most - parseInt(e.target.value, 10)); };
+$('#cardSize').oninput = onSizeSlider;
+$('#sizeQuick').oninput = onSizeSlider;
+// Ctrl + rueda sobre la biblioteca: una columna menos (acercar) o una más (alejar)
 $('#grid').addEventListener('wheel', (e) => {
   if (!e.ctrlKey) return;
   e.preventDefault();
-  setCardSize(cardSize + (e.deltaY < 0 ? 10 : -10));
+  const m = measureGrid(); if (!m) return;
+  setCardCols(colsFor(cardSize, m) + (e.deltaY < 0 ? -1 : 1));
 }, { passive: false });
 $('#saveMyTheme').onclick = saveMyTheme;
 $('#themeName').onkeydown = (e) => { if (e.key === 'Enter') saveMyTheme(); };
@@ -4480,7 +4519,7 @@ window.api.gameState().then(applyRunState).catch(() => {});
   buildLibraries();
   applyTheme(theme);
   applyCardSize();
-  $('#sizeQuick').value = cardSize;
+  syncSizeSliders();
   applyBackground();
   if (bg.path) { // si el archivo ya no existe, se quita el fondo en silencio
     const probe = isVideoPath(bg.path) ? document.createElement('video') : new Image(); // un vídeo no se puede comprobar como imagen

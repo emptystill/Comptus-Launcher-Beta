@@ -1,5 +1,7 @@
 # Comptus
 
+> **Tus juegos, un solo lugar.**
+
 Una sola interfaz para tus juegos de **Steam**, **Epic Games**, **GOG**, **Ubisoft Connect**, **Xbox / Game Pass** y los que tienes **locales** (cualquier .exe).
 
 ## Cómo ejecutarlo (Windows)

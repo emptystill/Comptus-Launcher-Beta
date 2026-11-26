@@ -3259,15 +3259,18 @@ main > .toolbar #couchBtn { position: relative; right: auto; top: auto; transfor
    Dos franjas inclinadas (una ancha de luz de cristal y otra fina con el color de acento) se deslizan de derecha a izquierda
    desde completamente fuera hasta completamente fuera de la portada, así que la recorren entera; el borde se enciende con el acento. */
 .card-glare { position: absolute; inset: 0; z-index: 3; border-radius: inherit; overflow: hidden; pointer-events: none; opacity: 0; }
-.card-glare::before, .card-glare::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; transform: translateX(260%) skewX(-22deg); }
-.card-glare::before { width: 55%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.05) 25%, rgba(255,255,255,.18) 50%, rgba(255,255,255,.05) 75%, transparent); }
-.card-glare::after { width: 55%; background: linear-gradient(90deg, transparent 62%, color-mix(in srgb, color-mix(in srgb, var(--accent) 70%, #fff) 50%, transparent) 69%, transparent 76%); } /* mismo ancho que la ancha (el % de translateX es sobre el propio ancho); la línea fina va dibujada dentro */
-/* rendimiento: el borde de acento es fijo y solo cambia la opacidad del conjunto (antes se animaba la sombra y se redibujaba cada fotograma) */
-.card.shining > .card-glare { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 75%, transparent), inset 0 0 16px color-mix(in srgb, var(--accent) 30%, transparent); animation: cardGlareFade 1s linear 0s 1 both; }
-.card.shining > .card-glare::before, .card.shining > .card-glare::after { will-change: transform; }
-.card.shining > .card-glare::before, .card.shining > .card-glare::after { animation: cardShine 1s cubic-bezier(.35,.15,.35,1) 0s 1 both; }
-@keyframes cardShine { from { transform: translateX(260%) skewX(-22deg); } to { transform: translateX(-260%) skewX(-22deg); } }
-@keyframes cardGlareFade { 0% { opacity: 0; } 6% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+/* El reflejo: toda la capa se funde con la portada en modo «screen» (suma luz), así la luz aclara la propia imagen
+   (antes era luz blanca pintada encima y se veía como una línea). Franja principal ancha y difuminada con un núcleo brillante,
+   una segunda más tenue con el color de acento detrás, y un brillo suave arriba, como en una superficie pulida.
+   (Dentro de la capa no puede ir el borde de acento: ya lo pone el propio borde de la portada al pasar el ratón.) */
+.card-glare { mix-blend-mode: screen; background: radial-gradient(ellipse 90% 45% at 15% 0%, rgba(255,255,255,.38), rgba(255,255,255,0) 70%); }
+.card-glare::before, .card-glare::after { content: ''; position: absolute; top: -10%; bottom: -10%; left: 0; width: 75%; transform: translateX(185%) skewX(-22deg); }
+.card-glare::before { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.08) 34%, rgba(255,255,255,.35) 46%, rgba(255,255,255,.95) 49.3%, #fff 50%, rgba(255,255,255,.95) 50.7%, rgba(255,255,255,.35) 54%, rgba(255,255,255,.08) 66%, rgba(255,255,255,0) 100%); } /* núcleo intenso y definido: destaca sobre la portada iluminada */
+.card-glare::after { background: linear-gradient(90deg, transparent 52%, color-mix(in srgb, color-mix(in srgb, var(--accent) 65%, #fff) 55%, transparent) 70%, transparent 88%); }
+.card.shining > .card-glare { animation: cardGlareFade .9s linear 0s 1 both; }
+.card.shining > .card-glare::before, .card.shining > .card-glare::after { will-change: transform; animation: cardShine .9s cubic-bezier(.2,.55,.4,1) 0s 1 both; } /* arranca con velocidad desde el primer instante */
+@keyframes cardShine { from { transform: translateX(185%) skewX(-22deg); } to { transform: translateX(-150%) skewX(-22deg); } } /* justo de fuera a fuera: sin tramos invisibles */
+@keyframes cardGlareFade { 0% { opacity: .35; } 4% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
 .card.complete > .card-glare { border-radius: 12px; }
 @media (prefers-reduced-motion: reduce) { .card.shining > .card-glare { animation: none; opacity: 0; } }
 /* Próxima versión · Página de perfil de Comptus */
@@ -3433,3 +3436,49 @@ main > .toolbar #couchBtn { position: relative; right: auto; top: auto; transfor
 .pf-name-input { font-size: clamp(22px, 2.6vw, 34px); font-family: 'Audiowide', 'Segoe UI', sans-serif; letter-spacing: .03em; padding: 6px 12px; max-width: 520px;
   border-radius: 10px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--panel) 80%, transparent); color: var(--text); }
 .pf-hero { padding-top: 56px; }
+/* Próxima versión · Mientras pasa el reflejo, la portada entera destella un instante: un velo de luz en la misma capa del reflejo
+   (modo «screen»), que sube y baja. (Con un filtro de brillo en la imagen, el navegador la pasa a otra capa y el reflejo dejaba de verse.) */
+.card.shining > .card-glare { animation: cardGlareFade .9s linear 0s 1 both, cardFlash .9s ease-out 0s 1 both; }
+@keyframes cardFlash { 0% { box-shadow: inset 0 0 0 999px rgba(255,255,255,0); } 22% { box-shadow: inset 0 0 0 999px rgba(255,255,255,.17); } 100% { box-shadow: inset 0 0 0 999px rgba(255,255,255,0); } }
+/* Próxima versión · «Ocultos»: solo el icono del ojo, abajo a la derecha junto al deslizador de tamaño de las portadas
+   (se ve y se oculta con él: solo donde hay portadas, nunca en el modo consola) */
+.hidden-link { position: fixed; right: 194px; bottom: 1px; z-index: 40; width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; border-radius: 8px; color: var(--muted); opacity: .55; cursor: pointer; transition: opacity .15s, background .15s; }
+.hidden-link .ic { width: 17px; height: 17px; }
+.hidden-link:hover { opacity: 1; background: color-mix(in srgb, var(--text) 8%, transparent); border: 0; }
+.hidden-link.active { opacity: 1; color: var(--accent); }
+body:has(.toolbar.hidden) .hidden-link:not(.active), body.couch-on .hidden-link, body.no-cards .hidden-link { display: none; }
+/* Próxima versión · El ojo de «Ocultos» a la DERECHA del deslizador de tamaño (el deslizador se aparta un poco del borde) */
+#sizeQuick.size-corner { right: 50px; }
+.hidden-link { right: 12px; bottom: 2px; }
+/* sin ocultos (no hay ojo), el deslizador vuelve a su sitio */
+body:not(:has(#hiddenLink:not(.hidden))) #sizeQuick.size-corner { right: 16px; }
+/* Próxima versión · menú superior sin negrita */
+.top-item { font-weight: 400; }
+/* Próxima versión · menú centrado de verdad: tres columnas (hueco · apartados · campana y perfil), los apartados en el centro de la ventana */
+.top-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+.top-items { grid-column: 2; justify-content: center; flex: none; }
+.top-right { grid-column: 3; justify-self: end; display: flex; align-items: center; gap: 10px; }
+.top-right #bellBtn { margin-left: 0; }
+.top-nav #bellBtn + .top-profile { margin-left: 0; }
+@media (max-width: 1000px), (orientation: portrait) { .top-nav { display: flex; } .top-items { flex: 1 1 auto; justify-content: flex-start; } .top-right { margin-left: auto; } } /* estrecho o vertical: como antes (los apartados pueden pasar a otra línea) */
+/* Próxima versión · Eslogan bajo la marca de la barra lateral («un solo lugar» en el color del final del degradado del logo) */
+.brand-tag { text-align: center; font-size: 12.5px; letter-spacing: .02em; color: var(--muted); margin: -10px 0 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand-tag b { font-weight: 600; color: var(--accent-2); }
+.brand-tag { margin-top: -18px; } /* pegado al logo (la barra lateral ya separa 6 px y la marca deja 16 px debajo) */
+/* Próxima versión · Menú superior en vertical (monitor girado): una sola línea, apartados repartidos de forma uniforme y letra algo menor
+   (antes pasaban a una segunda línea, alineados a la izquierda, y se veía desordenado). Si no cupieran, se desplazan de lado. */
+@media (max-width: 1000px), (orientation: portrait) {
+  .top-items { flex-wrap: nowrap; justify-content: space-between; column-gap: 12px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; min-width: 0; }
+  .top-items::-webkit-scrollbar { display: none; }
+  .top-item { font-size: 13px; letter-spacing: .03em; flex: none; }
+  .top-count { font-size: 10px; padding: 2px 5px; }
+  .top-nav { gap: 14px; }
+}
+/* Menú en vertical: la letra se ajusta al ancho del menú (11–14 px) para que los siete apartados quepan siempre en una línea */
+@media (max-width: 1000px), (orientation: portrait) {
+  .top-nav { container-type: inline-size; }
+  .top-item { font-size: clamp(11px, 1.6cqw, 14px); letter-spacing: .02em; }
+  .top-items { column-gap: clamp(8px, 1.4cqw, 14px); }
+  .top-right { gap: 8px; }
+}

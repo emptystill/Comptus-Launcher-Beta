@@ -11,6 +11,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: transparent;
 .name { font-family: 'Audiowide', 'Segoe UI', sans-serif; font-size: 40px; letter-spacing: .08em; line-height: 1; background: linear-gradient(90deg, var(--a), var(--b)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .bar { width: 180px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 8px; }
 .bar i { display: block; width: 40%; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--a), var(--b)); animation: slide 1.2s ease-in-out infinite; }
+.tag { font: 14px 'Segoe UI', sans-serif; letter-spacing: .02em; color: rgba(255,255,255,.62); margin-top: -4px; }
+.tag b { font-weight: 600; color: var(--b); } /* «un solo lugar» destacado con el color del tema */
 .ver { position: absolute; bottom: 12px; font: 11px 'Segoe UI', sans-serif; color: rgba(255,255,255,.35); }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 @keyframes slide { 0% { transform: translateX(-110%); } 100% { transform: translateX(280%); } }
@@ -19,6 +21,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: transparent;
 <body><div class="card">
 <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="13" r="1"/><circle cx="18" cy="11" r="1"/><path d="M17.3 5H6.7a4 4 0 0 0-3.9 3.2l-1.7 8A3 3 0 0 0 4 20c1 0 1.6-.6 2.2-1.4L8 16h8l1.8 2.6c.6.8 1.2 1.4 2.2 1.4a3 3 0 0 0 2.9-3.8l-1.7-8A4 4 0 0 0 17.3 5z"/></svg>
 <div class="name">Comptus</div>
+<div class="tag">Tus juegos, <b>un solo lugar</b>.</div>
 <div class="bar"><i></i></div>
 <div class="ver" id="v"></div>
 </div>

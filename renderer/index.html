@@ -11,11 +11,11 @@
 <body>
   <aside class="sidebar">
     <h1 class="brand"><i data-ic="gamepad"></i> <span class="brand-name">Comptus</span></h1>
+    <div class="brand-tag">Tus juegos, <b>un solo lugar</b>.</div>
     <nav id="filters">
       <button class="filter active" data-filter="all"><i data-ic="gamepad"></i> Página principal <span class="count" data-count="all"></span></button>
       <button class="filter" data-filter="favorites"><i data-ic="star"></i> Favoritos <span class="count" data-count="favorites"></span></button>
       <button class="filter" data-filter="recent"><i data-ic="clock"></i> Recientes <span class="count" data-count="recent"></span></button>
-      <button class="filter" data-filter="hidden"><i data-ic="eyeOff"></i> Ocultos <span class="count" data-count="hidden"></span></button>
       <div class="nav-title collapsible" data-sec="sources" title="Mostrar u ocultar esta sección"><span class="sec-chev"><i data-ic="chevD"></i></span>Bibliotecas</div>
       <div id="sourceFilters"></div>
       <!-- Colecciones: ahora en el menú superior (se dejan ocultas porque el código las sigue usando) -->
@@ -24,6 +24,8 @@
     </nav>
     <div class="nav-title list-title collapsible" data-sec="games" title="Mostrar u ocultar esta sección"><span><span class="sec-chev"><i data-ic="chevD"></i></span>Juegos</span> <span class="count" id="listCount"></span></div>
     <div id="gameList" class="game-list"></div>
+    <!-- Ocultos: solo un icono, junto al deslizador de tamaño de portadas (abajo a la derecha; renderer.js lo lleva allí) -->
+    <button id="hiddenLink" type="button" class="hidden-link hidden" title="Ver los juegos que ocultaste"><i data-ic="eyeOff"></i></button>
     <button id="openTheme"><i data-ic="settings"></i> Configuración</button>
     <button id="addLocal" class="primary">＋ Agregar juego local</button>
   </aside>
@@ -41,7 +43,7 @@
         <button class="top-item" data-top="community">Comunidad</button>
         <button class="top-item" data-top="stats">Estadísticas</button>
       </div>
-      <button id="topProfile" class="top-profile hidden"><img alt="" /><span class="tp-name"></span></button>
+      <div class="top-right"><button id="topProfile" class="top-profile hidden"><img alt="" /><span class="tp-name"></span></button></div>
     </nav>
     <!-- Barra de iconos: con la ventana en horizontal, columna a la derecha; en vertical, fila debajo del menú -->
     <header class="toolbar">

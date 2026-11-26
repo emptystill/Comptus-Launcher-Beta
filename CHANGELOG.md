@@ -1134,6 +1134,15 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.109
+- **Destello de las portadas, ahora como un reflejo:** la luz se funde con la portada (suma luz a la propia imagen) en lugar de pintar una franja blanca encima, que se veía como una línea. Franja ancha y difuminada con un núcleo brillante, otra más tenue con tu color de acento y un brillo suave arriba, como en una superficie pulida. Cruza la portada entera a ritmo uniforme, de fuera a fuera, con un núcleo de luz intenso que contrasta bien; mientras pasa, la portada entera destella un instante y vuelve a su brillo normal.
+- **«Ocultos», más discreto:** sale de la barra lateral y queda solo como un icono de ojo, abajo a la derecha, a la derecha del deslizador de tamaño de las portadas (con el número de ocultos al pasar el ratón). Solo aparece si tienes juegos ocultos.
+- **Tamaño de las portadas, preciso:** el deslizador (y el de Configuración, y Ctrl + rueda) va ahora por columnas: cada paso pone o quita una columna, así que siempre cambia el tamaño. Antes iba en píxeles y, como las portadas llenan la fila justa, muchas posiciones no hacían nada.
+- Las portadas y las tarjetas de colección ya no muestran el recuadro con el nombre al dejar el ratón encima.
+- **Eslogan: «Tus juegos, un solo lugar.»** En la pantalla de inicio y bajo la marca de la barra lateral (con «un solo lugar» en el color del tema), en el README y en el instalador.
+- **Instalador con el estilo de Comptus:** imágenes nuevas (lateral de la bienvenida y del final, cabecera y lateral del desinstalador) con el fondo oscuro, el degradado rosa y cian del logo y el eslogan; una pantalla de **bienvenida** que antes no había (no sale al actualizar) y textos propios en la pantalla final («¡Todo listo!»).
+- **Menú superior más ligero y centrado:** los apartados van sin negrita y centrados en la ventana (la campana y tu perfil, a la derecha). En vertical van en una sola línea, repartidos de forma uniforme y con la letra ajustada al ancho, para que siempre quepan.
+
 ## 1.84.108
 - **Ventana «Iniciando juego»**: al pulsar Jugar aparece una ventana propia, por encima de todo y sin quitar el foco, centrada en la pantalla de Comptus. Es vertical, como una carta, con el estilo de Comptus y los colores de tu tema: el banner del juego desenfocado de fondo, la portada grande e inclinada con un brillo de acento, la marca «COMPTUS», el estado y un botón para abrir su launcher, con una barra de progreso en el borde. Cuando el juego pasa al frente (o se detecta en marcha) muestra «En ejecución» y se cierra, siempre después de al menos 3 s en pantalla para que dé tiempo a verla (como mucho 25 s si el juego no llega a verse); si algo falla, lo explica ahí mismo. No sale al instalar ni en el modo consola.
 

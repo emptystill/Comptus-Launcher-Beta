@@ -28,6 +28,20 @@ Var txtMedia
   SetRegView 32
 !macroend
 
+; Pantalla de bienvenida (electron-builder no pone ninguna: la imagen lateral solo salía al final). Al actualizar no aparece.
+!macro customWelcomePage
+  !insertmacro skipPageIfUpdated
+  !define MUI_WELCOMEPAGE_TITLE "Te damos la bienvenida a Comptus"
+  !define MUI_WELCOMEPAGE_TEXT "Tus juegos, un solo lugar.$\r$\n$\r$\nComptus reúne en una sola biblioteca tus juegos de Steam, Epic Games, Xbox, Ubisoft Connect, GOG y los que tienes en tu equipo.$\r$\n$\r$\nPulsa Siguiente para empezar."
+  !insertmacro MUI_PAGE_WELCOME
+!macroend
+
+; Textos propios en la pantalla final del instalador (la casilla «Ejecutar Comptus» la sigue poniendo electron-builder)
+!ifndef BUILD_UNINSTALLER
+  !define MUI_FINISHPAGE_TITLE "¡Todo listo!"
+  !define MUI_FINISHPAGE_TEXT "Comptus ya está instalado.$\r$\n$\r$\nTus juegos, un solo lugar: ábrelo y empieza a jugar."
+!endif
+
 !macro customInit
   !ifndef BUILD_UNINSTALLER
   StrCpy $OptDesk ${BST_CHECKED}
@@ -38,7 +52,7 @@ Var txtMedia
 
 !ifndef BUILD_UNINSTALLER
 Function ComptusOptsCreate
-  !insertmacro MUI_HEADER_TEXT "Personaliza tu instalación" "Elige cómo quieres tener Comptus en tu equipo."
+  !insertmacro MUI_HEADER_TEXT "Personaliza tu instalación" "Tus juegos, un solo lugar. Elige cómo quieres tener Comptus en tu equipo."
   nsDialogs::Create 1018
   Pop $0
   ${If} $0 == error
