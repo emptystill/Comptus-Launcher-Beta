@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.111
+- **Interruptor para la animación de tamaño** (Configuración, junto al tamaño de las portadas): al pasar la ventana a otra pantalla, las portadas pueden cambiar de tamaño con la animación (se deslizan y se asientan con un pequeño rebote) o al instante. Viene activado.
+
 ## 1.84.110
 - **Ficha del juego más limpia:** arriba a la derecha solo se ve «⋯»; al pulsarlo se despliegan a su izquierda los botones de personalizar (banner, portada, icono, logotipo y color) y un engranaje con las opciones del juego. Se recogen con otro clic en «⋯» o haciendo clic en cualquier otra parte. Las opciones del juego también siguen con clic derecho en la cabecera.
 

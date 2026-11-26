@@ -3482,9 +3482,10 @@ function applyCardSize() {
 // Un solo lugar para cambiar el tamaño: sincroniza los dos controles y guarda
 // Al cambiar de pantalla (otro monitor o giro): se recupera el tamaño guardado para esa pantalla; si es nueva, se conserva el actual
 let screenT = null;
+let sizeAnim = true; // Configuración: animar las portadas al cambiar de tamaño por cambio de pantalla (si no, cambian al instante)
 function switchCardSize(saved) { // cambio de pantalla: cada portada viaja (posición y tamaño) de donde estaba a donde queda, sin parpadeo
   const g = $('#grid'), apply = () => { cardSize = saved; applyCardSize(); syncSizeSliders(); saveTheme(); };
-  if (!g || !g.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return; }
+  if (!sizeAnim || !g || !g.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return; }
   const kids = Array.from(g.children), first = new Map(), clamp = (v, m) => Math.max(-m, Math.min(m, v));
   if (kids.length <= 2500) kids.forEach((el) => { const r = el.getBoundingClientRect(); if (r.width) first.set(el, r); }); // posición de todas, también las que no se veían (en vertical caben muchas más)
   apply();
@@ -4105,6 +4106,7 @@ for (const [id, key] of Object.entries(THEME_KEYS)) {
 }
 $('#cardShape').onchange = (e) => { cardShape = e.target.value === 'wide' ? 'wide' : 'tall'; window.api.setSettings({ cardShape }); applyShape(); layoutGrid(); load(); };
 $('#wideLogos').onchange = (e) => { wideLogos = e.target.checked; window.api.setSettings({ wideLogos }); load(); };
+$('#sizeAnim').onchange = (e) => { sizeAnim = e.target.checked; window.api.setSettings({ sizeAnim }); };
 $('#hideNames').onchange = (e) => { hideNames = e.target.checked; window.api.setSettings({ hideNames }); applyShape(); load(); };
 // Tamaño de las portadas POR COLUMNAS: las portadas llenan la fila justa, así que su tamaño solo cambia cuando cabe una
 // columna más o una menos. Antes el deslizador iba en píxeles y muchas posiciones no hacían nada; ahora cada paso es una
@@ -4490,6 +4492,7 @@ window.api.gameState().then(applyRunState).catch(() => {});
   cardShape = s && s.cardShape === 'wide' ? 'wide' : 'tall'; hideNames = !!(s && s.hideNames); wideLogos = !(s && s.wideLogos === false);
   $('#wideLogos').checked = wideLogos;
   $('#cardShape').value = cardShape; $('#hideNames').checked = hideNames; applyShape();
+  sizeAnim = !(s && s.sizeAnim === false); $('#sizeAnim').checked = sizeAnim;
   if (s && s.background) bg = { ...bg, ...s.background };
   if (window.__diceRestore) window.__diceRestore(s);
   freeCountrySel = (s && s.freeCountry) || '';
