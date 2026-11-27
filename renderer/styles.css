@@ -3599,3 +3599,13 @@ body.list-mode:not(:has(#hiddenLink:not(.hidden))) .view-corner { right: 16px; }
 .grid:not(.list-view) .card.complete:hover::before { box-shadow: inset 0 0 0 2px rgba(255,220,110,1), 0 0 24px rgba(245,184,46,.75); }
 @keyframes goldBreath { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 @media (prefers-reduced-motion: reduce) { .grid .card.complete::before { animation: none; } }
+
+/* Próxima versión · menú superior adaptable a cualquier tamaño: renderer.js (fitTopNav) mide el hueco libre y fija --nav-fs.
+   Siempre en una línea; centrado si cabe, si no ocupa el hueco a la izquierda de la campana y el perfil, sin montarse nunca encima. */
+#topNav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
+#topNav .top-items { flex-wrap: nowrap; justify-content: center; column-gap: calc(var(--nav-fs, 18px) * 1.3); min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+#topNav .top-item { font-size: var(--nav-fs, 18px); flex: none; }
+#topNav.nav-left { display: flex; }
+#topNav.nav-left .top-items { flex: 1 1 auto; justify-content: space-between; }
+#topNav.nav-left .top-right { margin-left: auto; }
+#topNav.nav-wrap .top-items { flex-wrap: wrap; justify-content: center; overflow: visible; row-gap: 2px; }

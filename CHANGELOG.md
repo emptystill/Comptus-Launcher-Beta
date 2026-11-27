@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.117
+- **Menú superior adaptable a cualquier tamaño de ventana:** en anchos intermedios los apartados (Biblioteca, Colecciones… Estadísticas) se montaban encima de la campana y del perfil. Ahora Comptus mide el hueco que queda de verdad y ajusta la letra al momento: centrados si caben, si no ocupan el hueco a la izquierda de la campana, y con la ventana muy estrecha pasan a dos líneas. Nunca se montan ni se cortan.
+
 ## 1.84.116
 - **Iconos de los logros nuevos de Steam:** los logros que un juego añade más tarde (p. ej. los recientes de The Division 2) salían con el icono roto. Steam sigue dando sus direcciones en su servidor antiguo, donde esos iconos ya no están; ahora Comptus los pide al servidor actual, que tiene todos. Los logros ya guardados se corrigen solos al abrir Comptus.
 

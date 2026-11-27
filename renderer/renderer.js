@@ -992,6 +992,41 @@ async function renderProfile() {
 // al volver a la ventana se actualiza (p. ej. si acabas de iniciar o cerrar sesión en una tienda); Steam y Xbox van con caché
 // Dónde termina el menú superior (la fila de iconos desplegable cuelga justo debajo)
 try { const nav = $('#topNav'); new ResizeObserver(() => document.querySelector('main').style.setProperty('--nav-h', (nav.offsetTop + nav.offsetHeight) + 'px')).observe(nav); } catch { /* sin ResizeObserver: altura por defecto */ }
+// Menú superior adaptable: mide el hueco que queda de verdad (sin la campana y el perfil) y ajusta la letra para que los apartados
+// quepan siempre en una línea sin montarse encima. Si caben centrados en la ventana, van centrados; si no, ocupan todo el hueco a la izquierda.
+function fitTopNav() {
+  const nav = $('#topNav'); if (!nav || !nav.offsetWidth) return;
+  const items = nav.querySelector('.top-items'), right = nav.querySelector('.top-right');
+  const cs = getComputedStyle(nav);
+  const navW = nav.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const rightW = right ? right.offsetWidth : 0, GAP = 16, MIN = 11, CENTER_MIN = 14;
+  const maxF = Math.min(21, Math.max(15, window.innerWidth * 0.0135));
+  const kids = [...items.children].filter((k) => k.offsetWidth || k.getClientRects().length);
+  const widthAt = (f) => { nav.style.setProperty('--nav-fs', f.toFixed(2) + 'px'); return kids.reduce((t, k) => t + k.offsetWidth, 0) + f * 1.3 * (kids.length - 1); };
+  const center = navW - 2 * (rightW + GAP), left = navW - rightW - GAP;
+  let f = maxF, w = widthAt(f), mode = 'center';
+  if (w > center) {
+    f = Math.max(MIN, maxF * center / w); w = widthAt(f);
+    if (f < CENTER_MIN) { mode = 'left'; f = Math.max(MIN, Math.min(maxF, maxF * left / widthAt(maxF))); w = widthAt(f); }
+  }
+  const room = mode === 'center' ? center : left;
+  for (let i = 0; i < 12 && f > MIN && w > room; i++) { f = Math.max(MIN, f - 0.5); w = widthAt(f); } // ajuste fino (los contadores no crecen con la letra)
+  if (w > room) { mode = 'wrap'; f = Math.max(MIN, Math.min(15, maxF * left * 1.8 / widthAt(maxF))); widthAt(f); } // ni con la letra mínima: en dos líneas, nunca cortado
+  nav.classList.toggle('nav-left', mode !== 'center');
+  nav.classList.toggle('nav-wrap', mode === 'wrap');
+}
+{
+  let fitRaf = 0;
+  const fitSoon = () => { cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(fitTopNav); };
+  try {
+    const nav = $('#topNav');
+    const ro = new ResizeObserver(fitSoon); ro.observe(nav); ro.observe(nav.querySelector('.top-right'));
+    new MutationObserver(fitSoon).observe(nav.querySelector('.top-items'), { childList: true, subtree: true, characterData: true }); // contadores que cambian
+  } catch { /* sin observadores: se ajusta al cambiar el tamaño de la ventana */ }
+  window.addEventListener('resize', fitSoon);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSoon);
+  fitSoon();
+}
 { let last = Date.now(); addEventListener('focus', () => { if (Date.now() - last > 30000) { last = Date.now(); paintTopProfile(); } }); }
 let statsYear = null, statsSessions = [], statsLoaded = false;
 async function renderStats() {
