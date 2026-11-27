@@ -1134,6 +1134,9 @@ En el estilo «Xbox 360 (panel moderno)» del modo consola, cada apartado imita 
 ## 1.84.42 · Xbox 360: resumen del juego mejor repartido
 El resumen pone en una sola fila las fichas, el tráiler/capturas y, a la derecha, la portada con los datos. Antes los datos caían bajo el tráiler y se montaban con la barra de ayuda.
 
+## 1.84.118
+- **Imágenes de SteamGridDB para juegos nuevos o renombrados:** antes solo se buscaban al abrir Comptus, y si un juego no se encontraba no se volvía a intentar en dos semanas aunque le cambiaras el nombre. Ahora se buscan al momento cuando aparece un juego nuevo (por ejemplo uno añadido a mano) y, si le cambias el nombre, se vuelve a buscar con el nuevo.
+
 ## 1.84.117
 - **Menú superior adaptable a cualquier tamaño de ventana:** en anchos intermedios los apartados (Biblioteca, Colecciones… Estadísticas) se montaban encima de la campana y del perfil. Ahora Comptus mide el hueco que queda de verdad y ajusta la letra al momento: centrados si caben, si no ocupan el hueco a la izquierda de la campana, y con la ventana muy estrecha pasan a dos líneas. Nunca se montan ni se cortan.
 

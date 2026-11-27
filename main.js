@@ -511,7 +511,7 @@ async function refreshLibrary() {
     libLastRefresh = Date.now();
     libFresh = { t: Date.now(), lib: fresh };
     writeLibCache(fresh);
-    if (JSON.stringify(fresh) !== before) sendWin('library:changed');
+    if (JSON.stringify(fresh) !== before) { sendWin('library:changed'); sgdbSoon(fresh); }
   } catch (e) { if (process.env.COMPTUS_DEBUG) console.error(e); }
   finally { libRefreshing = false; }
 }
@@ -541,7 +541,7 @@ ipcMain.handle('library:get', async () => {
     }
   }
   if (libFresh && Date.now() - libFresh.t < 8000) return libFresh.lib; // acaba de actualizarse sola: no se escanea otra vez
-  const lib = await getLibrary(); libLastRefresh = Date.now(); writeLibCache(lib); return lib;
+  const lib = await getLibrary(); libLastRefresh = Date.now(); writeLibCache(lib); sgdbSoon(lib); return lib; // juegos añadidos o renombrados: sus imágenes se buscan ya
 });
 ipcMain.handle('sources:get', () => sourcesInfo());
 ipcMain.handle('game:launch', (_e, id) => launchGame(id));
@@ -1527,12 +1527,12 @@ async function sgdbSave(kind, gameName, url) {
     return true;
   } catch { return false; } finally { clearTimeout(t); }
 }
-async function runSgdb(kinds, silent) {
+async function runSgdb(kinds, silent, list) {
   const st = loadStore(); const key = String(st.settings.sgdbKey || '').trim();
   if (!key) return { ok: false, error: 'Escribe primero tu clave de SteamGridDB.' };
   if (sgdbRun) return { ok: false, error: 'Ya se están descargando imágenes.' };
   const want = (kinds && kinds.length ? kinds : ['cover', 'banner', 'logo']).filter((k) => sgdb.KINDS[k]);
-  const games = await getLibrary();
+  const games = list || await getLibrary();
   let tried = {}; try { tried = JSON.parse(fs.readFileSync(sgdbTriedFile(), 'utf8')) || {}; } catch { /* primera vez */ }
   const replace = (Array.isArray(st.settings.sgdbReplace) ? st.settings.sgdbReplace : []).filter((k) => want.includes(k));
   const todo = sgdb.pending(games, want, tried, Date.now(), SGDB_RETRY, replace);
@@ -1550,7 +1550,7 @@ async function runSgdb(kinds, silent) {
           for (const kind of ks) {
             let ok = false;
             if (found) { const im = await sgdb.findImage({ gameId: found.id, kind, key, getJson: sgdbJson }); if (im) ok = await sgdbSave(kind, game.name, im.url); }
-            tried[`${game.id}|${kind}`] = Date.now();
+            tried[`${game.id}|${kind}`] = Date.now(); tried[`${game.id}|name`] = game.name;
             if (ok) res.added++; else res.missed.push({ name: game.name, kind });
           }
         } catch (e) {
@@ -1575,6 +1575,12 @@ ipcMain.handle('sgdb:test', (_e, key) => sgdb.testKey({ key: String(key || '').t
 ipcMain.handle('sgdb:fill', () => runSgdb(sgdbKinds(), false));
 ipcMain.handle('sgdb:cancel', () => { if (sgdbRun) sgdbRun.cancel = true; return true; });
 // Al abrir Comptus (un minuto después) completa lo que falte, sin avisos
+// …y cuando aparecen juegos nuevos o cambias un nombre: se buscan sus imágenes al momento, sin avisos
+let sgdbSoonT = null;
+function sgdbSoon(list) {
+  clearTimeout(sgdbSoonT);
+  sgdbSoonT = setTimeout(() => { const s = loadStore().settings; if (s.sgdbKey && s.sgdbAuto !== false && !sgdbRun) runSgdb(sgdbKinds(), true, list || cache).catch(() => {}); }, 4000);
+}
 function backgroundSgdb() {
   setTimeout(() => { const s = loadStore().settings; if (s.sgdbKey && s.sgdbAuto !== false) runSgdb(sgdbKinds(), true).catch(() => {}); }, 60000);
 }

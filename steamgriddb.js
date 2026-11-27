@@ -60,7 +60,8 @@ function pending(games, kinds, tried, now, retryMs, replace) {
       if (g[kind] && !(rep.has(kind) && /^https?:\/\//i.test(String(g[kind])))) continue;
       if (kind === 'logo' && g.logoOff) continue;
       const t = tried && tried[`${g.id}|${kind}`];
-      if (t && now - t < retryMs) continue;
+      const sameName = !tried || !(`${g.id}|name` in tried) || tried[`${g.id}|name`] === g.name; // con otro nombre se vuelve a buscar
+      if (t && sameName && now - t < retryMs) continue;
       out.push({ game: g, kind });
     }
   }
